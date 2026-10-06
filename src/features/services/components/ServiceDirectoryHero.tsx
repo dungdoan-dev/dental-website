@@ -10,7 +10,6 @@ export function ServiceDirectoryHero() {
           <Icon className="h-4 w-4 text-slate-300" name="chevron-right" />
           <span aria-current="page" className="font-bold text-brand-blue-dark">Dịch vụ</span>
         </nav>
-        <div className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-white px-3.5 py-1.5 text-[11px] font-extrabold tracking-wide text-brand-blue-dark shadow-sm"><span className="h-2 w-2 rounded-full bg-brand-green" />TIÊU CHUẨN Y KHOA QUỐC TẾ TỪ 1999</div>
         <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-brand-blue-dark sm:text-4xl md:text-[2.75rem]">Dịch Vụ Nha Khoa Chuyên Sâu</h1>
         <p className="mx-auto max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">Hơn 25 năm đồng hành kiến tạo nụ cười khỏe đẹp với công nghệ tân tiến và đội ngũ bác sĩ chuyên khoa giàu kinh nghiệm.</p>
       </div>

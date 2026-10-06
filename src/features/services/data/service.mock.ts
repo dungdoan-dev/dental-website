@@ -13,9 +13,9 @@ const categoryByServiceId: Record<string, ServiceCategory> = {
   "service-1": "implant",
   "service-2": "aesthetic",
   "service-3": "orthodontics",
-  "service-4": "general",
-  "service-5": "surgery",
-  "service-6": "general",
+  "service-4": "periodontics",
+  "service-5": "other",
+  "service-6": "pediatric",
 };
 
 const additionalServices: readonly DentalService[] = [

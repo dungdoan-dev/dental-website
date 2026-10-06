@@ -55,13 +55,21 @@ a {
 }
 
 @keyframes insurance-scroll-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes insurance-scroll-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .insurance-marquee {
@@ -78,13 +86,25 @@ a {
 }
 
 @keyframes vision-slide-in-left {
-  from { opacity: 0; transform: translate3d(-72px, 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+  from {
+    opacity: 0;
+    transform: translate3d(-72px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @keyframes vision-slide-in-right {
-  from { opacity: 0; transform: translate3d(72px, 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+  from {
+    opacity: 0;
+    transform: translate3d(72px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .vision-mission-reveal--left.vision-mission-reveal--pending {
@@ -98,16 +118,56 @@ a {
 }
 
 .vision-mission-reveal--left.vision-mission-reveal--visible {
-  animation: vision-slide-in-left 1400ms ease-in-out both;
+  animation: vision-slide-in-left 2000ms ease-in-out both;
 }
 
 .vision-mission-reveal--right.vision-mission-reveal--visible {
-  animation: vision-slide-in-right 1400ms ease-in-out both;
+  animation: vision-slide-in-right 2000ms ease-in-out both;
 }
 
+@keyframes core-value-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.core-values--pending .core-value-card {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+}
+
+.core-values--visible .core-value-card {
+  animation: core-value-rise 1500ms ease-in-out both;
+}
+
+.core-values--visible .core-value-card:nth-child(2) { animation-delay: 220ms; }
+.core-values--visible .core-value-card:nth-child(3) { animation-delay: 440ms; }
+.core-values--visible .core-value-card:nth-child(4) { animation-delay: 660ms; }
+
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .insurance-marquee { animation: none; }
-  .vision-mission-reveal--pending { opacity: 1 !important; transform: none !important; }
-  .vision-mission-reveal--visible { animation: none !important; }
+  html {
+    scroll-behavior: auto;
+  }
+  .insurance-marquee {
+    animation: none;
+  }
+  .vision-mission-reveal--pending {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .vision-mission-reveal--visible {
+    animation: none !important;
+  }
+  .core-values--pending .core-value-card {
+    opacity: 1;
+    transform: none;
+  }
+  .core-values--visible .core-value-card {
+    animation: none;
+  }
 }

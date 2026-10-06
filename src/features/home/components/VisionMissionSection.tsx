@@ -3,9 +3,9 @@ import { VisionMissionReveal } from "./VisionMissionReveal";
 
 export function VisionMissionSection() {
   return (
-    <section className="bg-white py-16 lg:py-24">
+    <section className="bg-white pb-10 pt-12 lg:pb-12 lg:pt-16">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mb-16 w-full space-y-8">
+        <div className="w-full space-y-8">
           <div className="flex items-center justify-center"><h2 className="text-center text-3xl font-extrabold uppercase tracking-wide text-text-primary sm:text-4xl md:text-5xl">TẦM NHÌN <span className="mx-1 inline-block -translate-y-1 text-4xl font-normal italic text-brand-blue sm:text-5xl md:text-6xl">&amp;</span> SỨ MỆNH</h2></div>
           <div className="w-full space-y-6">
             <VisionMissionReveal direction="left">

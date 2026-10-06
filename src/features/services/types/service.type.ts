@@ -1,9 +1,11 @@
 export type ServiceCategory =
-  | "implant"
+  | "pediatric"
+  | "general"
   | "aesthetic"
   | "orthodontics"
-  | "general"
-  | "surgery";
+  | "implant"
+  | "periodontics"
+  | "other";
 
 export type DentalService = {
   id: string;

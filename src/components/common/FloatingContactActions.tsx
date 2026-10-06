@@ -9,8 +9,6 @@ type ActionType = "phone" | "facebook" | "zalo";
 type ContactAction = {
   id: ActionType;
   ariaLabel: string;
-  heading: string;
-  status: string;
   buttonClassName: string;
   badgeClassName: string;
   linkLabel: (clinic: (typeof siteConfig.clinics)[number]) => string;
@@ -22,8 +20,6 @@ const actions: readonly ContactAction[] = [
   {
     id: "phone",
     ariaLabel: "Gọi điện ngay",
-    heading: "Tổng Đài Hotline",
-    status: "Hỗ trợ nhanh",
     buttonClassName: "bg-brand-green hover:bg-brand-green-dark",
     badgeClassName: "bg-emerald-50 text-brand-green group-hover/item:bg-brand-green",
     linkLabel: (clinic) => `${clinic.district}: ${clinic.phone}`,
@@ -33,8 +29,6 @@ const actions: readonly ContactAction[] = [
   {
     id: "facebook",
     ariaLabel: "Nhắn tin Facebook",
-    heading: "Fanpage Facebook",
-    status: "Tư vấn 24/7",
     buttonClassName: "bg-[#1877f2] hover:bg-[#1264d3]",
     badgeClassName: "bg-blue-50 text-[#1877f2] group-hover/item:bg-[#1877f2]",
     linkLabel: (clinic) => `Fanpage ${clinic.label} ${clinic.district}`,
@@ -44,8 +38,6 @@ const actions: readonly ContactAction[] = [
   {
     id: "zalo",
     ariaLabel: "Chat qua Zalo",
-    heading: "Tư Vấn Trực Tuyến Zalo",
-    status: "Chat ngay",
     buttonClassName: "bg-[#0068ff] hover:bg-[#0058d8]",
     badgeClassName: "bg-sky-50 text-[#0068ff] group-hover/item:bg-[#0068ff]",
     linkLabel: (clinic) => `Zalo ${clinic.label} ${clinic.district}`,
@@ -69,7 +61,6 @@ export function FloatingContactActions() {
         return (
           <div className="group/action relative flex items-center justify-end" key={action.id}>
             <div aria-hidden={!isActive} className={`absolute bottom-0 right-14 z-50 w-[min(16rem,calc(100vw-5.5rem))] rounded-2xl border border-slate-200/90 bg-white p-3 shadow-2xl transition-all duration-300 ${isActive ? "pointer-events-auto translate-x-0 opacity-100" : "pointer-events-none translate-x-2 opacity-0 group-hover/action:pointer-events-auto group-hover/action:translate-x-0 group-hover/action:opacity-100"}`} id={menuId}>
-              <div className="mb-1 flex items-center justify-between border-b border-slate-100 px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400"><span>{action.heading}</span><span className={action.id === "phone" ? "text-brand-green-dark" : action.id === "facebook" ? "text-[#1877f2]" : "text-[#0068ff]"}>{action.status}</span></div>
               <div className="space-y-1.5">
                 {siteConfig.clinics.map((clinic) => <a className="group/item flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-50" href={action.href(clinic)} key={clinic.id} rel={action.id === "phone" ? undefined : "noopener noreferrer"} target={action.id === "phone" ? undefined : "_blank"}><span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors group-hover/item:text-white ${action.badgeClassName}`}>{clinic.label}</span><span className="min-w-0 text-left"><span className="block text-xs font-bold text-text-primary transition-colors group-hover/item:text-brand-blue-dark">{action.linkLabel(clinic)}</span><span className="block truncate text-[11px] text-text-secondary">{clinic.address}</span></span></a>)}
               </div>

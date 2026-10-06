@@ -39,15 +39,21 @@ export function ArticleExplorer({ articles, featuredArticle }: ArticleExplorerPr
     <>
       <section aria-label="Tìm và lọc bài viết" className="bg-surface pb-8">
         <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-          <div className="flex flex-col items-center justify-between gap-4 rounded-2xl bg-white p-3 shadow-sm lg:flex-row">
-            <div className="flex w-full items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
+          <div className="rounded-3xl border border-border-subtle bg-white p-5 shadow-[0_12px_40px_rgba(23,49,58,0.05)] sm:p-7 lg:p-8">
+            <div className="flex flex-col gap-5 border-b border-border-subtle pb-6 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h2 className="text-xl font-extrabold tracking-tight text-text-primary sm:text-2xl">Khám phá kiến thức nha khoa</h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">Tìm bài viết hoặc chọn chuyên mục bạn quan tâm.</p>
+              </div>
+              <label className="relative block w-full lg:max-w-80"><span className="sr-only">Tìm bài viết</span><Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary" name="search" /><input className="w-full rounded-xl border border-border-subtle bg-background-secondary py-3 pl-11 pr-4 text-sm text-text-primary outline-none transition focus:border-brand-blue focus:bg-white focus:ring-2 focus:ring-brand-blue/20" onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Tìm bài viết, triệu chứng..." type="search" value={query} /></label>
+            </div>
+            <div aria-label="Lọc theo chuyên mục" className="flex flex-wrap gap-2.5 pt-6" role="group">
               {articleCategories.map((item) => {
                 const count = item.value === "all" ? articles.length : articles.filter((article) => article.category === item.value).length;
                 const active = category === item.value;
-                return <button aria-pressed={active} className={`shrink-0 rounded-full px-4 py-2.5 text-xs font-semibold transition-all sm:text-sm ${active ? "bg-brand-blue-dark text-white shadow-sm" : "bg-surface-container-low text-text-secondary hover:bg-surface-container hover:text-text-primary"}`} key={item.value} onClick={() => { setCategory(item.value); setPage(1); }} type="button">{item.label} ({count})</button>;
+                return <button aria-pressed={active} className={`max-w-full rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-dark ${active ? "border-brand-blue-dark bg-brand-blue-dark text-white shadow-sm" : "border-border-subtle bg-background-secondary text-text-secondary hover:border-brand-blue hover:bg-brand-blue-light hover:text-brand-blue-dark"}`} key={item.value} onClick={() => { setCategory(item.value); setPage(1); }} type="button">{item.label} ({count})</button>;
               })}
             </div>
-            <label className="relative w-full shrink-0 lg:w-72"><span className="sr-only">Tìm bài viết</span><Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline" name="search" /><input className="w-full rounded-full bg-surface-container-low py-2.5 pl-11 pr-4 text-sm text-text-primary outline-none transition focus:bg-white focus:ring-2 focus:ring-brand-blue/30" onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Tìm bài viết, triệu chứng..." type="search" value={query} /></label>
           </div>
         </div>
       </section>
