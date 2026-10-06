@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Clinic {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  address      String
+  phone        String?
+  email        String?
+  doctors      Doctor[]
+  appointments Appointment[]
+  galleries    Gallery[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Doctor {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  avatar       String?
+  position     String
+  specialty    String
+  experience   Int           @default(0)
+  description  String        @db.Text
+  clinicId     String?
+  clinic       Clinic?       @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model ServiceCategory {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  services  Service[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Service {
+  id           String           @id @default(cuid())
+  name         String
+  slug         String           @unique
+  description  String           @db.Text
+  image        String?
+  categoryId   String?
+  category     ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  appointments Appointment[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model ArticleCategory {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  articles  Article[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Article {
+  id          String           @id @default(cuid())
+  title       String
+  slug        String           @unique
+  excerpt     String
+  content     String           @db.Text
+  thumbnail   String?
+  publishedAt DateTime?
+  author      String
+  categoryId  String?
+  category    ArticleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Appointment {
+  id              String   @id @default(cuid())
+  name            String
+  phone           String
+  email           String?
+  appointmentDate DateTime
+  note            String?  @db.Text
+  status          String   @default("pending")
+  serviceId       String?
+  service         Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  doctorId        String?
+  doctor          Doctor?  @relation(fields: [doctorId], references: [id], onDelete: SetNull)
+  clinicId        String?
+  clinic          Clinic?  @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  content   String   @db.Text
+  rating    Int      @default(5)
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gallery {
+  id        String   @id @default(cuid())
+  title     String
+  image     String
+  clinicId  String?
+  clinic    Clinic?  @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

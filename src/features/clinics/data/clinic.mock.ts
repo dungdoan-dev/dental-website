@@ -1,0 +1,6 @@
+import type { Clinic } from "../types/clinic.type";
+
+export const clinicMockData: readonly Clinic[] = [
+  { id: "clinic-1", name: "Cơ Sở Hồ Hảo Hớn", slug: "ho-hao-hon", label: "Trụ sở Quận 1", badge: "12 Ghế Điều Trị", address: "99 Hồ Hảo Hớn, P. Cầu Ông Lãnh, Quận 1, TP.HCM", phone: "1900 966 960", image: "/images/clinics/ho-hao-hon.jpg", description: "Khu vực trung tâm thuận tiện, gần đại lộ Võ Văn Kiệt và chợ Bến Thành.", workingHours: "08:00–12:00 | 13:30–20:00 (T2 - T7)", facilities: ["Máy Cone Beam 3D", "Phòng mổ áp lực âm", "Bãi đỗ xe ô tô an ninh", "Khu vui chơi trẻ em"], googleMapsUrl: "https://maps.google.com", accent: "blue" },
+  { id: "clinic-2", name: "Cơ Sở Ngô Gia Tự", slug: "ngo-gia-tu", label: "Cơ sở Quận 5", badge: "Trung Tâm Cấy Ghép", address: "502 Ngô Gia Tự, P. An Đông (P.9 cũ), Quận 5, TP.HCM", phone: "1900 888 642", image: "/images/clinics/ngo-gia-tu.jpg", description: "Trục đường giao thương sầm uất, giáp Quận 10, thuận tiện đón tiếp khách miền Tây.", workingHours: "08:00–12:00 | 13:30–20:00 (T2 - T7)", facilities: ["Labo CAD/CAM tại chỗ", "Phòng phục hồi hậu phẫu VIP", "Máy Scan quang học iTero", "Thang máy chuyên dụng y tế"], googleMapsUrl: "https://maps.google.com", accent: "green" },
+];

@@ -1,0 +1,3 @@
+export const homeAssets = {
+  whyChooseImage: "https://lh3.googleusercontent.com/aida/AEtjO1X8TXA9ITIaZT49iJQapAM5-lpTOX1YNolONtmfcOgN9l5o4lVbOMVGp7VJhALCltMRQmjtHowDLFVig66-9nTc7FYE_Ia4pc6Q-kdn7UcD5yPKqOXyYguKTxBZ4H4dRz8gRQXFeEjy6rG3kSWqybBlyholcromc3VkVEH0l-Qp-kyPD_zWKp3DI5T3OZ9zefuJ8rS9CY7q4um5HDIZ-mqvV9ijy8g6Kng-LDi9M6l23HXhf4ndX7nq9P0",
+} as const;
