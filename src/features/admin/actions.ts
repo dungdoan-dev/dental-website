@@ -1,11 +1,12 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "./auth/admin-auth";
 import { z } from "zod";
 import { serviceFormSchema, doctorFormSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
 import { runMutation, validationFailure, saveRevision, SlugConflictError } from "./services/mutation";
+import { publicDataTags } from "@/lib/public-data-cache";
 
 const heroSlideSchema = z.object({
   id: recordIdSchema, image: imagePathSchema, imageAlt: z.string().trim().min(1).max(200),
@@ -17,6 +18,13 @@ const heroSlideSchema = z.object({
 function revalidateContent(paths: string[]) {
   revalidatePath("/admin");
   for (const path of paths) revalidatePath(path);
+  if (paths.includes("/admin/services")) {
+    updateTag(publicDataTags.services);
+    updateTag(publicDataTags.siteContent);
+  }
+  if (paths.includes("/admin/doctors")) updateTag(publicDataTags.doctors);
+  if (paths.includes("/admin/articles")) updateTag(publicDataTags.articles);
+  if (paths.includes("/admin/home")) updateTag(publicDataTags.heroSlides);
 }
 
 export async function upsertHeroSlide(input: z.infer<typeof heroSlideSchema>) {
@@ -193,6 +201,7 @@ export async function upsertFaq(data: {
 
   revalidatePath("/admin/home");
   revalidatePath("/");
+  updateTag(publicDataTags.faqs);
   return { success: true };
 }
 
@@ -201,6 +210,7 @@ export async function deleteFaq(id: string) {
   await db.faqItem.delete({ where: { id: BigInt(id) } });
   revalidatePath("/admin/home");
   revalidatePath("/");
+  updateTag(publicDataTags.faqs);
   return { success: true };
 }
 
@@ -243,6 +253,7 @@ export async function upsertTestimonial(data: {
 
   revalidatePath("/admin/home");
   revalidatePath("/");
+  updateTag(publicDataTags.testimonials);
   return { success: true };
 }
 
@@ -251,6 +262,7 @@ export async function deleteTestimonial(id: string) {
   await db.testimonial.delete({ where: { id } });
   revalidatePath("/admin/home");
   revalidatePath("/");
+  updateTag(publicDataTags.testimonials);
   return { success: true };
 }
 
@@ -279,5 +291,6 @@ export async function updateClinic(data: {
 
   revalidatePath("/admin/clinics");
   revalidatePath("/");
+  updateTag(publicDataTags.clinics);
   return { success: true };
 }

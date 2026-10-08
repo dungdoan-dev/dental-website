@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -12,6 +12,7 @@ import { serviceDetailSchema, serviceDetailContentKey } from "@/features/service
 import type { MutationResult } from "./services/mutation";
 import { validationFailure } from "./services/mutation";
 import { imagePathSchema } from "./schemas/admin.schema";
+import { publicDataTags } from "@/lib/public-data-cache";
 
 type State = MutationResult | null;
 type ListRow = Record<string, string>;
@@ -39,6 +40,7 @@ async function saveSiteRecord(key: string, title: string, content: unknown) {
     await tx.siteContent.upsert({ where: { key }, create: { key, content: content as Prisma.InputJsonValue }, update: { content: content as Prisma.InputJsonValue } });
     await tx.adminContentRevision.create({ data: { kind: "site-content", entityId: key, title, snapshot: content as Prisma.InputJsonValue, actor: process.env.ADMIN_USERNAME?.trim() || "admin" } });
   });
+  updateTag(publicDataTags.siteContent);
 }
 
 export async function updateStructuredSiteContent(_previous: State, formData: FormData): Promise<MutationResult> {
@@ -146,6 +148,7 @@ export async function updateInsurancePartner(_previous: State, formData: FormDat
   revalidatePath("/admin");
   revalidatePath("/admin/content");
   revalidatePath("/");
+  updateTag(publicDataTags.insurancePartners);
   return { success: true };
 }
 

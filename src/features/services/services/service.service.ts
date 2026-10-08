@@ -4,10 +4,14 @@ import { implantDetailSchema, type ImplantDetailData } from "../schemas/implant-
 import { serviceDetailContentKey, serviceDetailSchema, type ServiceDetailData } from "../schemas/service-detail.schema";
 import { serviceSchema } from "../schemas/service.schema";
 import type { DentalService } from "../types/service.type";
+import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
+
+const getCachedServices = cachePublicData("services:list", [publicDataTags.services], () => serviceRepository.findAll());
+const getCachedServiceBySlug = cachePublicData("services:by-slug", [publicDataTags.services], (slug: string) => serviceRepository.findBySlug(slug));
 
 export async function getServices(): Promise<readonly DentalService[]> {
   try {
-    const services = await serviceRepository.findAll();
+    const services = await getCachedServices();
     return serviceSchema.array().parse(services);
   } catch {
     return [];
@@ -16,7 +20,7 @@ export async function getServices(): Promise<readonly DentalService[]> {
 
 export async function getServiceBySlug(slug: string): Promise<DentalService | null> {
   try {
-    const service = await serviceRepository.findBySlug(slug);
+    const service = await getCachedServiceBySlug(slug);
     return service ? serviceSchema.parse(service) : null;
   } catch {
     return null;

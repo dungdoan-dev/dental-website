@@ -2,10 +2,28 @@ import { db } from "@/lib/db";
 import { getSiteContent } from "@/features/content/services/site-content.service";
 import { z } from "zod";
 import type { CoreValue, FAQItem, HeroSlide, InsurancePartner, Testimonial } from "../types/home.type";
+import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
+
+const getCachedHeroSlides = cachePublicData("home:hero-slides", [publicDataTags.heroSlides], () => db.heroSlide.findMany({ orderBy: { sortOrder: "asc" } }));
+const getCachedCoreValues = cachePublicData("home:core-values", [publicDataTags.coreValues], () => db.coreValue.findMany({
+  select: { title: true, slogan: true, description: true, iconKey: true, sortOrder: true },
+  orderBy: { sortOrder: "asc" },
+}));
+const getCachedInsurancePartners = cachePublicData("home:insurance-partners", [publicDataTags.insurancePartners], () => db.$queryRaw<Array<{
+  code: string; name: string; description: string; accent: string; logoSrc: string | null;
+}>>`
+  SELECT code, name, description, accent, logo_src AS "logoSrc"
+  FROM insurance_partners ORDER BY sort_order ASC
+`);
+const getCachedFaqItems = cachePublicData("home:faqs", [publicDataTags.faqs], () => db.faqItem.findMany({
+  select: { question: true, answer: true, sortOrder: true },
+  orderBy: { sortOrder: "asc" },
+}));
+const getCachedTestimonials = cachePublicData("home:testimonials", [publicDataTags.testimonials], () => db.testimonial.findMany({ orderBy: { sortOrder: "asc" } }));
 
 export async function getHeroSlides(): Promise<readonly HeroSlide[]> {
   try {
-    const slides = await db.heroSlide.findMany({ orderBy: { sortOrder: "asc" } });
+    const slides = await getCachedHeroSlides();
     return slides.map((s) => ({
       id: s.id,
       image: s.image,
@@ -22,7 +40,7 @@ export async function getHeroSlides(): Promise<readonly HeroSlide[]> {
 
 export async function getCoreValues(): Promise<readonly CoreValue[]> {
   try {
-    const values = await db.coreValue.findMany({ orderBy: { sortOrder: "asc" } });
+    const values = await getCachedCoreValues();
     return values.map((v) => ({
       title: v.title,
       slogan: v.slogan,
@@ -38,12 +56,7 @@ export async function getInsurancePartners(): Promise<
   readonly InsurancePartner[]
 > {
   try {
-    const partners = await db.$queryRaw<Array<{
-      code: string; name: string; description: string; accent: string; logoSrc: string | null;
-    }>>`
-      SELECT code, name, description, accent, logo_src AS "logoSrc"
-      FROM insurance_partners ORDER BY sort_order ASC
-    `;
+    const partners = await getCachedInsurancePartners();
     return partners.map((p) => ({
       code: p.code,
       name: p.name,
@@ -67,7 +80,7 @@ export async function getWhyChooseImage(): Promise<string | null> {
 
 export async function getFaqItems(): Promise<readonly FAQItem[]> {
   try {
-    const items = await db.faqItem.findMany({ orderBy: { sortOrder: "asc" } });
+    const items = await getCachedFaqItems();
     return items.map((i) => ({ question: i.question, answer: i.answer }));
   } catch {
     return [];
@@ -76,7 +89,7 @@ export async function getFaqItems(): Promise<readonly FAQItem[]> {
 
 export async function getTestimonials(): Promise<readonly Testimonial[]> {
   try {
-    const list = await db.testimonial.findMany({ orderBy: { sortOrder: "asc" } });
+    const list = await getCachedTestimonials();
     return list.map((t) => ({
       id: t.id,
       customerName: t.customerName,
