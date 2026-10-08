@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { DoctorBookingSection } from "@/features/doctors/components/DoctorBookingSection";
 import { DoctorDirectoryHero } from "@/features/doctors/components/DoctorDirectoryHero";
 import { DoctorFilterGrid } from "@/features/doctors/components/DoctorFilterGrid";
 import { getDoctors } from "@/features/doctors/services/doctor.service";
@@ -17,7 +16,6 @@ export default async function DoctorsPage() {
     <>
       <DoctorDirectoryHero />
       <DoctorFilterGrid doctors={doctors} />
-      <DoctorBookingSection doctors={doctors} />
     </>
   );
 }

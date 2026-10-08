@@ -3,12 +3,20 @@ import { doctorSchema } from "../schemas/doctor.schema";
 import type { Doctor } from "../types/doctor.type";
 
 export async function getDoctors(): Promise<readonly Doctor[]> {
-  return doctorSchema.array().parse(await doctorRepository.findAll());
+  try {
+    return doctorSchema.array().parse(await doctorRepository.findAll());
+  } catch {
+    return [];
+  }
 }
 
 export async function getDoctorBySlug(slug: string): Promise<Doctor | null> {
-  const doctor = await doctorRepository.findBySlug(slug);
-  return doctor ? doctorSchema.parse(doctor) : null;
+  try {
+    const doctor = await doctorRepository.findBySlug(slug);
+    return doctor ? doctorSchema.parse(doctor) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getFeaturedDoctors(): Promise<readonly Doctor[]> {

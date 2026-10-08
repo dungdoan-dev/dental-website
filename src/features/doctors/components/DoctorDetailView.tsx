@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AppointmentButton } from "@/components/common/AppointmentButton";
 import { Icon } from "@/components/ui/Icon";
 import type { Doctor } from "../types/doctor.type";
 import { DoctorCertificateCarousel } from "./DoctorCertificateCarousel";
@@ -7,15 +8,95 @@ import { DoctorCertificateCarousel } from "./DoctorCertificateCarousel";
 type DoctorDetailViewProps = { doctor: Doctor };
 
 function DetailList({ title, items, markerColor }: { title: string; items: readonly string[]; markerColor: string }) {
-  return <section className="space-y-4"><h2 className="border-b border-border-subtle pb-2 text-lg font-bold uppercase tracking-tight text-text-primary">{title}</h2><ul className="space-y-3">{items.map((item) => <li className="flex items-start gap-3 leading-relaxed text-text-primary" key={item}><span aria-hidden="true" className={`mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full ${markerColor}`} /><span>{item}</span></li>)}</ul></section>;
+  return (
+    <section className="space-y-4">
+      <h2 className="border-b border-border-subtle pb-2 text-lg font-bold uppercase tracking-tight text-text-primary">{title}</h2>
+      <ul className="space-y-3">
+        {items.map((item) => (
+          <li className="flex items-start gap-3 leading-relaxed text-text-primary" key={item}>
+            <span aria-hidden="true" className={`mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full ${markerColor}`} />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
   const profile = doctor.profile;
+
   return (
     <>
-      <div className="border-b border-border-subtle bg-white"><div className="mx-auto max-w-7xl px-margin-mobile py-3.5 md:px-margin"><nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-text-secondary"><Link className="hover:text-brand-blue-dark" href="/">Trang chủ</Link><Icon className="h-4 w-4 opacity-40" name="chevron-right" /><Link className="hover:text-brand-blue-dark" href="/bac-si">Đội ngũ bác sĩ</Link><Icon className="h-4 w-4 opacity-40" name="chevron-right" /><span aria-current="page" className="font-bold text-brand-blue-dark">{doctor.name}</span></nav></div></div>
-      <article className="bg-white py-12 md:py-16"><div className="mx-auto grid max-w-7xl items-start gap-8 px-margin-mobile md:px-margin lg:grid-cols-12 lg:gap-12"><div className="flex flex-col gap-6 lg:col-span-5 xl:col-span-4"><div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-sm"><Image alt={`Chân dung ${doctor.name}`} className="object-cover object-top" fill priority sizes="(max-width: 1024px) 100vw, 400px" src={doctor.avatar} /></div><div className="space-y-3">{profile ? <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm"><span className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chứng chỉ hành nghề</span><span className="rounded bg-brand-green-light px-2.5 py-1 text-xs font-bold tracking-wide text-brand-green-dark">{profile.licenseNumber}</span></div> : null}<div className="rounded-xl border border-border-subtle bg-white p-4 shadow-sm"><div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chuyên môn</div><div className="flex flex-wrap gap-2">{(profile?.specialties ?? [doctor.specialty]).map((specialty) => <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue-light/50 px-3 py-1 text-sm font-medium text-brand-blue-dark" key={specialty}><span className="h-1.5 w-1.5 rounded-full bg-brand-blue" />{specialty}</span>)}</div></div>{profile ? <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm"><span className="text-sm font-medium text-text-secondary">Ngôn ngữ</span><span className="flex flex-wrap gap-2">{profile.languages.map((language) => <span className="rounded-full border border-border-subtle bg-surface-container-low px-3 py-1 text-xs font-medium text-text-primary" key={language}>{language}</span>)}</span></div> : null}</div></div><div className="flex flex-col gap-8 lg:col-span-7 xl:col-span-8"><header><h1 className="text-3xl font-extrabold uppercase tracking-tight text-text-primary md:text-[2.5rem]">{doctor.name}</h1><p className="mt-2 text-lg font-semibold leading-relaxed text-brand-blue-dark">{doctor.position}</p></header><blockquote className="border-l-4 border-brand-blue bg-brand-blue-light/50 p-6 text-lg italic leading-relaxed text-text-primary">“{profile?.quote ?? doctor.description}”</blockquote>{profile ? <><DetailList items={profile.education} markerColor="bg-brand-blue-dark" title="Học Vấn & Đào Tạo" /><DetailList items={profile.experienceHighlights} markerColor="bg-brand-green-dark" title="Kinh Nghiệm" /><DoctorCertificateCarousel certificates={profile.certificates} /><a className="text-sm font-semibold text-brand-blue-dark underline-offset-4 hover:underline" href={profile.sourceUrl} rel="noopener noreferrer" target="_blank">Xem hồ sơ trên website Nha Khoa 2000</a></> : <div className="space-y-4"><DetailList items={[`${doctor.experience} năm kinh nghiệm`, doctor.specialty]} markerColor="bg-brand-green-dark" title="Chuyên Môn & Kinh Nghiệm" /><p className="leading-relaxed text-text-secondary">{doctor.description}</p></div>}<div className="pt-2"><Link className="inline-flex items-center gap-2 rounded-full bg-brand-blue px-6 py-3 font-bold text-white shadow-sm transition hover:bg-brand-blue-dark" href="/bac-si#booking-section"><Icon className="h-5 w-5" name="calendar" />Đặt lịch thăm khám</Link></div></div></div></article>
+      <div className="border-b border-border-subtle bg-white">
+        <div className="mx-auto max-w-7xl px-margin-mobile py-3.5 md:px-margin">
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-text-secondary">
+            <Link className="hover:text-brand-blue-dark" href="/">Trang chủ</Link>
+            <Icon className="h-4 w-4 opacity-40" name="chevron-right" />
+            <Link className="hover:text-brand-blue-dark" href="/bac-si">Đội ngũ bác sĩ</Link>
+            <Icon className="h-4 w-4 opacity-40" name="chevron-right" />
+            <span aria-current="page" className="font-bold text-brand-blue-dark">{doctor.name}</span>
+          </nav>
+        </div>
+      </div>
+      <article className="bg-white py-12 md:py-16">
+        <div className="mx-auto grid max-w-7xl items-start gap-8 px-margin-mobile md:px-margin lg:grid-cols-12 lg:gap-12">
+          <div className="flex flex-col gap-6 lg:col-span-5 xl:col-span-4">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-sm">
+              <Image alt={`Chân dung ${doctor.name}`} className="object-cover object-top" fill priority sizes="(max-width: 1024px) 100vw, 400px" src={doctor.avatar} />
+            </div>
+            <div className="space-y-3">
+              {profile ? (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+                  <span className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chứng chỉ hành nghề</span>
+                  <span className="rounded bg-brand-green-light px-2.5 py-1 text-xs font-bold tracking-wide text-brand-green-dark">{profile.licenseNumber}</span>
+                </div>
+              ) : null}
+              <div className="rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+                <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chuyên môn</div>
+                <div className="flex flex-wrap gap-2">
+                  {(profile?.specialties ?? [doctor.specialty]).map((specialty) => (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue-light/50 px-3 py-1 text-sm font-medium text-brand-blue-dark" key={specialty}>
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-blue" />{specialty}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              {profile ? (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+                  <span className="text-sm font-medium text-text-secondary">Ngôn ngữ</span>
+                  <span className="flex flex-wrap gap-2">{profile.languages.map((language) => <span className="rounded-full border border-border-subtle bg-surface-container-low px-3 py-1 text-xs font-medium text-text-primary" key={language}>{language}</span>)}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex flex-col gap-8 lg:col-span-7 xl:col-span-8">
+            <header>
+              <h1 className="text-3xl font-extrabold uppercase tracking-tight text-text-primary md:text-[2.5rem]">{doctor.name}</h1>
+              <p className="mt-2 text-lg font-semibold leading-relaxed text-brand-blue-dark">{doctor.position}</p>
+            </header>
+            <blockquote className="border-l-4 border-brand-blue bg-brand-blue-light/50 p-6 text-lg italic leading-relaxed text-text-primary">“{profile?.quote ?? doctor.description}”</blockquote>
+            {profile ? (
+              <>
+                <DetailList items={profile.education} markerColor="bg-brand-blue-dark" title="Học vấn & Đào tạo" />
+                <DetailList items={profile.experienceHighlights} markerColor="bg-brand-green-dark" title="Kinh nghiệm" />
+                <DoctorCertificateCarousel certificates={profile.certificates} />
+                <a className="text-sm font-semibold text-brand-blue-dark underline-offset-4 hover:underline" href={profile.sourceUrl} rel="noopener noreferrer" target="_blank">Xem hồ sơ trên website Nha Khoa 2000</a>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <DetailList items={[`${doctor.experience} năm kinh nghiệm`, doctor.specialty]} markerColor="bg-brand-green-dark" title="Chuyên môn & Kinh nghiệm" />
+                <p className="leading-relaxed text-text-secondary">{doctor.description}</p>
+              </div>
+            )}
+            <div className="pt-2">
+              <AppointmentButton className="gap-2 rounded-full bg-brand-blue px-6 py-3 font-bold shadow-sm hover:bg-brand-blue-dark">
+                <Icon className="h-5 w-5" name="calendar" />Đặt lịch thăm khám
+              </AppointmentButton>
+            </div>
+          </div>
+        </div>
+      </article>
     </>
   );
 }

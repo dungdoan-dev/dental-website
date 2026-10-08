@@ -27,7 +27,8 @@ export const navigation: readonly NavigationItem[] = [
   { label: "Liên hệ", href: "/lien-he" },
 ];
 
-export function isNavigationItemActive(pathname: string, href: string): boolean {
+export function isNavigationItemActive(pathname: string | null | undefined, href: string): boolean {
+  if (!pathname) return false;
   if (href.includes("#")) return false;
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);

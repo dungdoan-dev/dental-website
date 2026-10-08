@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { Container } from "@/components/common/Container";
-import { SectionTitle } from "@/components/common/SectionTitle";
-import { getClinicSummary } from "@/features/clinics/services/clinic.service";
+import { AboutPageContent } from "@/features/about/components/AboutPageContent";
+import { getAboutPageData } from "@/features/about/services/about.service";
+import { getClinics } from "@/features/clinics/services/clinic.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = generateSeoMetadata({ title: "Giới thiệu" });
+export const metadata: Metadata = generateSeoMetadata({
+  title: "Giới thiệu Nha Khoa 2000",
+  description: "Tìm hiểu hành trình từ năm 1999, đội ngũ, giá trị cốt lõi và hai cơ sở của Nha Khoa 2000 tại TP. Hồ Chí Minh.",
+  image: "/images/hero/clinic-modern.jpg",
+  url: "/gioi-thieu",
+});
 
-export default function AboutPage() {
-  const clinic = getClinicSummary();
-  return <Container className="py-12"><Breadcrumb items={[{ label: "Giới thiệu" }]} /><SectionTitle title={`Giới thiệu ${clinic.name}`} description={clinic.description} /><div className="mt-8 space-y-4 rounded-2xl bg-white p-8 leading-7 text-slate-600 shadow-sm"><p>Chúng tôi hướng đến trải nghiệm nha khoa rõ ràng, thân thiện và phù hợp với nhu cầu của từng khách hàng.</p><p>Thông tin chi tiết về cơ sở vật chất, chứng nhận và hành trình phát triển sẽ được cập nhật trong giai đoạn nội dung tiếp theo.</p></div></Container>;
+export const dynamic = "force-dynamic";
+
+export default async function AboutPage() {
+  const [content, clinics] = await Promise.all([getAboutPageData(), getClinics()]);
+
+  if (!content) {
+    return <div className="mx-auto max-w-3xl px-5 py-20 text-center text-text-secondary">Nội dung giới thiệu đang được cập nhật.</div>;
+  }
+
+  return <AboutPageContent clinics={clinics} content={content} />;
 }

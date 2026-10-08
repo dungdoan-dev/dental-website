@@ -15,8 +15,8 @@ export const doctorSchema = z.object({
   category: z.enum(["implant", "ortho", "aesthetic", "surgery", "pediatric"]),
   directoryTitle: z.string().min(1),
   profile: z.object({
-    licenseNumber: z.string().min(1),
-    quote: z.string().min(1),
+    licenseNumber: z.string(),
+    quote: z.string(),
     specialties: z.array(z.string().min(1)),
     languages: z.array(z.string().min(1)),
     education: z.array(z.string().min(1)),
@@ -27,6 +27,6 @@ export const doctorSchema = z.object({
       detail: z.string().min(1),
       image: z.string().min(1),
     })),
-    sourceUrl: z.url(),
+    sourceUrl: z.union([z.literal(""), z.url()]),
   }).optional(),
 });

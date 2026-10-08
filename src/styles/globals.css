@@ -3,12 +3,15 @@
 @theme {
   --color-brand-blue: #29abe2;
   --color-brand-blue-dark: #0878b5;
+  --color-brand-blue-hover: #056697;
   --color-brand-green: #59b947;
   --color-brand-green-dark: #3d9638;
+  --color-brand-green-hover: #287b28;
   --color-brand-blue-light: #eaf7fc;
   --color-brand-green-light: #eff8ec;
   --color-text-primary: #17313a;
   --color-text-secondary: #60747b;
+  --color-text-on-service: #526777;
   --color-border-subtle: #dfeaed;
   --color-background-secondary: #f8fbfc;
   --color-surface: #f7f9ff;
@@ -21,8 +24,40 @@
   --color-on-surface-variant: #404850;
   --color-on-primary: #ffffff;
   --color-on-secondary: #ffffff;
+  --color-primary: #005e90;
+  --color-tertiary: #854c00;
+  --color-tertiary-fixed: #ffdcbf;
+  --color-tertiary-container: #a86100;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-outline: #707881;
+  --color-surface-variant: #e0e2e8;
+  --color-surface-tint: #f5fafc;
   --spacing-margin-mobile: 1.25rem;
   --spacing-margin: 2rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2.5rem;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
 }
 
 * {
@@ -31,15 +66,25 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 130px;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   overscroll-behavior: none;
   background: var(--color-surface);
   color: var(--color-on-surface);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-blue-dark);
+  outline-offset: 3px;
+}
+
+:where(input, select, textarea, [tabindex]) {
+  scroll-margin-block: 1rem;
 }
 
 @layer base {
@@ -169,5 +214,226 @@ a {
   }
   .core-values--visible .core-value-card {
     animation: none;
+  }
+}
+
+.appointment-phone-input.react-tel-input {
+  font-family: inherit;
+}
+
+.appointment-phone-input.react-tel-input .form-control {
+  width: 100%;
+  height: 52px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  background: var(--color-background-secondary);
+  padding-left: 60px;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.appointment-phone-input--compact.react-tel-input .form-control {
+  height: 44px;
+  font-size: 14px;
+}
+
+.appointment-phone-input.react-tel-input .form-control:focus {
+  border-color: var(--color-brand-blue);
+  background: white;
+  box-shadow: 0 0 0 3px rgb(41 171 226 / 20%);
+}
+
+.appointment-phone-input.react-tel-input .form-control[aria-invalid="true"] {
+  border-color: #dc2626;
+}
+
+.appointment-phone-input.react-tel-input .flag-dropdown {
+  border: 0;
+  border-right: 1px solid var(--color-border-subtle);
+  border-radius: 12px 0 0 12px;
+  background: transparent;
+}
+
+.appointment-phone-input.react-tel-input .selected-flag {
+  width: 54px;
+  padding-left: 12px;
+  border-radius: 12px 0 0 12px;
+}
+
+.appointment-phone-input.react-tel-input .selected-flag .arrow {
+  left: 21px;
+}
+
+.appointment-phone-input.react-tel-input .country-list {
+  z-index: 50;
+  left: 0;
+  width: min(300px, var(--phone-field-width, calc(100vw - 3rem)));
+  max-height: min(260px, 40dvh);
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  margin-top: 6px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgb(16 47 64 / 16%);
+}
+
+.appointment-phone-input.react-tel-input .country-list .search-box {
+  width: calc(100% - 40px);
+  min-height: 44px;
+  margin-left: 0;
+  border-radius: 8px;
+}
+
+.appointment-phone-input.react-tel-input .country-list .country {
+  min-height: 44px;
+  white-space: normal;
+}
+
+@media (max-width: 639px) {
+  .appointment-phone-input.react-tel-input .form-control,
+  .appointment-phone-input.react-tel-input .country-list .search-box {
+    font-size: 16px;
+  }
+}
+
+/* Shared admin dialog and form rhythm */
+.admin-dialog-overlay {
+  overscroll-behavior: contain;
+}
+
+.admin-dialog-panel {
+  isolation: isolate;
+}
+
+.admin-dialog-header {
+  background: #fff;
+}
+
+.admin-dialog-form {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  text-align: left;
+}
+
+.admin-dialog-form label {
+  display: block;
+  min-width: 0;
+  color: var(--color-text-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left !important;
+}
+
+.admin-dialog-form label:has(input[type="checkbox"]),
+.admin-dialog-form label:has(input[type="radio"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.admin-inline-form label {
+  min-width: 0;
+  text-align: left;
+}
+
+.admin-inline-form label:has(input[type="checkbox"]),
+.admin-inline-form label:has(input[type="radio"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.admin-inline-form input:not([type="checkbox"]):not([type="radio"]),
+.admin-inline-form select,
+.admin-inline-form textarea {
+  box-sizing: border-box;
+  min-width: 0;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.625rem;
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.admin-inline-form input:not([type="checkbox"]):not([type="radio"]),
+.admin-inline-form select {
+  min-height: 2.75rem;
+}
+
+.admin-inline-form input:focus,
+.admin-inline-form select:focus,
+.admin-inline-form textarea:focus {
+  border-color: var(--color-brand-blue);
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(41 171 226 / 14%);
+}
+
+.admin-dialog-form input:not([type="checkbox"]):not([type="radio"]),
+.admin-dialog-form select,
+.admin-dialog-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.375rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--color-background-secondary);
+  padding: 0.625rem 0.875rem;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: left;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.admin-dialog-form input:not([type="checkbox"]):not([type="radio"]),
+.admin-dialog-form select {
+  min-height: 2.75rem;
+}
+
+.admin-dialog-form textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.admin-dialog-form input:focus,
+.admin-dialog-form select:focus,
+.admin-dialog-form textarea:focus {
+  border-color: var(--color-brand-blue);
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(41 171 226 / 14%);
+}
+
+.admin-dialog-form > div:last-child {
+  position: sticky;
+  z-index: 2;
+  bottom: 0;
+  margin: 0 -0.125rem;
+  padding: 0.875rem 0.125rem;
+  background: linear-gradient(180deg, rgb(255 255 255 / 88%), #fff 24%);
+}
+
+@media (max-width: 639px) {
+  .admin-dialog-overlay {
+    padding: 0.625rem;
+  }
+
+  .admin-dialog-panel {
+    max-height: calc(100dvh - 1.25rem);
+    border-radius: 1.25rem;
+  }
+
+  .admin-dialog-form {
+    font-size: 0.875rem;
+  }
+
+  .admin-dialog-form input:not([type="checkbox"]):not([type="radio"]),
+  .admin-dialog-form select,
+  .admin-dialog-form textarea {
+    font-size: 16px;
   }
 }

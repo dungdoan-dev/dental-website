@@ -10,7 +10,6 @@ export function CoreValuesReveal({ children }: CoreValuesRevealProps) {
   useEffect(() => {
     const element = elementRef.current;
     if (!element || !window.IntersectionObserver || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     element.classList.add("core-values--pending");
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;

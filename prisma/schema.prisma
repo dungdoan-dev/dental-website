@@ -3,129 +3,312 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Clinic {
-  id           String        @id @default(cuid())
-  name         String
-  slug         String        @unique
-  address      String
-  phone        String?
-  email        String?
-  doctors      Doctor[]
-  appointments Appointment[]
-  galleries    Gallery[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String           @id
+  name          String
+  slug          String           @unique
+  label         String
+  badge         String
+  address       String
+  phone         String
+  image         String
+  description   String
+  workingHours  String           @map("working_hours")
+  googleMapsUrl String?          @map("google_maps_url")
+  accent        BadgeVariant
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  appointments  Appointment[]
+  facilities    ClinicFacility[]
+
+  @@map("clinics")
 }
 
-model Doctor {
-  id           String        @id @default(cuid())
-  name         String
-  slug         String        @unique
-  avatar       String?
-  position     String
-  specialty    String
-  experience   Int           @default(0)
-  description  String        @db.Text
-  clinicId     String?
-  clinic       Clinic?       @relation(fields: [clinicId], references: [id], onDelete: SetNull)
-  appointments Appointment[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
-
-model ServiceCategory {
-  id        String    @id @default(cuid())
+model ClinicFacility {
+  id        BigInt @id @default(autoincrement())
+  clinicId  String @map("clinic_id")
   name      String
-  slug      String    @unique
-  services  Service[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  sortOrder Int    @default(0) @map("sort_order")
+  clinic    Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("clinic_facilities")
 }
 
 model Service {
-  id           String           @id @default(cuid())
-  name         String
-  slug         String           @unique
-  description  String           @db.Text
-  image        String?
-  categoryId   String?
-  category     ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  appointments Appointment[]
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id               String          @id
+  name             String
+  slug             String          @unique
+  shortDescription String          @map("short_description")
+  description      String
+  image            String
+  badge            String
+  badgeVariant     BadgeVariant    @map("badge_variant")
+  featured         Boolean         @default(false)
+  category         ServiceCategory
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  appointments     Appointment[]
+
+  @@index([category])
+  @@index([featured])
+  @@map("services")
 }
 
-model ArticleCategory {
-  id        String    @id @default(cuid())
-  name      String
-  slug      String    @unique
-  articles  Article[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model Doctor {
+  id                   String                      @id
+  name                 String
+  slug                 String                      @unique
+  avatar               String
+  position             String
+  specialty            String
+  experience           Int
+  description          String
+  badge                String
+  highlight            String
+  featured             Boolean                     @default(false)
+  category             DoctorCategory
+  directoryTitle       String                      @map("directory_title")
+  licenseNumber        String?                     @map("license_number")
+  quote                String?
+  languages            Json?
+  sourceUrl            String?                     @map("source_url")
+  createdAt            DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime                    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  appointments         Appointment[]
+  certificates         DoctorCertificate[]
+  education            DoctorEducation[]
+  experienceHighlights DoctorExperienceHighlight[]
+  specialties          DoctorSpecialty[]
+
+  @@index([category])
+  @@index([featured])
+  @@map("doctors")
+}
+
+model DoctorSpecialty {
+  id        BigInt @id @default(autoincrement())
+  doctorId  String @map("doctor_id")
+  specialty String
+  sortOrder Int    @default(0) @map("sort_order")
+  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("doctor_specialties")
+}
+
+model DoctorEducation {
+  id        BigInt @id @default(autoincrement())
+  doctorId  String @map("doctor_id")
+  content   String
+  sortOrder Int    @default(0) @map("sort_order")
+  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("doctor_education")
+}
+
+model DoctorExperienceHighlight {
+  id        BigInt @id @default(autoincrement())
+  doctorId  String @map("doctor_id")
+  content   String
+  sortOrder Int    @default(0) @map("sort_order")
+  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("doctor_experience_highlights")
+}
+
+model DoctorCertificate {
+  id        BigInt @id @default(autoincrement())
+  doctorId  String @map("doctor_id")
+  title     String
+  issuer    String
+  detail    String
+  image     String
+  sortOrder Int    @default(0) @map("sort_order")
+  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("doctor_certificates")
 }
 
 model Article {
-  id          String           @id @default(cuid())
-  title       String
-  slug        String           @unique
-  excerpt     String
-  content     String           @db.Text
-  thumbnail   String?
-  publishedAt DateTime?
-  author      String
-  categoryId  String?
-  category    ArticleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id             String          @id
+  title          String
+  slug           String          @unique
+  excerpt        String
+  content        String
+  thumbnail      String
+  publishedAt    DateTime        @map("published_at") @db.Timestamptz(6)
+  author         String          @default("Đội ngũ Nha Khoa 2000")
+  category       ArticleCategory
+  readingMinutes Int             @default(3) @map("reading_minutes")
+  featured       Boolean         @default(false)
+  status         ArticleStatus   @default(published)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([category])
+  @@index([featured])
+  @@index([status])
+  @@index([publishedAt(sort: Desc)])
+  @@map("articles")
+}
+
+model AdminContentRevision {
+  id        BigInt   @id @default(autoincrement())
+  kind      String
+  entityId  String   @map("entity_id")
+  title     String
+  snapshot  Json     @db.JsonB
+  actor     String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt(sort: Desc)])
+  @@map("admin_content_revisions")
+}
+
+model AdminLoginLimit {
+  key       String   @id
+  attempts  Int
+  resetAt   DateTime @map("reset_at") @db.Timestamptz(6)
+
+  @@map("admin_login_limits")
 }
 
 model Appointment {
-  id              String   @id @default(cuid())
+  id              BigInt            @id @default(autoincrement())
   name            String
   phone           String
   email           String?
-  appointmentDate DateTime
-  note            String?  @db.Text
-  status          String   @default("pending")
-  serviceId       String?
-  service         Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
-  doctorId        String?
-  doctor          Doctor?  @relation(fields: [doctorId], references: [id], onDelete: SetNull)
-  clinicId        String?
-  clinic          Clinic?  @relation(fields: [clinicId], references: [id], onDelete: SetNull)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  serviceId       String?           @map("service_id")
+  doctorId        String?           @map("doctor_id")
+  clinicId        String?           @map("clinic_id")
+  appointmentDate DateTime          @map("appointment_date") @db.Timestamptz(6)
+  note            String?
+  status          AppointmentStatus @default(pending)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  clinic          Clinic?           @relation(fields: [clinicId], references: [id], onUpdate: NoAction)
+  doctor          Doctor?           @relation(fields: [doctorId], references: [id], onUpdate: NoAction)
+  service         Service?          @relation(fields: [serviceId], references: [id], onUpdate: NoAction)
+
+  @@index([appointmentDate])
+  @@index([phone])
+  @@index([status])
+  @@map("appointments")
 }
 
 model Testimonial {
-  id        String   @id @default(cuid())
-  name      String
-  content   String   @db.Text
-  rating    Int      @default(5)
-  avatar    String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id
+  customerName String   @map("customer_name")
+  rating       Int      @default(5)
+  content      String
+  avatar       String?
+  source       String?
+  initials     String
+  accent       String
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("testimonials")
 }
 
-model Gallery {
-  id        String   @id @default(cuid())
-  title     String
-  image     String
-  clinicId  String?
-  clinic    Clinic?  @relation(fields: [clinicId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model FaqItem {
+  id        BigInt   @id @default(autoincrement())
+  question  String
+  answer    String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("faq_items")
 }
 
-model Setting {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model HeroSlide {
+  id             String @id
+  image          String
+  imageAlt       String @map("image_alt")
+  badge          String
+  title          String
+  badgeVariant   String @map("badge_variant")
+  objectPosition String @default("center") @map("object_position")
+  sortOrder      Int    @default(0) @map("sort_order")
+
+  @@map("hero_slides")
+}
+
+model CoreValue {
+  id          BigInt @id @default(autoincrement())
+  title       String
+  slogan      String
+  description String
+  iconKey     String @map("icon_key")
+  sortOrder   Int    @default(0) @map("sort_order")
+
+  @@map("core_values")
+}
+
+model InsurancePartner {
+  id          BigInt @id @default(autoincrement())
+  code        String @unique
+  name        String
+  description String
+  accent      String
+  logoSrc     String? @map("logo_src")
+  sortOrder   Int    @default(0) @map("sort_order")
+
+  @@map("insurance_partners")
+}
+
+model SiteContent {
+  key       String   @id
+  content   Json     @db.JsonB
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("site_content")
+}
+
+enum ServiceCategory {
+  pediatric
+  general
+  aesthetic
+  orthodontics
+  implant
+  periodontics
+  other
+}
+
+enum BadgeVariant {
+  blue
+  green
+}
+
+enum DoctorCategory {
+  implant
+  ortho
+  aesthetic
+  surgery
+  pediatric
+}
+
+enum ArticleCategory {
+  implant
+  veneer
+  orthodontics
+  kids
+  periodontics
+  general
+}
+
+enum AppointmentStatus {
+  pending
+  confirmed
+  completed
+  cancelled
+}
+
+enum ArticleStatus {
+  draft
+  published
 }

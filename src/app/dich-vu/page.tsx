@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ServiceConsultationSection } from "@/features/services/components/ServiceConsultationSection";
 import { ServiceDirectoryHero } from "@/features/services/components/ServiceDirectoryHero";
 import { ServiceFilterGrid } from "@/features/services/components/ServiceFilterGrid";
 import { ServiceProcessSection } from "@/features/services/components/ServiceProcessSection";
@@ -24,7 +23,6 @@ export default async function ServicesPage({ searchParams }: ServicesPageProps) 
       <ServiceDirectoryHero />
       <ServiceFilterGrid activeFilter={activeFilter} services={services} />
       <ServiceProcessSection />
-      <ServiceConsultationSection services={services} />
     </>
   );
 }

@@ -12,4 +12,5 @@ export const articleSchema = z.object({
   category: z.enum(["implant", "veneer", "orthodontics", "kids", "periodontics", "general"]),
   readingMinutes: z.number().int().positive(),
   featured: z.boolean(),
+  status: z.enum(["draft", "published"]).default("published"),
 });

@@ -1,15 +1,16 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Icon } from "@/components/ui/Icon";
+import { ClinicCard } from "@/features/clinics/components/ClinicCard";
 import { getClinics } from "@/features/clinics/services/clinic.service";
-import type { Clinic } from "@/features/clinics/types/clinic.type";
-
-function ClinicCard({ clinic }: { clinic: Clinic }) {
-  const green = clinic.accent === "green";
-  return <article className="flex flex-col justify-between overflow-hidden rounded-3xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl"><div><div className="relative h-64"><Image alt={clinic.name} className="object-cover object-center" fill sizes="(max-width: 1024px) 100vw, 50vw" src={clinic.image} /><div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" /><div className="absolute bottom-4 left-6 right-6 flex items-end justify-between gap-3 text-white"><div><span className={`text-xs font-bold uppercase tracking-widest ${green ? "text-brand-green-light" : "text-brand-blue-light"}`}>{clinic.label}</span><h3 className="text-2xl font-bold text-white">{clinic.name}</h3></div><span className={`rounded-full px-3 py-1 text-xs font-bold backdrop-blur-md ${green ? "bg-brand-green/80" : "bg-brand-blue/80"}`}>{clinic.badge}</span></div></div><div className="space-y-4 p-7"><div className="flex items-start gap-3"><Icon className="mt-0.5 h-6 w-6 shrink-0 text-brand-blue" name="location" /><div><p className="font-semibold text-text-primary">{clinic.address}</p><p className="text-sm text-text-secondary">{clinic.description}</p></div></div><div className="flex items-center gap-3"><Icon className="h-6 w-6 shrink-0 text-brand-green" name="phone" /><a className="text-xl font-bold text-brand-blue-dark" href={`tel:${clinic.phone.replaceAll(" ", "")}`}>{clinic.phone}</a></div><div className="grid grid-cols-1 gap-3 pt-2 min-[430px]:grid-cols-2">{clinic.facilities.map((facility) => <div className="flex items-center gap-2 text-sm text-text-secondary" key={facility}><Icon className="h-4 w-4 shrink-0 text-brand-blue" name="check" /><span>{facility}</span></div>)}</div></div></div><div className="flex flex-wrap gap-3 p-7 pt-0"><Link className={`min-w-[160px] flex-1 rounded-full py-3 text-center text-[13px] font-bold text-white transition-colors ${green ? "bg-brand-green hover:bg-brand-green-dark" : "bg-brand-blue hover:bg-brand-blue-dark"}`} href="/lien-he">Đặt hẹn {clinic.id === "clinic-1" ? "CS1 (Q.1)" : "CS2 (Q.5)"}</Link><a className="inline-flex items-center gap-1.5 rounded-full bg-surface-container px-5 py-3 text-[13px] font-bold text-text-primary transition hover:bg-surface-container-high" href={clinic.googleMapsUrl} rel="noopener noreferrer" target="_blank"><Icon className="h-5 w-5" name="map" />Chỉ đường</a></div></article>;
-}
 
 export async function ClinicFacilitiesSection() {
   const clinics = await getClinics();
-  return <section className="bg-background-secondary py-12 lg:py-16" id="co-so-vat-chat"><div className="mx-auto max-w-7xl px-margin-mobile md:px-margin"><h2 className="sr-only">Cơ sở vật chất Nha Khoa 2000</h2><div className="grid grid-cols-1 gap-8 lg:grid-cols-2">{clinics.map((clinic) => <ClinicCard clinic={clinic} key={clinic.id} />)}</div></div></section>;
+  return (
+    <section className="bg-background-secondary py-12 lg:py-16" id="co-so-vat-chat">
+      <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
+        <h2 className="sr-only">Cơ sở vật chất Nha Khoa 2000</h2>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {clinics.map((clinic) => <ClinicCard clinic={clinic} key={clinic.id} />)}
+        </div>
+      </div>
+    </section>
+  );
 }

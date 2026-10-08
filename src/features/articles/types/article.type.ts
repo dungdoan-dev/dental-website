@@ -12,4 +12,5 @@ export type Article = {
   category: ArticleCategory;
   readingMinutes: number;
   featured: boolean;
+  status?: "draft" | "published";
 };

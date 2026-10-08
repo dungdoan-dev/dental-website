@@ -7,8 +7,8 @@ import type { Article, ArticleCategory } from "../types/article.type";
 import { ArticleCard } from "./ArticleCard";
 import { FeaturedArticle } from "./FeaturedArticle";
 
-type ArticleExplorerProps = { articles: readonly Article[]; featuredArticle?: Article };
 type CategoryFilter = "all" | ArticleCategory;
+type ArticleExplorerProps = { articles: readonly Article[]; featuredArticle?: Article; initialCategory?: CategoryFilter; initialQuery?: string };
 
 const pageSize = 6;
 
@@ -16,9 +16,9 @@ function normalizeSearch(value: string): string {
   return value.toLocaleLowerCase("vi-VN").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").trim();
 }
 
-export function ArticleExplorer({ articles, featuredArticle }: ArticleExplorerProps) {
-  const [category, setCategory] = useState<CategoryFilter>("all");
-  const [query, setQuery] = useState("");
+export function ArticleExplorer({ articles, featuredArticle, initialCategory = "all", initialQuery = "" }: ArticleExplorerProps) {
+  const [category, setCategory] = useState<CategoryFilter>(initialCategory);
+  const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(1);
 
   const filteredArticles = useMemo(() => {
@@ -58,7 +58,7 @@ export function ArticleExplorer({ articles, featuredArticle }: ArticleExplorerPr
         </div>
       </section>
       {featuredArticle && category === "all" && !query.trim() ? <FeaturedArticle article={featuredArticle} /> : null}
-      <section aria-label="Danh sách bài viết chuyên môn" className="bg-surface pb-16">
+      <section aria-label="Danh sách bài viết chuyên môn" className="bg-surface pb-16" id="article-list">
         <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
           <div className="mb-10 text-center"><h2 className="text-2xl font-bold tracking-tight text-text-primary md:text-3xl">DANH SÁCH BÀI VIẾT CHUYÊN MÔN</h2><div aria-hidden="true" className="mx-auto mb-3 mt-3 h-1 w-12 rounded-full bg-brand-blue" /><p className="text-sm text-text-secondary">Kiến thức giúp bạn chủ động chăm sóc sức khỏe răng miệng</p></div>
           {currentArticles.length > 0 ? <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">{currentArticles.map((article) => <ArticleCard article={article} key={article.id} />)}</div> : <div className="rounded-2xl bg-white px-6 py-12 text-center text-text-secondary">Không tìm thấy bài viết phù hợp. Hãy thử từ khóa hoặc chuyên mục khác.</div>}

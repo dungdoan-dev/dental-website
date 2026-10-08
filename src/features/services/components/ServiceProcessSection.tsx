@@ -12,7 +12,7 @@ export function ServiceProcessSection() {
         <div className="mx-auto mb-12 max-w-2xl text-center"><span className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-green-dark">Quy trình chuẩn hóa</span><h2 className="mt-3 text-3xl font-bold text-brand-blue-dark md:text-4xl">Quy Trình Khám &amp; Tư Vấn Tinh Gọn</h2><p className="mt-4 leading-relaxed text-text-secondary">Minh bạch từng bước, cá nhân hóa theo tình trạng răng miệng và nhu cầu thực tế của mỗi khách hàng.</p></div>
         <ol className="relative grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <span aria-hidden="true" className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-px bg-border-subtle lg:block" />
-          {processSteps.map((step, index) => <li className="relative rounded-2xl border border-border-subtle bg-white p-6 shadow-sm" key={step.title}><span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue text-lg font-extrabold text-white shadow-md">{String(index + 1).padStart(2, "0")}</span><h3 className="mt-5 text-lg font-bold text-brand-blue-dark">{step.title}</h3><p className="mt-2 text-sm leading-relaxed text-text-secondary">{step.description}</p></li>)}
+          {processSteps.map((step, index) => <li className="relative rounded-2xl border border-border-subtle bg-white p-6 shadow-sm" key={step.title}><span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-brand-blue-dark text-lg font-extrabold text-white shadow-md">{String(index + 1).padStart(2, "0")}</span><h3 className="mt-5 text-lg font-bold text-brand-blue-dark">{step.title}</h3><p className="mt-2 text-sm leading-relaxed text-text-secondary">{step.description}</p></li>)}
         </ol>
       </div>
     </section>

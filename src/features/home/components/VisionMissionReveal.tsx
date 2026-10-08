@@ -14,7 +14,6 @@ export function VisionMissionReveal({ children, direction }: VisionMissionReveal
     const element = elementRef.current;
     if (!element || !window.IntersectionObserver || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (element.classList.contains("vision-mission-reveal--visible")) return;
-
     element.classList.add("vision-mission-reveal--pending");
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;

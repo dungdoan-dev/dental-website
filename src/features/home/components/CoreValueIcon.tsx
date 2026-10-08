@@ -1,4 +1,4 @@
-import type { CoreValue } from "../data/core-values.data";
+import type { CoreValue } from "../types/home.type";
 
 type CoreValueIconProps = Pick<CoreValue, "iconKey">;
 

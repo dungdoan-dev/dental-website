@@ -7,5 +7,9 @@ export function getClinicSummary(): ClinicSummary {
 }
 
 export async function getClinics(): Promise<readonly Clinic[]> {
-  return clinicRepository.findAll();
+  try {
+    return await clinicRepository.findAll();
+  } catch {
+    return [];
+  }
 }

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { Container } from "@/components/common/Container";
 import { ArticleDetail } from "@/features/articles/components/ArticleDetail";
-import { getArticleBySlug } from "@/features/articles/services/article.service";
+import { getArticleBySlug, getArticles } from "@/features/articles/services/article.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
 type ArticleDetailPageProps = { params: Promise<{ slug: string }> };
@@ -14,7 +13,8 @@ export async function generateMetadata({ params }: ArticleDetailPageProps): Prom
 }
 
 export default async function ArticleDetailPage({ params }: ArticleDetailPageProps) {
-  const article = await getArticleBySlug((await params).slug);
+  const { slug } = await params;
+  const [article, articles] = await Promise.all([getArticleBySlug(slug), getArticles()]);
   if (!article) notFound();
-  return <Container className="py-12"><Breadcrumb items={[{ label: "Tin tức", href: "/tin-tuc" }, { label: article.title }]} /><ArticleDetail article={article} /></Container>;
+  return <><div className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8"><Breadcrumb items={[{ label: "Tin tức", href: "/tin-tuc" }, { label: article.title }]} /></div><ArticleDetail article={article} articles={articles} /></>;
 }

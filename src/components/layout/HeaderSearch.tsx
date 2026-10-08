@@ -7,13 +7,17 @@ export function HeaderSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
     inputRef.current?.focus();
 
     function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        toggleRef.current?.focus();
+      }
     }
 
     function handlePointerDown(event: PointerEvent): void {
@@ -34,8 +38,9 @@ export function HeaderSearch() {
         aria-controls="header-search-panel"
         aria-expanded={isOpen}
         aria-label={isOpen ? "Đóng tìm kiếm" : "Mở tìm kiếm"}
-        className="flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-surface-container-low hover:text-brand-blue-dark"
+        className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-surface-container-low hover:text-brand-blue-dark"
         onClick={() => setIsOpen((current) => !current)}
+        ref={toggleRef}
         type="button"
       >
         <Icon name={isOpen ? "close" : "search"} />

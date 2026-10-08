@@ -1,7 +1,11 @@
-import { insurancePartners, type InsurancePartner } from "../data/insurance.data";
+import Image from "next/image";
+import { getInsurancePartners } from "../services/home.service";
+import type { InsurancePartner } from "../types/home.type";
+
+type PartnerWithLogo = InsurancePartner & { logoSrc: string };
 
 type PartnerGroupProps = {
-  partners: readonly InsurancePartner[];
+  partners: readonly PartnerWithLogo[];
   duplicate?: boolean;
 };
 
@@ -9,20 +13,18 @@ function PartnerGroup({ partners, duplicate = false }: PartnerGroupProps) {
   return (
     <ul aria-hidden={duplicate || undefined} className="flex shrink-0 gap-5 pr-5">
       {partners.map((partner) => (
-        <li className="w-[220px] shrink-0 rounded-2xl border border-border-subtle bg-white p-5 shadow-sm" key={partner.code}>
-          <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-xs font-extrabold text-white ${partner.accent === "green" ? "bg-brand-green" : "bg-brand-blue-dark"}`}>{partner.code}</div>
-          <p className="font-bold text-text-primary">{partner.name}</p>
-          <p className="mt-1 text-xs text-text-secondary">{partner.description}</p>
+        <li className="relative h-36 w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm" key={partner.code}>
+          <Image alt={`Logo ${partner.name}`} className="object-contain p-3" fill sizes="220px" src={partner.logoSrc} />
         </li>
       ))}
     </ul>
   );
 }
 
-function PartnerRow({ partners, reverse = false }: { partners: readonly InsurancePartner[]; reverse?: boolean }) {
+function PartnerRow({ partners, reverse = false }: { partners: readonly PartnerWithLogo[]; reverse?: boolean }) {
   return (
-    <div className="overflow-hidden">
-      <div className={`insurance-marquee flex w-max ${reverse ? "insurance-marquee--reverse" : ""}`}>
+    <div className="group/insurance-row overflow-hidden">
+      <div className={`insurance-marquee flex w-max group-hover/insurance-row:[animation-play-state:paused] ${reverse ? "insurance-marquee--reverse" : ""}`}>
         <PartnerGroup partners={partners} />
         <PartnerGroup duplicate partners={partners} />
       </div>
@@ -30,7 +32,10 @@ function PartnerRow({ partners, reverse = false }: { partners: readonly Insuranc
   );
 }
 
-export function InsurancePartnersSection() {
+export async function InsurancePartnersSection() {
+  const insurancePartners = (await getInsurancePartners()).filter(
+    (partner): partner is PartnerWithLogo => Boolean(partner.logoSrc),
+  );
   const midpoint = Math.ceil(insurancePartners.length / 2);
 
   return (

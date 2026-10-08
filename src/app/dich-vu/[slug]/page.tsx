@@ -4,7 +4,8 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Container } from "@/components/common/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { ImplantServiceDetail } from "@/features/services/components/ImplantServiceDetail";
-import { getServiceBySlug } from "@/features/services/services/service.service";
+import { ServiceDetailPageContent } from "@/features/services/components/ServiceDetailPageContent";
+import { getImplantDetailData, getServiceBySlug, getServiceDetailData } from "@/features/services/services/service.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
 type ServiceDetailPageProps = { params: Promise<{ slug: string }> };
@@ -19,7 +20,12 @@ export async function generateMetadata({ params }: ServiceDetailPageProps): Prom
 export default async function ServiceDetailPage({ params }: ServiceDetailPageProps) {
   const service = await getServiceBySlug((await params).slug);
   if (!service) notFound();
-  if (service.slug === "trong-rang-implant") return <ImplantServiceDetail service={service} />;
+  const serviceContent = await getServiceDetailData(service.id);
+  if (serviceContent) return <ServiceDetailPageContent content={serviceContent} service={service} />;
+  if (service.slug === "trong-rang-implant") {
+    const content = await getImplantDetailData();
+    if (content) return <ImplantServiceDetail content={content} service={service} />;
+  }
 
   return (
     <Container className="py-12">
