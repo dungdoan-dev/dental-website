@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import type { Clinic } from "@/features/clinics/types/clinic.type";
 import { updateClinic } from "../actions";
+import { showAdminToast } from "./AdminToast";
 
 export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,8 +21,14 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
-      await updateClinic(formData);
-      setIsOpen(false);
+      try {
+        const result = await updateClinic(formData);
+        if (!result.success) throw new Error("Clinic update failed");
+        showAdminToast("success", "Đã cập nhật thông tin cơ sở.");
+        setIsOpen(false);
+      } catch {
+        showAdminToast("error", "Không thể cập nhật cơ sở. Vui lòng thử lại.");
+      }
     });
   };
 

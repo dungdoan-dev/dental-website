@@ -10,6 +10,7 @@ import type {
 import { upsertDoctor } from "../actions";
 import { ImageUploadField } from "./ImageUploadField";
 import { EditableRows } from "./EditableRows";
+import { useMutationToast } from "./AdminToast";
 
 const CATEGORIES: { label: string; value: DoctorCategory }[] = [
   { label: "Cấy Ghép Implant", value: "implant" },
@@ -31,6 +32,7 @@ export function DoctorFormDialog({
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
+  useMutationToast(result, doctor ? "Đã cập nhật hồ sơ bác sĩ." : "Đã thêm bác sĩ.");
 
   const [formData, setFormData] = useState({
     id: doctor?.id ?? "",
@@ -41,6 +43,8 @@ export function DoctorFormDialog({
     specialty: doctor?.specialty ?? "Nha khoa tổng quát",
     experience: doctor?.experience ?? 10,
     sortOrder: doctor?.sortOrder ?? 0,
+    nameLines: doctor?.nameLines ?? 1,
+    nameLine2: doctor?.nameLine2 ?? "",
     description: doctor?.description ?? "",
     badge: doctor?.badge ?? "Bác sĩ",
     highlight: doctor?.highlight ?? "Hơn 10 năm kinh nghiệm",
@@ -154,6 +158,36 @@ export function DoctorFormDialog({
                     placeholder="vo-van-tu-hien"
                   />
                 </div>
+              </div>
+
+              <div className="max-w-xs">
+                <label className="mb-1 block font-semibold text-text-primary" htmlFor={`doctor-name-lines-${doctor?.id ?? "new"}`}>Số dòng hiển thị tên trên thẻ</label>
+                <select
+                  id={`doctor-name-lines-${doctor?.id ?? "new"}`}
+                  value={formData.nameLines}
+                  onChange={(e) => setFormData({ ...formData, nameLines: Number(e.target.value) as 1 | 2 })}
+                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
+                >
+                  <option value={1}>1 dòng (tên dài có thể bị rút gọn)</option>
+                  <option value={2}>2 dòng (hiển thị tên đầy đủ hơn)</option>
+                </select>
+                <p className="mt-1 text-xs text-text-secondary">Dùng 2 dòng cho tên dài như học vị kèm họ tên.</p>
+                {formData.nameLines === 2 ? (
+                  <div className="mt-3">
+                    <label className="mb-1 block font-semibold text-text-primary" htmlFor={`doctor-name-line-2-${doctor?.id ?? "new"}`}>Tên hiển thị — dòng 2 *</label>
+                    <input
+                      id={`doctor-name-line-2-${doctor?.id ?? "new"}`}
+                      required
+                      maxLength={160}
+                      type="text"
+                      value={formData.nameLine2}
+                      onChange={(e) => setFormData({ ...formData, nameLine2: e.target.value })}
+                      className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
+                      placeholder="Ví dụ: Thân Trọng Nguyên"
+                    />
+                    <p className="mt-1 text-xs text-text-secondary">Dòng đầu sẽ tự bỏ phần này khỏi tên hồ sơ nếu nó nằm ở cuối tên.</p>
+                  </div>
+                ) : null}
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

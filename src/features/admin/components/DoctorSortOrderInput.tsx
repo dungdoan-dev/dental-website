@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { updateDoctorSortOrder } from "../actions";
+import { showAdminToast, showMutationToast } from "./AdminToast";
 
 export function DoctorSortOrderInput({ id, sortOrder }: { id: string; sortOrder: number }) {
   const [value, setValue] = useState(String(sortOrder));
@@ -13,9 +14,17 @@ export function DoctorSortOrderInput({ id, sortOrder }: { id: string; sortOrder:
     event.preventDefault();
     setMessage("");
     startTransition(async () => {
-      const result = await updateDoctorSortOrder({ id, sortOrder: Number(value) });
-      setIsError(!result.success);
-      setMessage(result.success ? "Đã lưu" : result.error ?? "Không thể lưu");
+      try {
+        const result = await updateDoctorSortOrder({ id, sortOrder: Number(value) });
+        showMutationToast(result, "Đã cập nhật thứ tự bác sĩ.");
+        setIsError(!result.success);
+        setMessage(result.success ? "Đã lưu" : result.error ?? "Không thể lưu");
+      } catch {
+        const message = "Không thể lưu thứ tự bác sĩ. Vui lòng thử lại.";
+        showAdminToast("error", message);
+        setIsError(true);
+        setMessage(message);
+      }
     });
   }
 

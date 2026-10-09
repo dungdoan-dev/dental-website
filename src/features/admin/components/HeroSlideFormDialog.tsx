@@ -3,6 +3,7 @@
 import { useState, useTransition, type FormEvent } from "react";
 import { upsertHeroSlide } from "../actions";
 import { ImageUploadField } from "./ImageUploadField";
+import { showAdminToast } from "./AdminToast";
 
 type HeroSlideData = {
   id: string;
@@ -37,10 +38,18 @@ export function HeroSlideFormDialog({
     setError("");
     startTransition(async () => {
       try {
-        await upsertHeroSlide({ ...formData, id: formData.id.trim(), sortOrder: Number(formData.sortOrder) });
+        const result = await upsertHeroSlide({ ...formData, id: formData.id.trim(), sortOrder: Number(formData.sortOrder) });
+        if (!result.success) {
+          setError(result.error);
+          showAdminToast("error", result.error);
+          return;
+        }
+        showAdminToast("success", slide ? "Đã cập nhật slide." : "Đã thêm slide.");
         setIsOpen(false);
       } catch {
-        setError("Không thể lưu slide. Hãy kiểm tra mã slide có bị trùng hoặc thông tin chưa hợp lệ.");
+        const message = "Không thể lưu slide. Hãy kiểm tra mã slide có bị trùng hoặc thông tin chưa hợp lệ.";
+        setError(message);
+        showAdminToast("error", message);
       }
     });
   }

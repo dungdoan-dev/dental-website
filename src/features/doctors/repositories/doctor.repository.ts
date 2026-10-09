@@ -11,6 +11,8 @@ function mapDoctor(d: {
   specialty: string;
   experience: number;
   sortOrder: number;
+  nameLines: number;
+  nameLine2: string | null;
   description: string;
   badge: string;
   highlight: string;
@@ -41,6 +43,8 @@ function mapDoctor(d: {
     specialty: d.specialty,
     experience: d.experience,
     sortOrder: d.sortOrder,
+    nameLines: (d.nameLines === 2 ? 2 : 1),
+    nameLine2: d.nameLine2 ?? "",
     description: d.description,
     badge: d.badge,
     highlight: d.highlight,

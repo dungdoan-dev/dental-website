@@ -69,6 +69,8 @@ export default async function AdminDoctorsPage() {
               {doctors.map((doctor, idx) => {
       const docObj: Doctor = {
                   ...doctor,
+                  nameLines: doctor.nameLines === 2 ? 2 : 1,
+                  nameLine2: doctor.nameLine2 ?? "",
                   category: doctor.category as Doctor["category"],
                   profile: {
                     licenseNumber: doctor.licenseNumber ?? "",

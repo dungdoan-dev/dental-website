@@ -68,6 +68,8 @@ model Doctor {
   specialty            String
   experience           Int
   sortOrder            Int                         @default(0) @map("sort_order")
+  nameLines            Int                         @default(1) @map("name_lines")
+  nameLine2            String?                     @map("name_line_2")
   description          String
   badge                String
   highlight            String
@@ -172,9 +174,9 @@ model AdminContentRevision {
 }
 
 model AdminLoginLimit {
-  key       String   @id
-  attempts  Int
-  resetAt   DateTime @map("reset_at") @db.Timestamptz(6)
+  key      String   @id
+  attempts Int
+  resetAt  DateTime @map("reset_at") @db.Timestamptz(6)
 
   @@map("admin_login_limits")
 }
@@ -252,13 +254,13 @@ model CoreValue {
 }
 
 model InsurancePartner {
-  id          BigInt @id @default(autoincrement())
-  code        String @unique
+  id          BigInt  @id @default(autoincrement())
+  code        String  @unique
   name        String
   description String
   accent      String
   logoSrc     String? @map("logo_src")
-  sortOrder   Int    @default(0) @map("sort_order")
+  sortOrder   Int     @default(0) @map("sort_order")
 
   @@map("insurance_partners")
 }

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { upsertTestimonial } from "../actions";
+import { showAdminToast } from "./AdminToast";
 
 export function TestimonialFormDialog({
   testimonial,
@@ -53,12 +54,18 @@ export function TestimonialFormDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
-      await upsertTestimonial({
-        ...formData,
-        id: formData.id || `review-${crypto.randomUUID()}`,
-        rating: Number(formData.rating),
-      });
-      setIsOpen(false);
+      try {
+        const result = await upsertTestimonial({
+          ...formData,
+          id: formData.id || `review-${crypto.randomUUID()}`,
+          rating: Number(formData.rating),
+        });
+        if (!result.success) throw new Error("Testimonial save failed");
+        showAdminToast("success", testimonial ? "Đã cập nhật đánh giá." : "Đã thêm đánh giá.");
+        setIsOpen(false);
+      } catch {
+        showAdminToast("error", "Không thể lưu đánh giá. Vui lòng thử lại.");
+      }
     });
   };
 

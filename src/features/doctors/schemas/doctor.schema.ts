@@ -9,6 +9,8 @@ export const doctorSchema = z.object({
   specialty: z.string().min(1),
   experience: z.number().int().nonnegative(),
   sortOrder: z.number().int().nonnegative(),
+  nameLines: z.union([z.literal(1), z.literal(2)]).default(1),
+  nameLine2: z.string().default(""),
   description: z.string().min(1),
   badge: z.string().min(1),
   highlight: z.string().min(1),

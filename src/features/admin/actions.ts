@@ -133,7 +133,7 @@ export async function upsertDoctor(input: DoctorFormData) {
   const parsed = doctorFormSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   const { education, specialties, experienceHighlights, certificates, ...data } = parsed.data;
-  const base = { ...data, licenseNumber: data.licenseNumber || null, quote: data.quote || null, sourceUrl: data.sourceUrl || null };
+  const base = { ...data, nameLine2: data.nameLine2 || null, licenseNumber: data.licenseNumber || null, quote: data.quote || null, sourceUrl: data.sourceUrl || null };
   return runMutation(async () => {
     await db.$transaction(async (tx) => {
       const duplicate = await tx.doctor.findUnique({ where: { slug: data.slug }, select: { id: true } });

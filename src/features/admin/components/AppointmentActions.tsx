@@ -5,6 +5,7 @@ import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
 import type { AppointmentStatus } from "@prisma/client";
 import { deleteAppointment, updateAppointmentStatus } from "../actions";
+import { showMutationToast } from "./AdminToast";
 
 export function AppointmentActions({
   id,
@@ -19,8 +20,15 @@ export function AppointmentActions({
   const handleStatusChange = (status: AppointmentStatus) => {
     startTransition(async () => {
       setResult(null);
-      try { setResult(await updateAppointmentStatus(id, status)); }
-      catch { setResult({ success: false, error: "Không thể cập nhật lịch hẹn. Vui lòng thử lại." }); }
+      try {
+        const response = await updateAppointmentStatus(id, status);
+        showMutationToast(response, "Đã cập nhật trạng thái lịch hẹn.");
+        setResult(response);
+      } catch {
+        const errorResult = { success: false as const, error: "Không thể cập nhật lịch hẹn. Vui lòng thử lại." };
+        showMutationToast(errorResult, "Đã cập nhật trạng thái lịch hẹn.");
+        setResult(errorResult);
+      }
     });
   };
 
@@ -28,8 +36,15 @@ export function AppointmentActions({
     if (confirm("Bạn có chắc chắn muốn xóa lịch hẹn này khỏi hệ thống?")) {
       startTransition(async () => {
         setResult(null);
-        try { setResult(await deleteAppointment(id)); }
-        catch { setResult({ success: false, error: "Không thể xóa lịch hẹn. Vui lòng thử lại." }); }
+        try {
+          const response = await deleteAppointment(id);
+          showMutationToast(response, "Đã xóa lịch hẹn.");
+          setResult(response);
+        } catch {
+          const errorResult = { success: false as const, error: "Không thể xóa lịch hẹn. Vui lòng thử lại." };
+          showMutationToast(errorResult, "Đã xóa lịch hẹn.");
+          setResult(errorResult);
+        }
       });
     }
   };

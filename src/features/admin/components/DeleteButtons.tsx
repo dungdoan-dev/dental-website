@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
+import { showMutationToast } from "./AdminToast";
 import {
   deleteService,
   deleteDoctor,
@@ -31,12 +32,17 @@ function BaseDeleteButton({
         try {
           const response = await onDelete();
           if (response && typeof response === "object" && "success" in response) {
-            setResult(response as MutationResult);
+            const mutationResult = response as MutationResult;
+            showMutationToast(mutationResult, "Đã xóa mục thành công.");
+            setResult(mutationResult);
           } else {
+            showMutationToast({ success: true }, "Đã xóa mục thành công.");
             setResult({ success: true });
           }
         } catch {
-          setResult({ success: false, error: "Không thể xóa mục này. Vui lòng thử lại." });
+          const errorResult = { success: false as const, error: "Không thể xóa mục này. Vui lòng thử lại." };
+          showMutationToast(errorResult, "Đã xóa mục thành công.");
+          setResult(errorResult);
         }
       });
     }

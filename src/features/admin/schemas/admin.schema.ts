@@ -25,12 +25,18 @@ export const doctorFormSchema = z.object({
   id: recordIdSchema, name: text(200), slug: slugSchema, avatar: imagePathSchema,
   position: text(200), specialty: text(200), experience: z.number().int().min(0).max(80),
   sortOrder: z.number().int().min(0).max(99999),
+  nameLines: z.union([z.literal(1), z.literal(2)]).default(1),
+  nameLine2: optionalText(160).optional(),
   description: text(10000), badge: optionalText(120), highlight: optionalText(300),
   category: z.enum(["implant", "ortho", "aesthetic", "surgery", "pediatric"]),
   directoryTitle: optionalText(200), licenseNumber: optionalText(120).optional(), quote: optionalText(2000).optional(),
   languages: list.optional(), specialties: list.optional(), education: list.optional(), experienceHighlights: list.optional(),
   sourceUrl: z.union([z.literal(""), webUrlSchema]).optional(),
   certificates: z.array(z.object({ title: text(200), issuer: text(200), detail: optionalText(2000), image: imagePathSchema })).max(50).optional(),
+}).superRefine((data, context) => {
+  if (data.nameLines === 2 && !data.nameLine2?.trim()) {
+    context.addIssue({ code: "custom", path: ["nameLine2"], message: "Vui lòng nhập nội dung dòng 2 của tên hiển thị." });
+  }
 });
 export const doctorSortOrderSchema = z.object({
   id: recordIdSchema,

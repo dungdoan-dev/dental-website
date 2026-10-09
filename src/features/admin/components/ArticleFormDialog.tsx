@@ -8,6 +8,7 @@ import { FormFeedback } from "./FormFeedback";
 import type { Article, ArticleCategory } from "@/features/articles/types/article.type";
 import { upsertArticle } from "../actions";
 import { ImageUploadField } from "./ImageUploadField";
+import { useMutationToast } from "./AdminToast";
 
 const TinyMceEditor = dynamic(() => import("./TinyMceEditor").then((module) => module.TinyMceEditor), {
   ssr: false,
@@ -41,6 +42,7 @@ export function ArticleFormDialog({
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
+  useMutationToast(result, article ? "Đã cập nhật bài viết." : "Đã thêm bài viết.");
 
   const [formData, setFormData] = useState({
     id: article?.id ?? "",

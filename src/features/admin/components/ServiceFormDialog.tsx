@@ -6,6 +6,7 @@ import { FormFeedback } from "./FormFeedback";
 import type { DentalService, ServiceCategory } from "@/features/services/types/service.type";
 import { upsertService } from "../actions";
 import { ImageUploadField } from "./ImageUploadField";
+import { useMutationToast } from "./AdminToast";
 
 const CATEGORIES: { label: string; value: ServiceCategory }[] = [
   { label: "Trồng Răng Implant", value: "implant" },
@@ -29,6 +30,7 @@ export function ServiceFormDialog({
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
+  useMutationToast(result, service ? "Đã cập nhật dịch vụ." : "Đã thêm dịch vụ.");
 
   const [formData, setFormData] = useState({
     id: service?.id ?? "",

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AdminHeader } from "./AdminHeader";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminPageConfigNavigation } from "./AdminPageConfigNavigation";
+import { AdminToastViewport } from "./AdminToast";
 
 export function AdminLayoutShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -21,6 +22,7 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
           {children}
         </main>
       </div>
+      <AdminToastViewport />
     </div>
   );
 }

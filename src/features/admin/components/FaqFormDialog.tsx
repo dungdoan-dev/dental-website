@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { upsertFaq } from "../actions";
+import { showAdminToast } from "./AdminToast";
 
 export function FaqFormDialog({
   faq,
@@ -25,8 +26,14 @@ export function FaqFormDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
-      await upsertFaq(formData);
-      setIsOpen(false);
+      try {
+        const result = await upsertFaq(formData);
+        if (!result.success) throw new Error("FAQ save failed");
+        showAdminToast("success", faq ? "Đã cập nhật câu hỏi." : "Đã thêm câu hỏi.");
+        setIsOpen(false);
+      } catch {
+        showAdminToast("error", "Không thể lưu câu hỏi. Vui lòng thử lại.");
+      }
     });
   };
 

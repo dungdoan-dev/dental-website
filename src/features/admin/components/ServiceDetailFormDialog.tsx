@@ -6,12 +6,14 @@ import { serviceDetailSchema, type ServiceDetailData } from "@/features/services
 import { EditableRows } from "./EditableRows";
 import { FormFeedback } from "./FormFeedback";
 import { updateServiceDetail } from "../content-actions";
+import { useMutationToast } from "./AdminToast";
 
 type Props = { service: DentalService; detail?: ServiceDetailData };
 
 export function ServiceDetailFormDialog({ service, detail }: Props) {
   const [open, setOpen] = useState(false);
   const [result, formAction, pending] = useActionState(updateServiceDetail, null);
+  useMutationToast(result, "Đã cập nhật chi tiết dịch vụ.");
   const initial = serviceDetailSchema.parse(detail ?? {
     eyebrow: service.category,
     title: service.name,
