@@ -169,3 +169,24 @@ export async function updateContactCta(_previous: State, formData: FormData): Pr
   revalidatePath("/");
   return { success: true };
 }
+
+const homeCopyKeys = ["services", "doctors", "whyChoose", "clinics", "insurance", "faq", "testimonials", "vision", "values"] as const;
+const homeCopySchema = z.record(z.string(), z.object({ title: z.string().trim().min(1).max(160), note: z.string().trim().max(400) }));
+
+export async function updateHomeSectionCopy(_previous: State, formData: FormData): Promise<MutationResult> {
+  await requireAdmin();
+  const candidate = Object.fromEntries(homeCopyKeys.map((key) => [key, {
+    title: formData.get(`${key}Title`),
+    note: formData.get(`${key}Note`),
+  }]));
+  const parsed = homeCopySchema.safeParse(candidate);
+  if (!parsed.success) return validationFailure(parsed.error);
+  try {
+    await saveSiteRecord("home_section_copy", "Tiêu đề và ghi chú các mục trang chủ", parsed.data);
+  } catch {
+    return { success: false, error: "Không thể lưu nội dung tiêu đề trang chủ. Vui lòng thử lại." };
+  }
+  revalidatePath("/");
+  revalidatePath("/admin/home");
+  return { success: true };
+}

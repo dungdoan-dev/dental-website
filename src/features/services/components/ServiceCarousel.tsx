@@ -3,14 +3,14 @@ import type { DentalService } from "../types/service.type";
 import { ServiceCard } from "./ServiceCard";
 import type { ReactNode } from "react";
 
-type ServiceCarouselProps = { services: readonly DentalService[]; footerAction?: ReactNode };
+type ServiceCarouselProps = { services: readonly DentalService[]; footerAction?: ReactNode; title?: string; note?: string };
 
-export function ServiceCarousel({ services, footerAction }: ServiceCarouselProps) {
+export function ServiceCarousel({ services, footerAction, title = "Dịch vụ nha khoa", note = "" }: ServiceCarouselProps) {
   if (!services.length) return null;
 
   return (
     <>
-      <h2 className="mb-8 text-center text-3xl font-extrabold tracking-tight text-text-primary sm:mb-10 sm:text-[2.5rem]">Dịch vụ nha khoa</h2>
+      <div className="mb-8 text-center sm:mb-10"><h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{title}</h2>{note ? <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{note}</p> : null}</div>
       <CardCarousel footerAction={footerAction} label="Dịch vụ nha khoa" nextLabel="Dịch vụ kế tiếp" pageLabel="Trang dịch vụ" previousLabel="Dịch vụ trước">
         {services.map((service) => <ServiceCard key={service.id} service={service} />)}
       </CardCarousel>

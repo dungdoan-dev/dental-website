@@ -1,13 +1,14 @@
-import { getCoreValues } from "../services/home.service";
+import { getCoreValues, getHomeSectionCopy } from "../services/home.service";
 import { CoreValueIcon } from "./CoreValueIcon";
 import { CoreValuesReveal } from "./CoreValuesReveal";
 
 export async function CoreValuesSection() {
-  const coreValues = await getCoreValues();
+  const [coreValues, copy] = await Promise.all([getCoreValues(), getHomeSectionCopy()]);
 
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-margin-mobile pb-8 md:px-margin lg:pb-10">
+        <div className="mb-6 text-center"><h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.values.title}</h2><p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.values.note}</p></div>
         <CoreValuesReveal>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {coreValues.map((value) => (

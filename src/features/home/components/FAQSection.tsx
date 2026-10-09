@@ -1,7 +1,7 @@
-import { getFaqItems } from "../services/home.service";
+import { getFaqHeading, getFaqItems } from "../services/home.service";
 import { FAQAccordion } from "./FAQAccordion";
 
 export async function FAQSection() {
-  const items = await getFaqItems();
-  return <FAQAccordion items={items} />;
+  const [items, heading] = await Promise.all([getFaqItems(), getFaqHeading()]);
+  return <FAQAccordion items={items} {...heading} />;
 }

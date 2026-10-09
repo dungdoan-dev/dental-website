@@ -6,10 +6,11 @@ import { TestimonialFormDialog } from "@/features/admin/components/TestimonialFo
 import { DeleteFaqButton, DeleteHeroSlideButton, DeleteTestimonialButton } from "@/features/admin/components/DeleteButtons";
 import { HeroSlideFormDialog } from "@/features/admin/components/HeroSlideFormDialog";
 import { InsurancePartnersManager, type InsurancePartnerRecord } from "@/features/admin/components/InsurancePartnersManager";
-import { updateStructuredSiteContent } from "@/features/admin/content-actions";
+import { updateHomeSectionCopy, updateStructuredSiteContent } from "@/features/admin/content-actions";
 import { updateCoreValue } from "@/features/admin/actions";
 import { AdminActionForm } from "@/features/admin/components/AdminActionForm";
 import { ImageUploadField } from "@/features/admin/components/ImageUploadField";
+import { HOME_SECTION_COPY, type HomeSectionCopyMap } from "@/features/home/home-section-copy";
 
 export const metadata = {
   title: "Cấu Hình Trang Chủ | Admin Nha Khoa 2000",
@@ -17,7 +18,7 @@ export const metadata = {
 
 export default async function AdminHomePage() {
   await requireAdmin();
-  const [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent] = await Promise.all([
+  const [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent] = await Promise.all([
     db.faqItem.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] }),
     db.testimonial.findMany({ orderBy: { sortOrder: "asc" } }),
     db.coreValue.findMany({ orderBy: { sortOrder: "asc" } }),
@@ -27,8 +28,23 @@ export default async function AdminHomePage() {
       FROM insurance_partners ORDER BY sort_order ASC
     `,
     db.siteContent.findUnique({ where: { key: "home_why_choose" }, select: { content: true } }),
+    db.siteContent.findUnique({ where: { key: "home_faq_heading" }, select: { content: true } }),
+    db.siteContent.findUnique({ where: { key: "home_section_copy" }, select: { content: true } }),
   ]);
   const whyChooseImage = whyChooseContent?.content && typeof whyChooseContent.content === "object" && !Array.isArray(whyChooseContent.content) && "image" in whyChooseContent.content && typeof whyChooseContent.content.image === "string" ? whyChooseContent.content.image : "";
+  const faqHeading = faqHeadingContent?.content && typeof faqHeadingContent.content === "object" && !Array.isArray(faqHeadingContent.content) ? faqHeadingContent.content : {};
+  const sectionCopy = { ...HOME_SECTION_COPY } as unknown as HomeSectionCopyMap;
+  const savedCopy = sectionCopyContent?.content && typeof sectionCopyContent.content === "object" && !Array.isArray(sectionCopyContent.content) ? sectionCopyContent.content : {};
+  for (const key of Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>) {
+    const value = key === "faq" && !(key in savedCopy) ? faqHeading : (key in savedCopy ? (savedCopy as Record<string, unknown>)[key] : null);
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      const fields = value as Record<string, unknown>;
+      sectionCopy[key] = {
+        title: typeof fields.title === "string" ? fields.title : HOME_SECTION_COPY[key].title,
+        note: typeof fields.note === "string" ? fields.note : HOME_SECTION_COPY[key].note,
+      };
+    }
+  }
 
   return (
     <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
@@ -54,6 +70,16 @@ export default async function AdminHomePage() {
           </Link>
         </div>
       </div>
+
+      <section className="order-10 overflow-hidden rounded-2xl border border-border-subtle/50 bg-white shadow-sm">
+        <div className="border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4"><h2 className="text-base font-bold text-text-primary">Tiêu đề và ghi chú trang chủ</h2><p className="text-xs text-text-secondary">Quản lý tiêu đề cùng dòng mô tả nhỏ bên dưới từng tiêu đề section.</p></div>
+        <AdminActionForm action={updateHomeSectionCopy} submitLabel="Lưu tất cả tiêu đề" className="grid gap-4 p-6 md:grid-cols-2">
+          {(Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>).map((key) => {
+            const labels: Record<keyof typeof HOME_SECTION_COPY, string> = { services: "Dịch vụ", doctors: "Đội ngũ bác sĩ", whyChoose: "Lý do lựa chọn", clinics: "Cơ sở", insurance: "Bảo hiểm", faq: "Câu hỏi thường gặp", testimonials: "Đánh giá khách hàng", vision: "Tầm nhìn & sứ mệnh", values: "Giá trị cốt lõi" };
+            return <fieldset className="space-y-3 rounded-xl border border-border-subtle p-4" key={key}><legend className="px-1 text-xs font-bold text-brand-blue-dark">{labels[key]}</legend><label className="block text-xs font-semibold text-text-secondary">Tiêu đề<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={sectionCopy[key].title} maxLength={160} name={`${key}Title`} required /></label><label className="block text-xs font-semibold text-text-secondary">Ghi chú nhỏ<textarea className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={sectionCopy[key].note} maxLength={400} name={`${key}Note`} rows={2} /></label></fieldset>;
+          })}
+        </AdminActionForm>
+      </section>
 
       {/* SECTION 1: FAQ */}
       <section className="order-8 overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">

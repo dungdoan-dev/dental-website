@@ -3,6 +3,7 @@ import { getSiteContent } from "@/features/content/services/site-content.service
 import { z } from "zod";
 import type { CoreValue, FAQItem, HeroSlide, InsurancePartner, Testimonial } from "../types/home.type";
 import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
+import { HOME_SECTION_COPY, type HomeSectionCopyMap } from "../home-section-copy";
 
 const getCachedHeroSlides = cachePublicData("home:hero-slides", [publicDataTags.heroSlides], () => db.heroSlide.findMany({ orderBy: { sortOrder: "asc" } }));
 const getCachedCoreValues = cachePublicData("home:core-values", [publicDataTags.coreValues], () => db.coreValue.findMany({
@@ -85,6 +86,27 @@ export async function getFaqItems(): Promise<readonly FAQItem[]> {
   } catch {
     return [];
   }
+}
+
+export async function getFaqHeading(): Promise<{ title: string; note: string }> {
+  const copy = await getHomeSectionCopy();
+  return copy.faq;
+}
+
+export async function getHomeSectionCopy(): Promise<HomeSectionCopyMap> {
+  const [content, legacyFaq] = await Promise.all([
+    getSiteContent("home_section_copy", z.record(z.string(), z.object({ title: z.string(), note: z.string() }))),
+    getSiteContent("home_faq_heading", z.object({ title: z.string(), note: z.string() })),
+  ]);
+  const result = { ...HOME_SECTION_COPY } as unknown as HomeSectionCopyMap;
+  if (content) {
+    for (const key of Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>) {
+      const entry = content[key];
+      if (entry) result[key] = { title: entry.title || HOME_SECTION_COPY[key].title, note: entry.note || HOME_SECTION_COPY[key].note };
+    }
+  }
+  if (!content?.faq && legacyFaq) result.faq = legacyFaq;
+  return result;
 }
 
 export async function getTestimonials(): Promise<readonly Testimonial[]> {

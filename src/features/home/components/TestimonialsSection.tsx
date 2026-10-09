@@ -1,10 +1,10 @@
 import { StarRating } from "@/components/ui/StarRating";
-import { getTestimonials } from "../services/home.service";
+import { getHomeSectionCopy, getTestimonials } from "../services/home.service";
 
 const accentClass = { blue: "bg-brand-blue", green: "bg-brand-green", "blue-dark": "bg-brand-blue-dark" } as const;
 
 export async function TestimonialsSection() {
-  const testimonials = await getTestimonials();
+  const [testimonials, copy] = await Promise.all([getTestimonials(), getHomeSectionCopy()]);
   const averageRating = testimonials.length > 0
     ? testimonials.reduce((sum, item) => sum + item.rating, 0) / testimonials.length
     : null;
@@ -14,8 +14,8 @@ export async function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
         <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl space-y-3">
-            <h2 className="text-3xl font-extrabold tracking-tight text-text-primary sm:text-[2.5rem]">Khách hàng chia sẻ</h2>
-            <p className="text-text-secondary">Chia sẻ từ khách hàng sau khi trải nghiệm dịch vụ tại Nha Khoa 2000.</p>
+            <h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{copy.testimonials.title}</h2>
+            <p className="text-sm leading-relaxed text-text-secondary sm:text-base">{copy.testimonials.note}</p>
           </div>
           <div className="flex shrink-0 items-center gap-4 rounded-2xl bg-white px-6 py-3.5 shadow-sm">
             <div className="text-3xl font-extrabold text-brand-blue-dark">{averageRating?.toFixed(1) ?? "—"}</div>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getInsurancePartners } from "../services/home.service";
 import type { InsurancePartner } from "../types/home.type";
+import { getHomeSectionCopy } from "../services/home.service";
 
 type PartnerWithLogo = InsurancePartner & { logoSrc: string };
 
@@ -33,7 +34,8 @@ function PartnerRow({ partners, reverse = false }: { partners: readonly PartnerW
 }
 
 export async function InsurancePartnersSection() {
-  const insurancePartners = (await getInsurancePartners()).filter(
+  const [partners, copy] = await Promise.all([getInsurancePartners(), getHomeSectionCopy()]);
+  const insurancePartners = partners.filter(
     (partner): partner is PartnerWithLogo => Boolean(partner.logoSrc),
   );
   const midpoint = Math.ceil(insurancePartners.length / 2);
@@ -42,8 +44,8 @@ export async function InsurancePartnersSection() {
     <section className="select-none overflow-hidden border-t border-border-subtle bg-surface py-8 lg:py-10" id="doi-tac-bao-hiem">
       <div className="mx-auto mb-6 max-w-7xl px-margin-mobile md:px-margin">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-text-primary sm:text-[2.5rem]">Đối Tác Bảo Hiểm &amp; Bảo Lãnh Viện Phí Trực Tiếp</h2>
-          <p className="mt-4 leading-relaxed text-text-secondary">Nha Khoa 2000 hỗ trợ thanh toán bảo lãnh viện phí trực tiếp nhanh chóng với hơn 15+ đối tác bảo hiểm hàng đầu, giúp quý khách an tâm điều trị không lo thủ tục phức tạp.</p>
+          <h2 className="whitespace-nowrap text-[clamp(0.7rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{copy.insurance.title}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.insurance.note}</p>
         </div>
       </div>
       <div className="space-y-5">

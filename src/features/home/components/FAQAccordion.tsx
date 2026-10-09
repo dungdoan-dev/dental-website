@@ -4,21 +4,18 @@ import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { FAQItem } from "../types/home.type";
 
-export function FAQAccordion({ items }: { items: readonly FAQItem[] }) {
+export function FAQAccordion({ items, title, note }: { items: readonly FAQItem[]; title: string; note: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <section className="bg-white py-8 lg:py-10">
       <div className="mx-auto max-w-4xl px-margin-mobile md:px-margin">
         <div className="mx-auto mb-8 max-w-2xl space-y-3 text-center">
-          <span className="block text-[13px] font-bold uppercase tracking-widest text-brand-blue">
-            GIẢI ĐÁP THẮC MẮC
-          </span>
-          <h2 className="text-3xl font-extrabold tracking-tight text-text-primary sm:text-[2.5rem]">
-            Câu hỏi thường gặp khi đến với Nha Khoa 2000
+          <h2 className="whitespace-nowrap text-[clamp(0.7rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">
+            {title}
           </h2>
-          <p className="text-text-secondary">
-            Mọi thắc mắc của bạn luôn được đội ngũ chuyên môn giải đáp chi tiết, minh bạch và khoa học nhất.
+          <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
+            {note}
           </p>
         </div>
         <div className="space-y-4">
