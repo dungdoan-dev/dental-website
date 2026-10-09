@@ -5,6 +5,7 @@ import { DoctorTeamSection } from "@/features/home/components/DoctorTeamSection"
 import { FAQSection } from "@/features/home/components/FAQSection";
 import { FeaturedServicesSection } from "@/features/home/components/FeaturedServicesSection";
 import { HeroCarousel } from "@/features/home/components/HeroCarousel";
+import { HomePageSectionReveal } from "@/features/home/components/HomePageSectionReveal";
 import { InsurancePartnersSection } from "@/features/home/components/InsurancePartnersSection";
 import { TestimonialsSection } from "@/features/home/components/TestimonialsSection";
 import { VisionMissionSection } from "@/features/home/components/VisionMissionSection";
@@ -19,16 +20,16 @@ export const metadata: Metadata = generateSeoMetadata({
 export default function HomePage() {
   return (
     <>
-      <HeroCarousel />
-      <VisionMissionSection />
-      <CoreValuesSection />
-      <FeaturedServicesSection />
-      <DoctorTeamSection />
-      <WhyChooseSection />
-      <ClinicFacilitiesSection />
-      <InsurancePartnersSection />
-      <FAQSection />
-      <TestimonialsSection />
+      <HomePageSectionReveal><HeroCarousel /></HomePageSectionReveal>
+      <HomePageSectionReveal><VisionMissionSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><CoreValuesSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><FeaturedServicesSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><DoctorTeamSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><WhyChooseSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><ClinicFacilitiesSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><InsurancePartnersSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><FAQSection /></HomePageSectionReveal>
+      <HomePageSectionReveal><TestimonialsSection /></HomePageSectionReveal>
     </>
   );
 }

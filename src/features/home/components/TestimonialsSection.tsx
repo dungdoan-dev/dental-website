@@ -14,7 +14,7 @@ export async function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
         <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl space-y-3">
-            <h2 className="text-[13px] font-bold uppercase tracking-widest text-brand-blue">KHÁCH HÀNG CHIA SẺ</h2>
+            <h2 className="text-3xl font-extrabold tracking-tight text-text-primary sm:text-[2.5rem]">Khách hàng chia sẻ</h2>
             <p className="text-text-secondary">Chia sẻ từ khách hàng sau khi trải nghiệm dịch vụ tại Nha Khoa 2000.</p>
           </div>
           <div className="flex shrink-0 items-center gap-4 rounded-2xl bg-white px-6 py-3.5 shadow-sm">

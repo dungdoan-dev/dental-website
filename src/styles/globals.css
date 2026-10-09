@@ -126,6 +126,26 @@ a {
   animation-name: insurance-scroll-right;
 }
 
+@keyframes home-section-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.home-section-reveal--pending {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+
+.home-section-reveal--visible {
+  animation: home-section-enter 1.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .insurance-marquee:hover {
   animation-play-state: paused;
 }
@@ -133,7 +153,7 @@ a {
 @keyframes vision-slide-in-left {
   from {
     opacity: 0;
-    transform: translate3d(-72px, 0, 0);
+    transform: translate3d(-32px, 0, 0);
   }
   to {
     opacity: 1;
@@ -144,7 +164,7 @@ a {
 @keyframes vision-slide-in-right {
   from {
     opacity: 0;
-    transform: translate3d(72px, 0, 0);
+    transform: translate3d(32px, 0, 0);
   }
   to {
     opacity: 1;
@@ -154,20 +174,20 @@ a {
 
 .vision-mission-reveal--left.vision-mission-reveal--pending {
   opacity: 0;
-  transform: translate3d(-72px, 0, 0);
+  transform: translate3d(-32px, 0, 0);
 }
 
 .vision-mission-reveal--right.vision-mission-reveal--pending {
   opacity: 0;
-  transform: translate3d(72px, 0, 0);
+  transform: translate3d(32px, 0, 0);
 }
 
 .vision-mission-reveal--left.vision-mission-reveal--visible {
-  animation: vision-slide-in-left 2000ms ease-in-out both;
+  animation: vision-slide-in-left 1.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .vision-mission-reveal--right.vision-mission-reveal--visible {
-  animation: vision-slide-in-right 2000ms ease-in-out both;
+  animation: vision-slide-in-right 1.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes core-value-rise {
@@ -187,18 +207,25 @@ a {
 }
 
 .core-values--visible .core-value-card {
-  animation: core-value-rise 1500ms ease-in-out both;
+  animation: core-value-rise 1.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.core-values--visible .core-value-card:nth-child(2) { animation-delay: 220ms; }
-.core-values--visible .core-value-card:nth-child(3) { animation-delay: 440ms; }
-.core-values--visible .core-value-card:nth-child(4) { animation-delay: 660ms; }
+.core-values--visible .core-value-card:nth-child(2) { animation-delay: 100ms; }
+.core-values--visible .core-value-card:nth-child(3) { animation-delay: 200ms; }
+.core-values--visible .core-value-card:nth-child(4) { animation-delay: 300ms; }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .insurance-marquee {
+    animation: none;
+  }
+  .home-section-reveal--pending {
+    opacity: 1;
+    transform: none;
+  }
+  .home-section-reveal--visible {
     animation: none;
   }
   .vision-mission-reveal--pending {

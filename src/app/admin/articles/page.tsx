@@ -15,11 +15,28 @@ export const metadata = {
 export default async function AdminArticlesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireAdmin();
   const raw = await searchParams;
-  const query = articleListQuerySchema.parse({ status: typeof raw.status === "string" ? raw.status : "all" });
-  const articles = await db.article.findMany({
-    where: query.status === "all" ? undefined : { status: query.status },
-    orderBy: { publishedAt: "desc" },
+  const query = articleListQuerySchema.parse({
+    status: typeof raw.status === "string" ? raw.status : "all",
+    page: typeof raw.page === "string" ? raw.page : 1,
   });
+  const pageSize = 20;
+  const where = query.status === "all" ? undefined : { status: query.status };
+  const total = await db.article.count({ where });
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(query.page, pageCount);
+  const articles = await db.article.findMany({
+    where,
+    orderBy: { publishedAt: "desc" },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  });
+
+  function pageHref(nextPage: number) {
+    const params = new URLSearchParams();
+    if (query.status !== "all") params.set("status", query.status);
+    if (nextPage > 1) params.set("page", String(nextPage));
+    return `/admin/articles${params.size ? `?${params.toString()}` : ""}`;
+  }
 
   return (
     <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
@@ -158,6 +175,14 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
           </table>
         </div>
       </div>
+      <nav aria-label="Phân trang bài viết" className="flex flex-wrap items-center justify-between gap-3 text-sm text-text-secondary">
+        <p>Hiển thị {total === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} / {total} bài viết</p>
+        <div className="flex items-center gap-2">
+          <Link aria-disabled={page <= 1} className={`inline-flex min-h-10 items-center rounded-lg border border-border-subtle bg-white px-4 font-semibold ${page <= 1 ? "pointer-events-none opacity-50" : "hover:border-brand-blue"}`} href={pageHref(Math.max(1, page - 1))}>Trước</Link>
+          <span aria-current="page" className="min-w-20 text-center font-semibold text-text-primary">Trang {page} / {pageCount}</span>
+          <Link aria-disabled={page >= pageCount} className={`inline-flex min-h-10 items-center rounded-lg border border-border-subtle bg-white px-4 font-semibold ${page >= pageCount ? "pointer-events-none opacity-50" : "hover:border-brand-blue"}`} href={pageHref(Math.min(pageCount, page + 1))}>Tiếp</Link>
+        </div>
+      </nav>
     </div>
   );
 }

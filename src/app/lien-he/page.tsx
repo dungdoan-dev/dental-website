@@ -1,81 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { AppointmentButton } from "@/components/common/AppointmentButton";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Container } from "@/components/common/Container";
 import { Icon } from "@/components/ui/Icon";
 import { siteConfig } from "@/config/site";
+import { ClinicCard } from "@/features/clinics/components/ClinicCard";
 import { getClinics } from "@/features/clinics/services/clinic.service";
-import type { Clinic } from "@/features/clinics/types/clinic.type";
 import { generateSeoMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = generateSeoMetadata({ title: "Liên hệ và đặt lịch", url: "/lien-he" });
-
-function ClinicContactCard({ clinic, index }: { clinic: Clinic; index: number }) {
-  const clinicNumber = `CS${index + 1}`;
-  const phoneLink = `tel:${clinic.phone.replace(/[^\d+]/g, "")}`;
-
-  return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
-      <div className="relative aspect-[16/7] overflow-hidden bg-surface-container-low">
-        <Image
-          alt={`Không gian ${clinic.name}`}
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          src={clinic.image}
-        />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
-        <span className="absolute left-5 top-5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-extrabold tracking-wide text-brand-blue-dark shadow-sm">{clinicNumber} · {clinic.badge}</span>
-        <div className="absolute bottom-5 left-5 right-5 text-white sm:bottom-6 sm:left-7">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">{clinic.label}</p>
-          <h2 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">{clinic.name}</h2>
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <p className="leading-7 text-text-secondary">{clinic.description}</p>
-        <div className="mt-4 space-y-3">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-blue-light text-brand-blue-dark"><Icon className="h-5 w-5" name="location" /></span>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-text-secondary">Địa chỉ</p>
-              <p className="mt-1 text-sm font-medium leading-6 text-text-primary">{clinic.address}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-green-light text-brand-green-dark"><Icon className="h-5 w-5" name="clock" /></span>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-text-secondary">Giờ làm việc</p>
-              <p className="mt-1 text-sm font-medium leading-6 text-text-primary">{clinic.workingHours}</p>
-            </div>
-          </div>
-        </div>
-
-        {clinic.facilities.length > 0 ? (
-          <ul aria-label={`Tiện ích tại ${clinic.name}`} className="mt-4 flex flex-wrap gap-2">
-            {clinic.facilities.slice(0, 3).map((facility) => (
-              <li className="rounded-full bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary" key={facility}>{facility}</li>
-            ))}
-          </ul>
-        ) : null}
-
-        <div className="mt-auto flex flex-col gap-3 border-t border-border-subtle pt-4 sm:flex-row">
-          <a aria-label={`Gọi ${clinicNumber}, ${clinic.phone}`} className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brand-blue-dark px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2" href={phoneLink}>
-            <Icon className="h-5 w-5" name="phone" />
-            {clinic.phone}
-          </a>
-          {clinic.googleMapsUrl ? (
-            <a aria-label={`Chỉ đường đến ${clinicNumber} (mở tab mới)`} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-border-subtle px-5 py-3 text-sm font-bold text-text-primary transition-colors hover:border-brand-blue hover:bg-brand-blue-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2" href={clinic.googleMapsUrl} rel="noopener noreferrer" target="_blank">
-              <Icon className="h-5 w-5 text-brand-blue-dark" name="map" />
-              Chỉ đường
-            </a>
-          ) : null}
-        </div>
-      </div>
-    </article>
-  );
-}
 
 export default async function ContactPage() {
   const clinics = await getClinics().catch(() => []);
@@ -148,7 +81,7 @@ export default async function ContactPage() {
 
           {clinics.length > 0 ? (
             <div className="grid items-stretch gap-6 lg:grid-cols-2 lg:gap-8">
-              {clinics.map((clinic, index) => <ClinicContactCard clinic={clinic} index={index} key={clinic.id} />)}
+              {clinics.map((clinic) => <ClinicCard clinic={clinic} key={clinic.id} />)}
             </div>
           ) : (
             <div className="rounded-2xl border border-border-subtle bg-white p-8 text-center text-text-secondary">

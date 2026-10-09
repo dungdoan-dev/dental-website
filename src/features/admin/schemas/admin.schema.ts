@@ -56,4 +56,5 @@ export const appointmentQuerySchema = z.object({
 
 export const articleListQuerySchema = z.object({
   status: z.enum(["draft", "published", "all"]).default("all").catch("all"),
+  page: z.coerce.number().int().min(1).max(100000).default(1).catch(1),
 });
