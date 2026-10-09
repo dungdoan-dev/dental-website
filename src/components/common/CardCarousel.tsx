@@ -10,11 +10,12 @@ type CardCarouselProps = {
   previousLabel: string;
   nextLabel: string;
   pageLabel: string;
+  desktopColumns?: 2 | 3;
 };
 
 const arrowClassName = "flex h-12 w-12 items-center justify-center rounded-full border border-border-subtle bg-white text-brand-blue-dark transition-colors duration-300 enabled:hover:border-brand-blue-dark enabled:hover:bg-brand-blue-dark enabled:hover:text-white disabled:cursor-not-allowed disabled:text-slate-300 motion-reduce:transition-none";
 
-export function CardCarousel({ children, label, previousLabel, nextLabel, pageLabel }: CardCarouselProps) {
+export function CardCarousel({ children, label, previousLabel, nextLabel, pageLabel, desktopColumns = 3 }: CardCarouselProps) {
   const items = Children.toArray(children);
   const carouselId = useId();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -79,7 +80,7 @@ export function CardCarousel({ children, label, previousLabel, nextLabel, pageLa
         <div className="relative col-span-3 col-start-1 row-start-1 min-w-0 lg:col-span-1 lg:col-start-2">
           <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain px-1 pt-2 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" id={carouselId} onScroll={syncPagination} ref={viewportRef}>
             {items.map((item, index) => (
-              <div aria-label={`${index + 1} / ${items.length}`} aria-roledescription="slide" className="relative min-w-0 shrink-0 basis-full snap-start md:basis-[calc((100%-1.5rem)/2)] lg:basis-[calc((100%-3rem)/3)]" key={typeof item === "object" && item !== null && "key" in item ? item.key : index} role="group">
+              <div aria-label={`${index + 1} / ${items.length}`} aria-roledescription="slide" className={`relative min-w-0 shrink-0 basis-full snap-start md:basis-[calc((100%-1.5rem)/2)] ${desktopColumns === 2 ? "lg:basis-[calc((100%-1.5rem)/2)]" : "lg:basis-[calc((100%-3rem)/3)]"}`} key={typeof item === "object" && item !== null && "key" in item ? item.key : index} role="group">
                 {item}
               </div>
             ))}
