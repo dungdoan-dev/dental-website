@@ -24,12 +24,17 @@ const list = z.array(text(2000)).max(50);
 export const doctorFormSchema = z.object({
   id: recordIdSchema, name: text(200), slug: slugSchema, avatar: imagePathSchema,
   position: text(200), specialty: text(200), experience: z.number().int().min(0).max(80),
+  sortOrder: z.number().int().min(0).max(99999),
   description: text(10000), badge: optionalText(120), highlight: optionalText(300),
-  featured: z.boolean(), category: z.enum(["implant", "ortho", "aesthetic", "surgery", "pediatric"]),
+  category: z.enum(["implant", "ortho", "aesthetic", "surgery", "pediatric"]),
   directoryTitle: optionalText(200), licenseNumber: optionalText(120).optional(), quote: optionalText(2000).optional(),
   languages: list.optional(), specialties: list.optional(), education: list.optional(), experienceHighlights: list.optional(),
   sourceUrl: z.union([z.literal(""), webUrlSchema]).optional(),
   certificates: z.array(z.object({ title: text(200), issuer: text(200), detail: optionalText(2000), image: imagePathSchema })).max(50).optional(),
+});
+export const doctorSortOrderSchema = z.object({
+  id: recordIdSchema,
+  sortOrder: z.number().int().min(0).max(99999),
 });
 export const articleFormSchema = z.object({
   id: recordIdSchema, title: text(240), slug: slugSchema, excerpt: text(2000), content: text(100000),

@@ -7,7 +7,9 @@ import { DeleteFaqButton, DeleteHeroSlideButton, DeleteTestimonialButton } from 
 import { HeroSlideFormDialog } from "@/features/admin/components/HeroSlideFormDialog";
 import { InsurancePartnersManager, type InsurancePartnerRecord } from "@/features/admin/components/InsurancePartnersManager";
 import { updateStructuredSiteContent } from "@/features/admin/content-actions";
+import { updateCoreValue } from "@/features/admin/actions";
 import { AdminActionForm } from "@/features/admin/components/AdminActionForm";
+import { ImageUploadField } from "@/features/admin/components/ImageUploadField";
 
 export const metadata = {
   title: "Cấu Hình Trang Chủ | Admin Nha Khoa 2000",
@@ -16,7 +18,7 @@ export const metadata = {
 export default async function AdminHomePage() {
   await requireAdmin();
   const [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent] = await Promise.all([
-    db.faqItem.findMany({ orderBy: { id: "asc" } }),
+    db.faqItem.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] }),
     db.testimonial.findMany({ orderBy: { sortOrder: "asc" } }),
     db.coreValue.findMany({ orderBy: { sortOrder: "asc" } }),
     db.heroSlide.findMany({ orderBy: { sortOrder: "asc" } }),
@@ -58,7 +60,7 @@ export default async function AdminHomePage() {
         <div className="flex items-center justify-between border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
           <div>
             <h2 className="text-base font-bold text-text-primary">Câu hỏi thường gặp (FAQ)</h2>
-            <p className="text-xs text-text-secondary">Giải đáp thắc mắc hiển thị ở khối accordion chân trang</p>
+            <p className="text-xs text-text-secondary">Câu hỏi và câu trả lời hiển thị trong mục FAQ trên trang chủ; thứ tự theo số thứ tự.</p>
           </div>
           <FaqFormDialog
             buttonLabel="+ Thêm Câu Hỏi"
@@ -141,18 +143,29 @@ export default async function AdminHomePage() {
       {/* SECTION 3: CORE VALUES */}
       <section className="order-2 overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div className="border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
-          <h2 className="text-base font-bold text-text-primary">4 Giá trị cốt lõi</h2>
-          <p className="text-xs text-text-secondary">Tôn chỉ và sứ mệnh hoạt động của thương hiệu Nha Khoa 2000</p>
+          <h2 className="text-base font-bold text-text-primary">4 Giá Trị Tạo Dựng Niềm Tin Bền Vững</h2>
+          <p className="text-xs text-text-secondary">Chỉnh sửa tiêu đề, thông điệp, mô tả, biểu tượng và thứ tự hiển thị trên trang chủ.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           {coreValues.map((cv) => (
-            <div key={cv.id} className="p-5 space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-blue-dark">
-                {cv.title}
-              </span>
-              <h3 className="text-xs font-bold text-text-primary">{cv.slogan}</h3>
-              <p className="text-xs text-text-secondary leading-relaxed">{cv.description}</p>
+            <div key={cv.id} className="p-5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-blue-dark">{cv.title}</span>
+              <h3 className="mt-2 text-xs font-bold text-text-primary">{cv.slogan}</h3>
+              <p className="mt-1 text-xs text-text-secondary leading-relaxed">{cv.description}</p>
+              <details className="mt-4 rounded-xl border border-border-subtle p-3">
+                <summary className="cursor-pointer text-xs font-semibold text-brand-blue-dark">Chỉnh sửa nội dung</summary>
+                <AdminActionForm action={updateCoreValue} submitLabel="Lưu giá trị" className="mt-3 space-y-3">
+                  <input name="id" type="hidden" value={cv.id.toString()} />
+                  <label className="block text-xs font-semibold text-text-secondary">Tiêu đề<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.title} name="title" maxLength={80} required /></label>
+                  <label className="block text-xs font-semibold text-text-secondary">Thông điệp<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.slogan} name="slogan" maxLength={200} required /></label>
+                  <label className="block text-xs font-semibold text-text-secondary">Mô tả<textarea className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.description} name="description" maxLength={1200} rows={4} required /></label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block text-xs font-semibold text-text-secondary">Biểu tượng<select className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.iconKey} name="iconKey"><option value="heart">Tận thương</option><option value="care">Tận tâm</option><option value="honesty">Trung thực</option><option value="innovation">Tân tiến</option></select></label>
+                    <label className="block text-xs font-semibold text-text-secondary">Thứ tự<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.sortOrder} min={0} max={999} name="sortOrder" type="number" required /></label>
+                  </div>
+                </AdminActionForm>
+              </details>
             </div>
           ))}
         </div>
@@ -191,21 +204,21 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      <section className="order-3 rounded-2xl border border-border-subtle/50 bg-white p-6 shadow-sm">
+      <section className="order-5 rounded-2xl border border-border-subtle/50 bg-white p-6 shadow-sm">
         <div className="mb-4"><h2 className="text-base font-bold text-text-primary">Lý do lựa chọn</h2><p className="text-xs text-text-secondary">Cập nhật hình ảnh hiển thị trong section này trên trang chủ.</p></div>
         <AdminActionForm action={updateStructuredSiteContent} submitLabel="Lưu hình ảnh" className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <input name="key" type="hidden" value="home_why_choose" />
-          <label className="flex-1 text-xs font-semibold text-text-secondary">Đường dẫn hình ảnh<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={whyChooseImage} name="image" placeholder="/images/home/why-choose.jpg" required /></label>
+          <div className="flex-1"><ImageUploadField aspect={16 / 9} name="image" label="Hình ảnh section" defaultValue={whyChooseImage} required /></div>
         </AdminActionForm>
       </section>
 
-      <section className="order-4 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div><h2 className="font-bold text-text-primary">Dịch vụ nổi bật</h2><p className="text-xs text-text-secondary">Dịch vụ được đánh dấu nổi bật sẽ hiển thị trong section trên trang chủ.</p></div>
+      <section className="order-3 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="font-bold text-text-primary">Dịch vụ</h2><p className="text-xs text-text-secondary">Các dịch vụ đang hoạt động được hiển thị trong danh sách dịch vụ trang chủ.</p></div>
         <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/services">Quản lý dịch vụ →</Link>
       </section>
 
-      <section className="order-5 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div><h2 className="font-bold text-text-primary">Đội ngũ bác sĩ</h2><p className="text-xs text-text-secondary">Chọn hồ sơ bác sĩ nổi bật để quản lý nội dung đội ngũ trên trang chủ.</p></div>
+      <section className="order-4 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="font-bold text-text-primary">Đội ngũ bác sĩ</h2><p className="text-xs text-text-secondary">Các hồ sơ bác sĩ đang hoạt động được hiển thị trong danh sách trang chủ.</p></div>
         <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/doctors">Quản lý bác sĩ →</Link>
       </section>
 

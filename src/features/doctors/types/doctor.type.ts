@@ -26,10 +26,10 @@ export type Doctor = {
   position: string;
   specialty: string;
   experience: number;
+  sortOrder: number;
   description: string;
   badge: string;
   highlight: string;
-  featured: boolean;
   category: DoctorCategory;
   directoryTitle: string;
   profile?: DoctorProfile;

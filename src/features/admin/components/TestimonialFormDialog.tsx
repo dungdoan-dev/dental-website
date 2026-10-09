@@ -16,6 +16,7 @@ export function TestimonialFormDialog({
     source?: string;
     initials: string;
     accent: string;
+    sortOrder: number;
   };
   buttonLabel?: string;
   buttonClassName?: string;
@@ -31,6 +32,7 @@ export function TestimonialFormDialog({
     source: testimonial?.source ?? "",
     initials: testimonial?.initials ?? "KH",
     accent: testimonial?.accent ?? "blue",
+    sortOrder: testimonial?.sortOrder ?? 0,
   });
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,7 +93,7 @@ export function TestimonialFormDialog({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
+            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-semibold text-text-primary mb-1">
@@ -170,6 +172,10 @@ export function TestimonialFormDialog({
                   placeholder="Cảm nhận thực tế của khách hàng..."
                 />
               </div>
+
+              <label className="block font-semibold text-text-primary">Thứ tự hiển thị
+                <input className="mt-1 w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 font-normal text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none" min={0} onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })} type="number" value={formData.sortOrder} />
+              </label>
 
               <div>
                 <label className="block font-semibold text-text-primary mb-1">Màu sắc đại diện</label>

@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 
 type CardCarouselProps = {
   children: ReactNode;
+  footerAction?: ReactNode;
   label: string;
   previousLabel: string;
   nextLabel: string;
@@ -15,7 +16,7 @@ type CardCarouselProps = {
 
 const arrowClassName = "flex h-12 w-12 items-center justify-center rounded-full border border-border-subtle bg-white text-brand-blue-dark transition-colors duration-300 enabled:hover:border-brand-blue-dark enabled:hover:bg-brand-blue-dark enabled:hover:text-white disabled:cursor-not-allowed disabled:text-slate-300 motion-reduce:transition-none";
 
-export function CardCarousel({ children, label, previousLabel, nextLabel, pageLabel, desktopColumns = 3 }: CardCarouselProps) {
+export function CardCarousel({ children, footerAction, label, previousLabel, nextLabel, pageLabel, desktopColumns = 3 }: CardCarouselProps) {
   const items = Children.toArray(children);
   const carouselId = useId();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -69,7 +70,13 @@ export function CardCarousel({ children, label, previousLabel, nextLabel, pageLa
     });
   }
 
-  if (!items.length) return null;
+  if (!items.length) {
+    return footerAction ? (
+      <section aria-label={label} aria-roledescription="carousel">
+        <div className="flex justify-center">{footerAction}</div>
+      </section>
+    ) : null;
+  }
 
   return (
     <section aria-label={label} aria-roledescription="carousel">
@@ -89,13 +96,16 @@ export function CardCarousel({ children, label, previousLabel, nextLabel, pageLa
         <button aria-controls={carouselId} aria-label={nextLabel} className={`${arrowClassName} col-start-3 row-start-2 lg:row-start-1`} disabled={pagination.page === pagination.count - 1} onClick={() => goToPage(pagination.page + 1)} type="button">
           <Icon name="arrow-right" />
         </button>
-        <div aria-atomic="true" aria-live="polite" className="col-start-2 row-start-2 text-center text-sm tabular-nums text-text-secondary">
+      </div>
+      <div className="mt-2 flex flex-col items-center justify-center gap-3 sm:grid sm:grid-cols-[1fr_auto_1fr]">
+        <div aria-atomic="true" aria-live="polite" className="text-center text-sm tabular-nums text-text-secondary sm:col-start-2">
           <span className="sr-only">{pageLabel} </span>
           <span className="font-semibold text-brand-blue-dark">{String(pagination.page + 1).padStart(2, "0")}</span>
           <span aria-hidden="true" className="mx-3 text-slate-300">/</span>
           <span className="sr-only"> trên </span>
           {String(pagination.count).padStart(2, "0")}
         </div>
+        {footerAction ? <div className="sm:col-start-3 sm:justify-self-end">{footerAction}</div> : null}
       </div>
     </section>
   );

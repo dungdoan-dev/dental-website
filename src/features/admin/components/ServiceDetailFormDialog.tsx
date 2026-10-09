@@ -42,7 +42,7 @@ export function ServiceDetailFormDialog({ service, detail }: Props) {
               </button>
             </header>
 
-            <form action={formAction} className="admin-dialog-form min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+            <form action={formAction} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <input name="serviceId" type="hidden" value={service.id} />
               <div className="grid gap-4 sm:grid-cols-2">

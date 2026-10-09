@@ -67,6 +67,7 @@ model Doctor {
   position             String
   specialty            String
   experience           Int
+  sortOrder            Int                         @default(0) @map("sort_order")
   description          String
   badge                String
   highlight            String
@@ -87,6 +88,7 @@ model Doctor {
 
   @@index([category])
   @@index([featured])
+  @@index([sortOrder])
   @@map("doctors")
 }
 

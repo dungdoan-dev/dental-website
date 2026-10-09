@@ -8,6 +8,7 @@ import type {
   DoctorCategory,
 } from "@/features/doctors/types/doctor.type";
 import { upsertDoctor } from "../actions";
+import { ImageUploadField } from "./ImageUploadField";
 import { EditableRows } from "./EditableRows";
 
 const CATEGORIES: { label: string; value: DoctorCategory }[] = [
@@ -39,10 +40,10 @@ export function DoctorFormDialog({
     position: doctor?.position ?? "Bác Sĩ Chuyên Khoa",
     specialty: doctor?.specialty ?? "Nha khoa tổng quát",
     experience: doctor?.experience ?? 10,
+    sortOrder: doctor?.sortOrder ?? 0,
     description: doctor?.description ?? "",
     badge: doctor?.badge ?? "Bác sĩ",
     highlight: doctor?.highlight ?? "Hơn 10 năm kinh nghiệm",
-    featured: doctor?.featured ?? false,
     category: doctor?.category ?? ("implant" as DoctorCategory),
     directoryTitle: doctor?.directoryTitle ?? "Chuyên Gia Nha Khoa",
     licenseNumber: doctor?.profile?.licenseNumber ?? "",
@@ -122,7 +123,7 @@ export function DoctorFormDialog({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -155,7 +156,7 @@ export function DoctorFormDialog({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div>
                   <label className="block font-semibold text-text-primary mb-1">
                     Chức vụ *
@@ -203,6 +204,25 @@ export function DoctorFormDialog({
                     }
                     className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
                   />
+                </div>
+                <div>
+                  <label className="block font-semibold text-text-primary mb-1" htmlFor="doctor-sort-order">
+                    Thứ tự hiển thị
+                  </label>
+                  <input
+                    id="doctor-sort-order"
+                    type="number"
+                    min="0"
+                    max="99999"
+                    step="1"
+                    value={formData.sortOrder}
+                    onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })}
+                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
+                    aria-describedby="doctor-sort-order-help"
+                  />
+                  <p id="doctor-sort-order-help" className="mt-1 text-xs text-text-secondary">
+                    Số nhỏ hiển thị trước; nếu trùng, hệ thống sắp theo mã bác sĩ.
+                  </p>
                 </div>
               </div>
 
@@ -264,20 +284,7 @@ export function DoctorFormDialog({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Ảnh chân dung *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.avatar}
-                    onChange={(e) =>
-                      setFormData({ ...formData, avatar: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary font-mono focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  />
-                </div>
+                <ImageUploadField aspect={1} label="Ảnh chân dung *" onChange={(avatar) => setFormData({ ...formData, avatar })} required value={formData.avatar} />
                 <div>
                   <label className="block font-semibold text-text-primary mb-1">
                     Điểm nổi bật
@@ -333,20 +340,6 @@ export function DoctorFormDialog({
               <EditableRows label="Ngôn ngữ" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.languages.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, languages: rows.map((row) => row.value) })} />
               <EditableRows label="Chứng chỉ và bằng cấp" columns={[{ key: "title", label: "Tên chứng chỉ" }, { key: "issuer", label: "Đơn vị cấp" }, { key: "detail", label: "Chi tiết", multiline: true }, { key: "image", label: "Đường dẫn ảnh" }]} value={formData.certificates} onChange={(rows) => setFormData({ ...formData, certificates: rows.map((row) => ({ title: row.title, issuer: row.issuer, detail: row.detail, image: row.image })) })} />
               <label className="block text-xs font-semibold">URL nguồn hồ sơ<input className="mt-1 min-h-11 w-full rounded-lg border border-border-subtle px-3" type="url" value={formData.sourceUrl} onChange={(event) => setFormData({ ...formData, sourceUrl: event.target.value })} /></label>
-
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-text-primary font-medium">
-                  <input
-                    type="checkbox"
-                    checked={formData.featured}
-                    onChange={(e) =>
-                      setFormData({ ...formData, featured: e.target.checked })
-                    }
-                    className="h-4 w-4 rounded border-border-subtle text-brand-blue-dark accent-brand-blue-dark cursor-pointer"
-                  />
-                  <span>Đánh dấu bác sĩ nổi bật</span>
-                </label>
-              </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button

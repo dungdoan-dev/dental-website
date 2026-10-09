@@ -10,9 +10,9 @@ export async function TestimonialsSection() {
     : null;
 
   return (
-    <section className="bg-brand-blue-light/50 py-12 lg:py-16">
+    <section className="bg-brand-blue-light/50 py-8 lg:py-10">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl space-y-3">
             <h2 className="text-[13px] font-bold uppercase tracking-widest text-brand-blue">KHÁCH HÀNG CHIA SẺ</h2>
             <p className="text-text-secondary">Chia sẻ từ khách hàng sau khi trải nghiệm dịch vụ tại Nha Khoa 2000.</p>

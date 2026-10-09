@@ -1,11 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
+import { marked } from "marked";
 import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
 import type { Article, ArticleCategory } from "@/features/articles/types/article.type";
 import { upsertArticle } from "../actions";
-import { ArticleBody } from "@/features/articles/components/ArticleBody";
+import { ImageUploadField } from "./ImageUploadField";
+
+const TinyMceEditor = dynamic(() => import("./TinyMceEditor").then((module) => module.TinyMceEditor), {
+  ssr: false,
+  loading: () => <div className="grid min-h-80 place-items-center rounded-xl border border-border-subtle bg-surface text-sm text-text-secondary">Đang tải trình soạn thảo…</div>,
+});
+
+function articleContentToHtml(content: string) {
+  return /<(?:p|h[1-6]|ul|ol|li|blockquote|table|strong|em|div|br|hr)\b/i.test(content)
+    ? content
+    : String(marked.parse(content, { async: false }));
+}
 
 const CATEGORIES: { label: string; value: ArticleCategory }[] = [
   { label: "Trồng Răng Implant", value: "implant" },
@@ -26,7 +39,6 @@ export function ArticleFormDialog({
   buttonClassName?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
 
@@ -43,6 +55,7 @@ export function ArticleFormDialog({
     featured: article?.featured ?? false,
     status: article?.status ?? ("draft" as const),
   });
+  const [editorContent, setEditorContent] = useState(() => articleContentToHtml(article?.content ?? ""));
 
   const generateSlug = (title: string) => {
     return title
@@ -83,7 +96,7 @@ export function ArticleFormDialog({
     <>
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={() => { setEditorContent(articleContentToHtml(formData.content)); setIsOpen(true); }}
         className={buttonClassName}
       >
         {buttonLabel}
@@ -110,7 +123,7 @@ export function ArticleFormDialog({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <div>
                 <label className="block font-semibold text-text-primary mb-1">
@@ -181,40 +194,14 @@ export function ArticleFormDialog({
               </div>
 
               <div>
-                <label className="block font-semibold text-text-primary mb-1">
-                  Nội dung đầy đủ * (văn bản / Markdown)
-                </label>
-                <textarea
-                  required
-                  rows={5}
-                  value={formData.content}
-                  onChange={(e) =>
-                    setFormData({ ...formData, content: e.target.value })
-                  }
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none leading-relaxed"
-                  placeholder="Nội dung chi tiết của bài viết..."
-                />
+                <label className="mb-2 block font-semibold text-text-primary">Nội dung bài viết / Kiến thức nha khoa *</label>
+                <TinyMceEditor value={editorContent} onChange={(content) => { setEditorContent(content); setFormData((current) => ({ ...current, content })); }} />
               </div>
 
-              <p className="text-xs leading-relaxed text-text-secondary">Dòng trống tách đoạn; # tiêu đề lớn, ## tiêu đề phụ; mỗi dòng bắt đầu bằng - để tạo danh sách. HTML được hiển thị như văn bản, không thực thi.</p>
-              <button className="min-h-11 rounded-lg border border-border-subtle px-4 text-sm text-brand-blue-dark" onClick={() => setShowPreview(!showPreview)} type="button">{showPreview ? "Ẩn xem trước" : "Xem trước nội dung"}</button>
-              {showPreview && <div className="rounded-xl border border-border-subtle p-4 text-base leading-8"><ArticleBody content={formData.content} /></div>}
+              <p className="text-xs leading-relaxed text-text-secondary">Có thể định dạng tiêu đề, danh sách, liên kết và bảng. Nội dung bài Markdown cũ sẽ được chuyển sang định dạng editor khi mở.</p>
               <label className="block text-sm font-semibold">Trạng thái bài viết<select className="mt-1 min-h-11 w-full rounded-lg border border-border-subtle px-3" onChange={(event) => setFormData({ ...formData, status: event.target.value as "draft" | "published" })} value={formData.status}><option value="draft">Bản nháp — chưa hiển thị công khai</option><option value="published">Xuất bản — hiển thị trên website</option></select></label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Ảnh thu nhỏ (Thumbnail) *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.thumbnail}
-                    onChange={(e) =>
-                      setFormData({ ...formData, thumbnail: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary font-mono focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  />
-                </div>
+                <div className="sm:col-span-2"><ImageUploadField aspect={16 / 9} label="Ảnh thu nhỏ (Thumbnail) *" onChange={(thumbnail) => setFormData({ ...formData, thumbnail })} required value={formData.thumbnail} /></div>
                 <div>
                   <label className="block font-semibold text-text-primary mb-1">
                     Thời gian đọc (phút)

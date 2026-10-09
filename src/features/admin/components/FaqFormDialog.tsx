@@ -8,7 +8,7 @@ export function FaqFormDialog({
   buttonLabel = "Sửa",
   buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
 }: {
-  faq?: { id: string; question: string; answer: string };
+  faq?: { id: string; question: string; answer: string; sortOrder: number };
   buttonLabel?: string;
   buttonClassName?: string;
 }) {
@@ -19,6 +19,7 @@ export function FaqFormDialog({
     id: faq?.id,
     question: faq?.question ?? "",
     answer: faq?.answer ?? "",
+    sortOrder: faq?.sortOrder ?? 0,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -60,7 +61,7 @@ export function FaqFormDialog({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
+            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
               <div>
                 <label className="block font-semibold text-text-primary mb-1">Câu hỏi *</label>
                 <input
@@ -84,6 +85,10 @@ export function FaqFormDialog({
                   placeholder="Nội dung giải đáp thắc mắc chi tiết..."
                 />
               </div>
+
+              <label className="block font-semibold text-text-primary">Thứ tự hiển thị
+                <input className="mt-1 w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 font-normal text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none" min={0} name="sortOrder" onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })} type="number" value={formData.sortOrder} />
+              </label>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button

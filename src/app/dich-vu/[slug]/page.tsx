@@ -12,9 +12,14 @@ type ServiceDetailPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: ServiceDetailPageProps): Promise<Metadata> {
   const service = await getServiceBySlug((await params).slug);
-  return service
-    ? generateSeoMetadata({ title: service.name, description: service.description, image: service.image, url: `/dich-vu/${service.slug}` })
-    : generateSeoMetadata({ title: "Không tìm thấy dịch vụ" });
+  if (!service) return generateSeoMetadata({ title: "Không tìm thấy dịch vụ" });
+  const content = await getServiceDetailData(service.id);
+  return generateSeoMetadata({
+    title: content?.title ?? service.name,
+    description: content?.introduction ?? service.description,
+    image: service.image,
+    url: `/dich-vu/${service.slug}`,
+  });
 }
 
 export default async function ServiceDetailPage({ params }: ServiceDetailPageProps) {

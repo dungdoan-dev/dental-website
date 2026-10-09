@@ -1,5 +1,6 @@
 import { updateInsurancePartner } from "../content-actions";
 import { AdminActionForm } from "./AdminActionForm";
+import { ImageUploadField } from "./ImageUploadField";
 
 export type InsurancePartnerRecord = {
   code: string;
@@ -22,7 +23,7 @@ export function InsurancePartnersManager({ partners }: { partners: readonly Insu
         <div className="text-xs"><p className="font-bold text-text-primary">{partner.name}</p><p className="mt-1 font-mono text-text-secondary">{partner.code}</p></div>
         <label className="text-xs font-semibold text-text-secondary">Tên hiển thị<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.name} name="name" required /></label>
         <label className="text-xs font-semibold text-text-secondary">Mô tả<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.description} name="description" required /></label>
-        <label className="text-xs font-semibold text-text-secondary">Đường dẫn logo<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.logoSrc ?? ""} name="logoSrc" placeholder="/images/insurance_logos/logo.png" /></label>
+        <div><ImageUploadField aspect={2 / 1} label="Logo đối tác" name="logoSrc" defaultValue={partner.logoSrc ?? ""} /></div>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-xs font-semibold text-text-secondary">Màu nhấn<select className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-2 py-2 text-sm font-normal text-text-primary" defaultValue={partner.accent} name="accent"><option value="blue">Xanh dương</option><option value="green">Xanh lá</option></select></label>
           <label className="text-xs font-semibold text-text-secondary">Thứ tự<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.sortOrder} min={0} name="sortOrder" required type="number" /></label>

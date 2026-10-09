@@ -25,6 +25,7 @@ function DetailList({ title, items, markerColor }: { title: string; items: reado
 
 export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
   const profile = doctor.profile;
+  const specialties = profile?.specialties.length ? profile.specialties : [doctor.specialty];
 
   return (
     <>
@@ -46,7 +47,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
               <Image alt={`Chân dung ${doctor.name}`} className="object-cover object-top" fill priority sizes="(max-width: 1024px) 100vw, 400px" src={doctor.avatar} />
             </div>
             <div className="space-y-3">
-              {profile ? (
+              {profile?.licenseNumber ? (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
                   <span className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chứng chỉ hành nghề</span>
                   <span className="rounded bg-brand-green-light px-2.5 py-1 text-xs font-bold tracking-wide text-brand-green-dark">{profile.licenseNumber}</span>
@@ -55,14 +56,14 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
               <div className="rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
                 <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chuyên môn</div>
                 <div className="flex flex-wrap gap-2">
-                  {(profile?.specialties ?? [doctor.specialty]).map((specialty) => (
+                  {specialties.map((specialty) => (
                     <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-brand-blue-light/50 px-3 py-1 text-sm font-medium text-brand-blue-dark" key={specialty}>
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-blue" />{specialty}
                     </span>
                   ))}
                 </div>
               </div>
-              {profile ? (
+              {profile?.languages.length ? (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
                   <span className="text-sm font-medium text-text-secondary">Ngôn ngữ</span>
                   <span className="flex flex-wrap gap-2">{profile.languages.map((language) => <span className="rounded-full border border-border-subtle bg-surface-container-low px-3 py-1 text-xs font-medium text-text-primary" key={language}>{language}</span>)}</span>
@@ -74,19 +75,19 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
             <header>
               <h1 className="text-3xl font-extrabold uppercase tracking-tight text-text-primary md:text-[2.5rem]">{doctor.name}</h1>
               <p className="mt-2 text-lg font-semibold leading-relaxed text-brand-blue-dark">{doctor.position}</p>
+              <p className="mt-5 max-w-3xl leading-relaxed text-text-secondary">{doctor.description}</p>
             </header>
-            <blockquote className="border-l-4 border-brand-blue bg-brand-blue-light/50 p-6 text-lg italic leading-relaxed text-text-primary">“{profile?.quote ?? doctor.description}”</blockquote>
+            {profile?.quote ? <blockquote className="border-l-4 border-brand-blue bg-brand-blue-light/50 p-6 text-lg italic leading-relaxed text-text-primary">“{profile.quote}”</blockquote> : null}
             {profile ? (
               <>
-                <DetailList items={profile.education} markerColor="bg-brand-blue-dark" title="Học vấn & Đào tạo" />
-                <DetailList items={profile.experienceHighlights} markerColor="bg-brand-green-dark" title="Kinh nghiệm" />
-                <DoctorCertificateCarousel certificates={profile.certificates} />
-                <a className="text-sm font-semibold text-brand-blue-dark underline-offset-4 hover:underline" href={profile.sourceUrl} rel="noopener noreferrer" target="_blank">Xem hồ sơ trên website Nha Khoa 2000</a>
+                {profile.education.length ? <DetailList items={profile.education} markerColor="bg-brand-blue-dark" title="Học vấn & Đào tạo" /> : null}
+                {profile.experienceHighlights.length ? <DetailList items={profile.experienceHighlights} markerColor="bg-brand-green-dark" title="Kinh nghiệm" /> : null}
+                {profile.certificates.length ? <DoctorCertificateCarousel certificates={profile.certificates} /> : null}
+                {profile.sourceUrl ? <a className="text-sm font-semibold text-brand-blue-dark underline-offset-4 hover:underline" href={profile.sourceUrl} rel="noopener noreferrer" target="_blank">Xem hồ sơ trên website Nha Khoa 2000</a> : null}
               </>
             ) : (
               <div className="space-y-4">
                 <DetailList items={[`${doctor.experience} năm kinh nghiệm`, doctor.specialty]} markerColor="bg-brand-green-dark" title="Chuyên môn & Kinh nghiệm" />
-                <p className="leading-relaxed text-text-secondary">{doctor.description}</p>
               </div>
             )}
             <div className="pt-2">

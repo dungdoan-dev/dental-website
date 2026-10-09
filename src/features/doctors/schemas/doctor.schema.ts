@@ -8,10 +8,10 @@ export const doctorSchema = z.object({
   position: z.string().min(1),
   specialty: z.string().min(1),
   experience: z.number().int().nonnegative(),
+  sortOrder: z.number().int().nonnegative(),
   description: z.string().min(1),
   badge: z.string().min(1),
   highlight: z.string().min(1),
-  featured: z.boolean(),
   category: z.enum(["implant", "ortho", "aesthetic", "surgery", "pediatric"]),
   directoryTitle: z.string().min(1),
   profile: z.object({

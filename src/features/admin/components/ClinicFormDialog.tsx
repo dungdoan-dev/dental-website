@@ -56,7 +56,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
+            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
               <div>
                 <label className="block font-semibold text-text-primary mb-1">Tên cơ sở *</label>
                 <input

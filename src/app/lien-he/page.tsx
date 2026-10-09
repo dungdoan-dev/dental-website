@@ -17,7 +17,7 @@ function ClinicContactCard({ clinic, index }: { clinic: Clinic; index: number })
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
-      <div className="relative aspect-[16/8] overflow-hidden bg-surface-container-low">
+      <div className="relative aspect-[16/7] overflow-hidden bg-surface-container-low">
         <Image
           alt={`Không gian ${clinic.name}`}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -33,9 +33,9 @@ function ClinicContactCard({ clinic, index }: { clinic: Clinic; index: number })
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5 sm:p-7">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
         <p className="leading-7 text-text-secondary">{clinic.description}</p>
-        <div className="mt-5 space-y-4">
+        <div className="mt-4 space-y-3">
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-blue-light text-brand-blue-dark"><Icon className="h-5 w-5" name="location" /></span>
             <div>
@@ -53,14 +53,14 @@ function ClinicContactCard({ clinic, index }: { clinic: Clinic; index: number })
         </div>
 
         {clinic.facilities.length > 0 ? (
-          <ul aria-label={`Tiện ích tại ${clinic.name}`} className="mt-5 flex flex-wrap gap-2">
+          <ul aria-label={`Tiện ích tại ${clinic.name}`} className="mt-4 flex flex-wrap gap-2">
             {clinic.facilities.slice(0, 3).map((facility) => (
               <li className="rounded-full bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary" key={facility}>{facility}</li>
             ))}
           </ul>
         ) : null}
 
-        <div className="mt-auto flex flex-col gap-3 border-t border-border-subtle pt-5 sm:flex-row">
+        <div className="mt-auto flex flex-col gap-3 border-t border-border-subtle pt-4 sm:flex-row">
           <a aria-label={`Gọi ${clinicNumber}, ${clinic.phone}`} className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brand-blue-dark px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2" href={phoneLink}>
             <Icon className="h-5 w-5" name="phone" />
             {clinic.phone}
@@ -137,7 +137,7 @@ export default async function ContactPage() {
       </section>
 
       <section aria-labelledby="clinic-contact-title" className="py-12 sm:py-16 lg:py-20">
-        <Container>
+        <Container className="max-w-5xl">
           <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue">Hệ thống phòng khám</p>

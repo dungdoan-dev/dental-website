@@ -22,7 +22,3 @@ export async function getDoctorBySlug(slug: string): Promise<Doctor | null> {
     return null;
   }
 }
-
-export async function getFeaturedDoctors(): Promise<readonly Doctor[]> {
-  return (await getDoctors()).filter((doctor) => doctor.featured);
-}

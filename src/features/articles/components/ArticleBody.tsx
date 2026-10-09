@@ -1,12 +1,10 @@
 import Link from "next/link";
+import { getRichArticleHeadings, isRichArticleHtml, sanitizeArticleHtml, slugifyArticleHeading, type ArticleHeading } from "../lib/article-content";
 
-export type ArticleHeading = { id: string; text: string; level: 2 | 3 };
-
-export function slugifyArticleHeading(value: string) {
-  return value.toLocaleLowerCase("vi-VN").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "muc-noi-dung";
-}
+export type { ArticleHeading } from "../lib/article-content";
 
 export function getArticleHeadings(content: string): ArticleHeading[] {
+  if (isRichArticleHtml(content)) return getRichArticleHeadings(content);
   return content.replace(/\r\n?/g, "\n").split("\n").flatMap((line) => {
     const match = /^(#{2,3})\s+(.+)$/.exec(line.trim());
     return match ? [{ id: slugifyArticleHeading(match[2]), text: match[2], level: match[1].length as 2 | 3 }] : [];
@@ -34,6 +32,9 @@ function InlineText({ text }: { text: string }) {
 }
 
 export function ArticleBody({ content }: { content: string }) {
+  if (isRichArticleHtml(content)) {
+    return <div className="article-prose space-y-6 [&_p]:mb-5 [&_p]:leading-8 [&_p]:text-text-secondary [&_h2]:mb-4 [&_h2]:mt-8 [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-text-primary [&_h3]:mb-3 [&_h3]:mt-6 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-text-primary [&_ul]:my-4 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_a]:font-semibold [&_a]:text-brand-blue-dark [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-brand-blue [&_blockquote]:pl-5 [&_blockquote]:italic [&_table]:my-5 [&_table]:min-w-full [&_td]:border [&_td]:border-border-subtle [&_td]:p-3 [&_th]:border [&_th]:border-border-subtle [&_th]:bg-brand-blue-light [&_th]:p-3 [&_img]:my-5 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-xl" dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(content) }} />;
+  }
   const blocks = content.replace(/\r\n?/g, "\n").split(/\n\s*\n/).filter((block) => block.trim());
   return <div className="article-prose space-y-6">{blocks.map((block, index) => {
     const lines = block.trim().split("\n").map((line) => line.trim());

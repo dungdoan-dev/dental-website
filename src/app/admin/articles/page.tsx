@@ -5,6 +5,7 @@ import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { ArticleFormDialog } from "@/features/admin/components/ArticleFormDialog";
 import { DeleteArticleButton } from "@/features/admin/components/DeleteButtons";
 import type { Article } from "@/features/articles/types/article.type";
+import { getArticleCategoryLabel } from "@/features/articles/data/article-categories.data";
 import { articleListQuerySchema } from "@/features/admin/schemas/admin.schema";
 
 export const metadata = {
@@ -61,10 +62,10 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
                 <th className="px-6 py-4">Ảnh</th>
                 <th className="px-6 py-4">Tiêu đề &amp; Slug</th>
+                <th className="px-4 py-4">Trạng thái</th>
                 <th className="px-4 py-4">Chuyên mục</th>
                 <th className="px-4 py-4">Tác giả</th>
                 <th className="px-4 py-4">Ngày đăng</th>
-                <th className="px-4 py-4">Trạng thái</th>
                 <th className="px-4 py-4">Nổi bật</th>
                 <th className="px-6 py-4 text-right">Thao tác</th>
               </tr>
@@ -113,7 +114,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
 
                     <td className="px-4 py-3.5">
                       <span className="inline-flex items-center rounded-full bg-brand-blue-light px-2.5 py-0.5 text-[11px] font-bold text-brand-blue-dark">
-                        {article.category}
+                        {getArticleCategoryLabel(article.category as Article["category"])}
                       </span>
                     </td>
 

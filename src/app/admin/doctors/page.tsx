@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { DoctorFormDialog } from "@/features/admin/components/DoctorFormDialog";
 import { DeleteDoctorButton } from "@/features/admin/components/DeleteButtons";
+import { DoctorSortOrderInput } from "@/features/admin/components/DoctorSortOrderInput";
 import type { Doctor } from "@/features/doctors/types/doctor.type";
 
 export const metadata = {
@@ -19,7 +20,7 @@ export default async function AdminDoctorsPage() {
       experienceHighlights: { orderBy: { sortOrder: "asc" } },
       certificates: { orderBy: { sortOrder: "asc" } },
     },
-    orderBy: { experience: "desc" },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
   });
 
   return (
@@ -60,7 +61,7 @@ export default async function AdminDoctorsPage() {
                 <th className="px-6 py-4">Bác sĩ</th>
                 <th className="px-4 py-4">Chức vụ &amp; Chuyên khoa</th>
                 <th className="px-4 py-4">Kinh nghiệm</th>
-                <th className="px-4 py-4">Nổi bật</th>
+                <th className="px-4 py-4">Thứ tự</th>
                 <th className="px-6 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
@@ -122,14 +123,7 @@ export default async function AdminDoctorsPage() {
                     </td>
 
                     <td className="px-4 py-3.5">
-                      {doctor.featured ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-green-dark">
-                          <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                          <span>Trang chủ</span>
-                        </span>
-                      ) : (
-                        <span className="text-xs text-text-secondary">—</span>
-                      )}
+                      <DoctorSortOrderInput id={doctor.id} sortOrder={doctor.sortOrder} />
                     </td>
 
                     <td className="px-6 py-3.5 text-right">

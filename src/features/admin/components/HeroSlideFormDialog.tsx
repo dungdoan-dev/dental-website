@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { upsertHeroSlide } from "../actions";
+import { ImageUploadField } from "./ImageUploadField";
 
 type HeroSlideData = {
   id: string;
@@ -60,16 +61,14 @@ export function HeroSlideFormDialog({
               <h2 className="text-lg font-bold text-text-primary" id="hero-slide-dialog-title">{slide ? "Chỉnh sửa slide" : "Thêm slide trang chủ"}</h2>
               <button aria-label="Đóng" className="rounded-lg px-2 py-1 text-text-secondary hover:bg-surface-container-low" onClick={() => setIsOpen(false)} type="button">✕</button>
             </div>
-            <form className="admin-dialog-form grid min-h-0 flex-1 gap-4 overflow-y-auto px-5 py-5 text-sm sm:grid-cols-2 sm:px-7" onSubmit={handleSubmit}>
+            <form className="admin-dialog-form grid min-h-0 flex-1 gap-5 overflow-y-auto px-5 py-5 text-sm sm:grid-cols-2 sm:px-7" onSubmit={handleSubmit}>
               <label className="grid gap-1 font-medium text-text-primary">Mã slide *
                 <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2 disabled:opacity-70" disabled={Boolean(slide)} maxLength={80} onChange={(event) => updateField("id", event.target.value)} placeholder="clinic" required value={formData.id} />
               </label>
               <label className="grid gap-1 font-medium text-text-primary">Thứ tự hiển thị *
                 <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" min={0} onChange={(event) => updateField("sortOrder", Number(event.target.value))} required type="number" value={formData.sortOrder} />
               </label>
-              <label className="grid gap-1 font-medium text-text-primary sm:col-span-2">Đường dẫn ảnh *
-                <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("image", event.target.value)} placeholder="/images/hero/clinic.jpg" required value={formData.image} />
-              </label>
+              <div className="sm:col-span-2"><ImageUploadField aspect={16 / 9} label="Ảnh slide *" onChange={(image) => updateField("image", image)} required value={formData.image} /></div>
               <label className="grid gap-1 font-medium text-text-primary sm:col-span-2">Văn bản thay thế ảnh *
                 <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("imageAlt", event.target.value)} required value={formData.imageAlt} />
               </label>

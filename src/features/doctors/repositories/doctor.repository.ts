@@ -10,10 +10,10 @@ function mapDoctor(d: {
   position: string;
   specialty: string;
   experience: number;
+  sortOrder: number;
   description: string;
   badge: string;
   highlight: string;
-  featured: boolean;
   category: string;
   directoryTitle: string;
   licenseNumber: string | null;
@@ -40,10 +40,10 @@ function mapDoctor(d: {
     position: d.position,
     specialty: d.specialty,
     experience: d.experience,
+    sortOrder: d.sortOrder,
     description: d.description,
     badge: d.badge,
     highlight: d.highlight,
-    featured: d.featured,
     category: d.category as DoctorCategory,
     directoryTitle: d.directoryTitle,
     profile: hasProfile
@@ -76,7 +76,7 @@ export const doctorRepository = {
         experienceHighlights: { orderBy: { sortOrder: "asc" } },
         certificates: { orderBy: { sortOrder: "asc" } },
       },
-      orderBy: { id: "asc" },
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     });
 
     return doctors.map(mapDoctor);

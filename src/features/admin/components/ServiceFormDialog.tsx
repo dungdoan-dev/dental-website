@@ -5,6 +5,7 @@ import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
 import type { DentalService, ServiceCategory } from "@/features/services/types/service.type";
 import { upsertService } from "../actions";
+import { ImageUploadField } from "./ImageUploadField";
 
 const CATEGORIES: { label: string; value: ServiceCategory }[] = [
   { label: "Trồng Răng Implant", value: "implant" },
@@ -107,7 +108,7 @@ export function ServiceFormDialog({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -191,16 +192,7 @@ export function ServiceFormDialog({
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">Đường dẫn ảnh *</label>
-                <input
-                  required
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none font-mono"
-                />
-              </div>
+              <ImageUploadField label="Ảnh trang chi tiết và SEO *" onChange={(image) => setFormData({ ...formData, image })} required value={formData.image} />
 
               <div className="pt-2">
                 <label className="flex items-center gap-2 cursor-pointer text-text-primary font-medium">

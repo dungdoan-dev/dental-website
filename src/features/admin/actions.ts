@@ -4,9 +4,10 @@ import { revalidatePath, updateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "./auth/admin-auth";
 import { z } from "zod";
-import { serviceFormSchema, doctorFormSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
+import { serviceFormSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
 import { runMutation, validationFailure, saveRevision, SlugConflictError } from "./services/mutation";
 import { publicDataTags } from "@/lib/public-data-cache";
+import { sanitizeArticleContent } from "@/features/articles/lib/article-content";
 
 const heroSlideSchema = z.object({
   id: recordIdSchema, image: imagePathSchema, imageAlt: z.string().trim().min(1).max(200),
@@ -14,6 +15,35 @@ const heroSlideSchema = z.object({
   badgeVariant: z.enum(["blue", "green"]), objectPosition: z.enum(["center", "top"]),
   sortOrder: z.number().int().min(0).max(9999),
 });
+
+const coreValueSchema = z.object({
+  id: numericIdSchema,
+  title: z.string().trim().min(1).max(80),
+  slogan: z.string().trim().min(1).max(200),
+  description: z.string().trim().min(1).max(1200),
+  iconKey: z.enum(["heart", "care", "honesty", "innovation"]),
+  sortOrder: z.number().int().min(0).max(999),
+});
+
+export async function updateCoreValue(_previous: import("./services/mutation").MutationResult | null, formData: FormData) {
+  await requireAdmin();
+  const parsed = coreValueSchema.safeParse({
+    id: formData.get("id"),
+    title: formData.get("title"),
+    slogan: formData.get("slogan"),
+    description: formData.get("description"),
+    iconKey: formData.get("iconKey"),
+    sortOrder: Number(formData.get("sortOrder")),
+  });
+  if (!parsed.success) return validationFailure(parsed.error);
+  const { id, ...data } = parsed.data;
+  return runMutation(async () => {
+    await db.coreValue.update({ where: { id: BigInt(id) }, data });
+    revalidatePath("/admin/home");
+    revalidatePath("/");
+    updateTag(publicDataTags.coreValues);
+  });
+}
 
 function revalidateContent(paths: string[]) {
   revalidatePath("/admin");
@@ -131,6 +161,19 @@ export async function upsertDoctor(input: DoctorFormData) {
   });
 }
 
+export async function updateDoctorSortOrder(input: { id: string; sortOrder: number }) {
+  await requireAdmin();
+  const parsed = doctorSortOrderSchema.safeParse(input);
+  if (!parsed.success) return validationFailure(parsed.error);
+  return runMutation(async () => {
+    await db.doctor.update({
+      where: { id: parsed.data.id },
+      data: { sortOrder: parsed.data.sortOrder },
+    });
+    revalidateContent(["/admin/doctors", "/bac-si", "/"]);
+  });
+}
+
 export async function deleteDoctor(id: string) {
   await requireAdmin();
   const parsed = recordIdSchema.safeParse(id);
@@ -146,7 +189,7 @@ export async function upsertArticle(input: ArticleFormData) {
   await requireAdmin();
   const parsed = articleFormSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
-  const data = parsed.data;
+  const data = { ...parsed.data, content: sanitizeArticleContent(parsed.data.content) };
   return runMutation(async () => {
     await db.$transaction(async (tx) => {
       const duplicate = await tx.article.findUnique({ where: { slug: data.slug }, select: { id: true } });
