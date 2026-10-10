@@ -11,10 +11,10 @@ export async function TestimonialsSection() {
     : null;
 
   return (
-    <section className="bg-brand-blue-light/50 py-8 lg:py-10">
+    <section className="bg-brand-blue-light/50 py-5 lg:py-6">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl space-y-3">
+        <div className="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div className="max-w-2xl space-y-1">
             <h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{copy.testimonials.title}</h2>
             <p className="text-sm leading-relaxed text-text-secondary sm:text-base">{copy.testimonials.note}</p>
           </div>

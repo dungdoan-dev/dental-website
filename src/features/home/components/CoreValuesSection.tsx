@@ -7,8 +7,8 @@ export async function CoreValuesSection() {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-7xl px-margin-mobile pb-8 md:px-margin lg:pb-10">
-        <div className="mb-6 text-center"><h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.values.title}</h2><p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.values.note}</p></div>
+      <div className="mx-auto max-w-7xl px-margin-mobile pb-5 pt-4 md:px-margin lg:pb-6 lg:pt-5">
+        <div className="mb-4 text-center"><h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.values.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.values.note}</p></div>
         <CoreValuesReveal>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {coreValues.map((value) => (

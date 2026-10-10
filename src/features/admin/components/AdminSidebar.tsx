@@ -71,7 +71,7 @@ export function AdminSidebar() {
                 src="/images/logo/nha-khoa-2000.png"
                 alt="Nha Khoa 2000"
                 width={126}
-                height={38}
+                height={42}
                 className="h-8 w-auto object-contain"
                 priority
               />

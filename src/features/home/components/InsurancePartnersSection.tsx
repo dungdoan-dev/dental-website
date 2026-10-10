@@ -41,8 +41,8 @@ export async function InsurancePartnersSection() {
   const midpoint = Math.ceil(insurancePartners.length / 2);
 
   return (
-    <section className="select-none overflow-hidden border-t border-border-subtle bg-surface py-8 lg:py-10" id="doi-tac-bao-hiem">
-      <div className="mx-auto mb-6 max-w-7xl px-margin-mobile md:px-margin">
+    <section className="select-none overflow-hidden border-t border-border-subtle bg-surface py-5 lg:py-6" id="doi-tac-bao-hiem">
+      <div className="mx-auto mb-4 max-w-7xl px-margin-mobile md:px-margin">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="whitespace-nowrap text-[clamp(0.7rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{copy.insurance.title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.insurance.note}</p>

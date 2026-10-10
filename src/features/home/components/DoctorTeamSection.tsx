@@ -9,13 +9,13 @@ export async function DoctorTeamSection() {
   const [doctors, copy] = await Promise.all([getDoctors(), getHomeSectionCopy()]);
 
   return (
-    <section className="bg-background-secondary py-8 lg:py-10" id="doi-ngu-chuyen-gia">
+    <section className="bg-background-secondary py-5 lg:py-6" id="doi-ngu-chuyen-gia">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mx-auto mb-8 flex max-w-2xl flex-col items-center text-center">
+        <div className="mx-auto mb-4 flex max-w-2xl flex-col items-center text-center">
           <h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">
             {copy.doctors.title}
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.doctors.note}</p>
+          <p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.doctors.note}</p>
         </div>
         <CardCarousel
           footerAction={

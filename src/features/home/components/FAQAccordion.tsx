@@ -8,9 +8,9 @@ export function FAQAccordion({ items, title, note }: { items: readonly FAQItem[]
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="bg-white py-8 lg:py-10">
+    <section className="bg-white py-5 lg:py-6">
       <div className="mx-auto max-w-4xl px-margin-mobile md:px-margin">
-        <div className="mx-auto mb-8 max-w-2xl space-y-3 text-center">
+        <div className="mx-auto mb-4 max-w-2xl space-y-1 text-center">
           <h2 className="whitespace-nowrap text-[clamp(0.7rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">
             {title}
           </h2>

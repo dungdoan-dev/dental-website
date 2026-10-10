@@ -5,10 +5,10 @@ import { getHomeSectionCopy } from "../services/home.service";
 export async function VisionMissionSection() {
   const copy = await getHomeSectionCopy();
   return (
-    <section className="bg-white pb-6 pt-8 lg:pb-8 lg:pt-10">
+    <section className="bg-white pb-4 pt-5 lg:pb-6 lg:pt-6">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="w-full space-y-6">
-          <div className="text-center"><h2 className="whitespace-nowrap text-[clamp(1rem,3.2vw,2.5rem)] font-extrabold uppercase tracking-wide text-text-primary">{copy.vision.title}</h2><p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.vision.note}</p></div>
+        <div className="w-full space-y-4">
+          <div className="text-center"><h2 className="whitespace-nowrap text-[clamp(1rem,3.2vw,2.5rem)] font-extrabold uppercase tracking-wide text-text-primary">{copy.vision.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.vision.note}</p></div>
           <div className="w-full space-y-6">
             <VisionMissionReveal direction="left">
               <div className="relative flex flex-col items-stretch overflow-hidden rounded-2xl border-2 border-brand-blue-dark bg-white shadow-sm transition-shadow hover:shadow-md md:flex-row"><div className="flex shrink-0 select-none items-center justify-center bg-brand-blue-dark px-4 py-2.5 text-white md:flex-col md:px-3.5 md:py-6"><span className="text-sm font-bold uppercase tracking-widest md:rotate-180 md:[writing-mode:vertical-lr]">TẦM NHÌN</span></div><div className="flex flex-1 flex-col items-center justify-between gap-6 p-6 sm:p-8 md:flex-row"><p className="flex-1 text-base leading-relaxed text-text-primary sm:text-lg">Tự hào với đội ngũ y bác sĩ có tay nghề chuyên môn cao; luôn cập nhật xu hướng mới nhất của ngành Nha thế giới. Nha Khoa 2000 hướng tới việc trở thành địa chỉ uy tín hàng đầu mà khách hàng nghĩ tới đầu tiên khi có nhu cầu tìm kiếm Nha Khoa chất lượng.</p><div className="flex h-44 w-full max-w-[280px] shrink-0 items-center justify-center md:w-5/12"><Image alt="Tầm nhìn Nha Khoa 2000" className="h-full w-full object-contain" height={286} src="/images/about/vision.jpg" width={512} /></div></div></div>

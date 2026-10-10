@@ -10,7 +10,7 @@ export function ServiceCarousel({ services, footerAction, title = "Dịch vụ n
 
   return (
     <>
-      <div className="mb-8 text-center sm:mb-10"><h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{title}</h2>{note ? <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{note}</p> : null}</div>
+      <div className="mb-4 text-center"><h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{title}</h2>{note ? <p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{note}</p> : null}</div>
       <CardCarousel footerAction={footerAction} label="Dịch vụ nha khoa" nextLabel="Dịch vụ kế tiếp" pageLabel="Trang dịch vụ" previousLabel="Dịch vụ trước">
         {services.map((service) => <ServiceCard key={service.id} service={service} />)}
       </CardCarousel>
