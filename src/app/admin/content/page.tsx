@@ -17,16 +17,27 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
   ]);
 
   const editableContent: SiteContentRecord[] = [];
+  let aboutRecordFound = false;
+  let aboutRecordInvalid = false;
   for (const { key, content } of contentRecords) {
     if (key === "about_page") {
+      aboutRecordFound = true;
       const parsed = aboutPageSchema.safeParse(content);
       if (parsed.success) editableContent.push({ key: "about_page", content: parsed.data });
+      else aboutRecordInvalid = true;
     }
   }
+
+  const aboutContentWarning = aboutRecordInvalid
+    ? "Dữ liệu trang giới thiệu trong cơ sở dữ liệu không khớp cấu trúc hiện tại nên form chưa thể hiển thị. Dữ liệu chưa bị thay đổi; cần kiểm tra lại nội dung hoặc cấu trúc JSON."
+    : !aboutRecordFound
+      ? "Chưa tìm thấy bản ghi about_page. Hãy chạy migration khởi tạo nội dung website trước khi chỉnh sửa trang này."
+      : undefined;
 
   return (
     <ContentDatabaseManager
       contentRecords={editableContent}
+      contentWarning={aboutContentWarning}
       contactCtaSettings={contactCtaSettings}
       clinics={clinics.map(({ id, label }) => ({ id, label }))}
       section={section}

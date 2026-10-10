@@ -4,47 +4,48 @@ import type { AboutPageData } from "@/features/about/schemas/about.schema";
 import type { ImplantDetailData } from "@/features/services/schemas/implant-detail.schema";
 import { EditableRows } from "./EditableRows";
 import { AdminActionForm } from "./AdminActionForm";
+import { ImageUploadField } from "./ImageUploadField";
 
 export type SiteContentRecord =
   | { key: "about_page"; content: AboutPageData }
   | { key: "implant_detail"; content: ImplantDetailData };
 
-const inputClass = "mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary outline-none focus:border-brand-blue";
+const inputClass = "mt-1 min-h-11 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/15";
 
 function TextField({ label, name, value, required = false }: { label: string; name: string; value: string; required?: boolean }) {
-  return <label className="block text-xs font-semibold text-text-secondary">{label}<input className={inputClass} defaultValue={value} name={name} required={required} /></label>;
+  return <label className="block text-sm font-semibold text-text-primary">{label}<input className={inputClass} defaultValue={value} name={name} required={required} /></label>;
 }
 
 function TextAreaField({ label, name, value, hint }: { label: string; name: string; value: string; hint?: string }) {
-  return <label className="block text-xs font-semibold text-text-secondary">{label}{hint ? <span className="ml-1 font-normal">({hint})</span> : null}<textarea className={`${inputClass} min-h-20 leading-relaxed`} defaultValue={value} name={name} /></label>;
+  return <label className="block text-sm font-semibold text-text-primary">{label}{hint ? <span className="ml-1 text-xs font-normal text-text-secondary">({hint})</span> : null}<textarea className={`${inputClass} min-h-28 resize-y leading-relaxed`} defaultValue={value} name={name} /></label>;
 }
 
 function EditorSection({ title, children, columns = "" }: { title: string; children: React.ReactNode; columns?: string }) {
-  return <fieldset className="rounded-xl border border-border-subtle p-4"><legend className="px-1 text-sm font-bold text-text-primary">{title}</legend><div className={`grid gap-3 ${columns}`}>{children}</div></fieldset>;
+  return <fieldset className="min-w-0 rounded-xl border border-border-subtle bg-white p-4 sm:p-5"><legend className="px-2 text-base font-bold text-text-primary">{title}</legend><div className={`grid min-w-0 gap-4 ${columns}`}>{children}</div></fieldset>;
 }
 
 function ContentEditor({ record }: { record: SiteContentRecord }) {
   if (record.key === "about_page") {
     const { hero, highlights, story, visionMission, principles, expertise, clinics } = record.content;
-    return <AdminActionForm action={updateStructuredSiteContent} className="space-y-4 rounded-2xl border border-border-subtle bg-white p-5 shadow-sm" submitLabel="Lưu trang giới thiệu">
+    return <AdminActionForm action={updateStructuredSiteContent} className="space-y-5 rounded-2xl border border-border-subtle bg-background-secondary p-4 sm:p-6" submitLabel="Lưu trang giới thiệu">
       <input name="key" type="hidden" value={record.key} />
-      <h3 className="font-bold text-text-primary">Nội dung trang Giới thiệu</h3>
+      <div><h3 className="text-lg font-bold text-text-primary">Nội dung trang Giới thiệu</h3><p className="mt-1 text-sm text-text-secondary">Các trường được nhóm theo đúng thứ tự nội dung trên /gioi-thieu. Ảnh có thể tải lên Supabase Storage (có cắt ảnh) hoặc nhập URL.</p></div>
       <EditorSection columns="sm:grid-cols-2" title="Banner giới thiệu">
-        <TextField label="Dòng giới thiệu" name="heroEyebrow" value={hero.eyebrow} />
-        <TextField label="Tiêu đề" name="heroTitle" value={hero.title} />
-        <TextAreaField label="Mô tả" name="heroDescription" value={hero.description} />
-        <TextField label="Đường dẫn ảnh" name="heroImage" value={hero.image} />
+        <TextField label="Dòng giới thiệu" name="heroEyebrow" value={hero.eyebrow} required />
+        <TextField label="Tiêu đề" name="heroTitle" value={hero.title} required />
+        <div className="sm:col-span-2"><TextAreaField label="Mô tả" name="heroDescription" value={hero.description} /></div>
+        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 3} defaultValue={hero.image} label="Ảnh banner" name="heroImage" required /></div>
       </EditorSection>
-      <EditorSection title="Thông tin nổi bật">
+      <EditorSection title="Thông tin nổi bật dưới banner">
         <EditableRows label="Các mục nổi bật" name="highlights" columns={[{ key: "value", label: "Giá trị" }, { key: "label", label: "Nhãn" }]} initialRows={highlights.map((item) => ({ value: item.value, label: item.label }))} />
       </EditorSection>
       <EditorSection columns="sm:grid-cols-2" title="Câu chuyện phòng khám">
-        <TextField label="Dòng giới thiệu" name="storyEyebrow" value={story.eyebrow} />
-        <TextField label="Tiêu đề" name="storyTitle" value={story.title} />
-        <EditableRows label="Các đoạn nội dung" name="storyParagraphs" columns={[{ key: "value", label: "Nội dung", multiline: true }]} initialRows={story.paragraphs.map((value) => ({ value }))} />
+        <TextField label="Dòng giới thiệu" name="storyEyebrow" value={story.eyebrow} required />
+        <TextField label="Tiêu đề" name="storyTitle" value={story.title} required />
+        <div className="sm:col-span-2"><EditableRows label="Các đoạn nội dung" name="storyParagraphs" columns={[{ key: "value", label: "Nội dung", multiline: true }]} initialRows={story.paragraphs.map((value) => ({ value }))} /></div>
         <TextField label="Người sáng lập" name="founderName" value={story.founderName} />
         <TextField label="Chức danh" name="founderRole" value={story.founderRole} />
-        <TextField label="Đường dẫn ảnh" name="storyImage" value={story.image} />
+        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 5} defaultValue={story.image} label="Ảnh người sáng lập" name="storyImage" required /></div>
       </EditorSection>
       <EditorSection columns="sm:grid-cols-2" title="Tầm nhìn và sứ mệnh">
         <TextField label="Dòng giới thiệu" name="visionEyebrow" value={visionMission.eyebrow} />
@@ -53,23 +54,24 @@ function ContentEditor({ record }: { record: SiteContentRecord }) {
         <TextAreaField label="Tầm nhìn" name="vision" value={visionMission.vision} />
         <TextAreaField label="Sứ mệnh" name="mission" value={visionMission.mission} />
       </EditorSection>
-      <EditorSection columns="sm:grid-cols-2" title="Nguyên tắc hoạt động">
+      <EditorSection columns="sm:grid-cols-2" title="Nguyên tắc hoạt động trên trang giới thiệu">
         <TextField label="Dòng giới thiệu" name="principlesEyebrow" value={principles.eyebrow} />
         <TextField label="Tiêu đề" name="principlesTitle" value={principles.title} />
         <TextAreaField label="Mô tả" name="principlesIntroduction" value={principles.introduction} />
-        <EditableRows label="Các nguyên tắc" name="principles" columns={[{ key: "number", label: "Số thứ tự" }, { key: "title", label: "Tiêu đề" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={principles.items.map((item) => ({ number: item.number, title: item.title, description: item.description }))} />
+        <div className="sm:col-span-2"><EditableRows label="Các nguyên tắc" name="principles" columns={[{ key: "number", label: "Số thứ tự" }, { key: "title", label: "Tiêu đề" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={principles.items.map((item) => ({ number: item.number, title: item.title, description: item.description }))} /></div>
       </EditorSection>
       <EditorSection columns="sm:grid-cols-2" title="Chuyên môn và cam kết">
         <TextField label="Dòng giới thiệu" name="expertiseEyebrow" value={expertise.eyebrow} />
         <TextField label="Tiêu đề" name="expertiseTitle" value={expertise.title} />
         <TextAreaField label="Mô tả" name="expertiseDescription" value={expertise.description} />
-        <EditableRows label="Cam kết" name="commitments" columns={[{ key: "value", label: "Nội dung", multiline: true }]} initialRows={expertise.commitments.map((value) => ({ value }))} />
-        <TextField label="Đường dẫn ảnh" name="expertiseImage" value={expertise.image} />
+        <div className="sm:col-span-2"><EditableRows label="Cam kết" name="commitments" columns={[{ key: "value", label: "Nội dung", multiline: true }]} initialRows={expertise.commitments.map((value) => ({ value }))} /></div>
+        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 3} defaultValue={expertise.image} label="Ảnh chuyên môn" name="expertiseImage" required /></div>
       </EditorSection>
       <EditorSection columns="sm:grid-cols-2" title="Thông tin hệ thống phòng khám">
         <TextField label="Dòng giới thiệu" name="clinicsEyebrow" value={clinics.eyebrow} />
         <TextField label="Tiêu đề" name="clinicsTitle" value={clinics.title} />
         <TextAreaField label="Mô tả" name="clinicsDescription" value={clinics.description} />
+        <p className="text-xs leading-5 text-text-secondary sm:col-span-2">Địa chỉ, số điện thoại, hình ảnh và đường dẫn bản đồ của từng cơ sở được lấy từ mục Quản trị → Cơ sở phòng khám, không lưu trong phần nội dung này.</p>
       </EditorSection>
     </AdminActionForm>;
   }
@@ -87,11 +89,13 @@ function ContentEditor({ record }: { record: SiteContentRecord }) {
 
 export function ContentDatabaseManager({
   contentRecords,
+  contentWarning,
   contactCtaSettings,
   clinics,
   section,
 }: {
   contentRecords: readonly SiteContentRecord[];
+  contentWarning?: string;
   contactCtaSettings: ContactCtaSettings;
   clinics: readonly { id: string; label: string }[];
   section: string;
@@ -120,6 +124,7 @@ export function ContentDatabaseManager({
 
       {showContent ? <section aria-labelledby="site-content-heading" className="space-y-4">
         <div><h2 className="text-xl font-bold text-text-primary" id="site-content-heading">Nội dung website</h2><p className="mt-1 text-sm text-text-secondary">Chỉnh nội dung theo từng trang bằng form; các danh sách được nhập mỗi mục trên một dòng theo hướng dẫn.</p></div>
+        {section === "about" && contentWarning ? <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950" role="alert">{contentWarning}</p> : null}
         {visibleContent.length ? visibleContent.map((record) => <ContentEditor key={record.key} record={record} />) : <p className="rounded-2xl border border-border-subtle bg-white p-5 text-sm text-text-secondary">Chưa có nội dung cấu hình cho mục này.</p>}
       </section> : null}
 

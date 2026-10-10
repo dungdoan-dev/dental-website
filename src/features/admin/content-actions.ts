@@ -57,15 +57,25 @@ export async function updateStructuredSiteContent(_previous: State, formData: Fo
       content = parsed.data;
       title = "Hình ảnh mục lý do lựa chọn";
     } else if (key === "about_page") {
+      const images = z.object({
+        heroImage: imagePathSchema,
+        storyImage: imagePathSchema,
+        expertiseImage: imagePathSchema,
+      }).safeParse({
+        heroImage: readField(formData, "heroImage"),
+        storyImage: readField(formData, "storyImage"),
+        expertiseImage: readField(formData, "expertiseImage"),
+      });
+      if (!images.success) return validationFailure(images.error);
       const highlights = readRowList(formData, "highlights", ["value", "label"]);
       const principles = readRowList(formData, "principles", ["number", "title", "description"]);
       content = {
-        hero: { eyebrow: readField(formData, "heroEyebrow"), title: readField(formData, "heroTitle"), description: readField(formData, "heroDescription"), image: readField(formData, "heroImage") },
+        hero: { eyebrow: readField(formData, "heroEyebrow"), title: readField(formData, "heroTitle"), description: readField(formData, "heroDescription"), image: images.data.heroImage },
         highlights,
-        story: { eyebrow: readField(formData, "storyEyebrow"), title: readField(formData, "storyTitle"), paragraphs: readStringList(formData, "storyParagraphs"), founderName: readField(formData, "founderName"), founderRole: readField(formData, "founderRole"), image: readField(formData, "storyImage") },
+        story: { eyebrow: readField(formData, "storyEyebrow"), title: readField(formData, "storyTitle"), paragraphs: readStringList(formData, "storyParagraphs"), founderName: readField(formData, "founderName"), founderRole: readField(formData, "founderRole"), image: images.data.storyImage },
         visionMission: { eyebrow: readField(formData, "visionEyebrow"), title: readField(formData, "visionTitle"), introduction: readField(formData, "visionIntroduction"), vision: readField(formData, "vision"), mission: readField(formData, "mission") },
         principles: { eyebrow: readField(formData, "principlesEyebrow"), title: readField(formData, "principlesTitle"), introduction: readField(formData, "principlesIntroduction"), items: principles },
-        expertise: { eyebrow: readField(formData, "expertiseEyebrow"), title: readField(formData, "expertiseTitle"), description: readField(formData, "expertiseDescription"), commitments: readStringList(formData, "commitments"), image: readField(formData, "expertiseImage") },
+        expertise: { eyebrow: readField(formData, "expertiseEyebrow"), title: readField(formData, "expertiseTitle"), description: readField(formData, "expertiseDescription"), commitments: readStringList(formData, "commitments"), image: images.data.expertiseImage },
         clinics: { eyebrow: readField(formData, "clinicsEyebrow"), title: readField(formData, "clinicsTitle"), description: readField(formData, "clinicsDescription") },
       };
       const parsed = aboutPageSchema.safeParse(content);
