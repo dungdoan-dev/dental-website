@@ -155,7 +155,7 @@ export default async function AdminHomePage() {
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <TestimonialFormDialog
-                  testimonial={{ ...item, source: item.source ?? undefined }}
+                  testimonial={{ ...item, source: item.source ?? undefined, avatar: item.avatar }}
                   buttonLabel="Sửa"
                   buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                 />

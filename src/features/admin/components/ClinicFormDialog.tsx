@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import type { Clinic } from "@/features/clinics/types/clinic.type";
 import { updateClinic } from "../actions";
 import { showAdminToast } from "./AdminToast";
+import { ImageUploadField } from "./ImageUploadField";
 
 export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +18,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
     phone: clinic.phone,
     workingHours: clinic.workingHours,
     description: clinic.description,
+    image: clinic.image,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,10 +26,14 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
     startTransition(async () => {
       try {
         const result = await updateClinic(formData);
-        if (!result.success) throw new Error("Clinic update failed");
+        if (!result.success) throw new Error(result.error || "Không thể cập nhật cơ sở.");
         showAdminToast("success", "Đã cập nhật thông tin cơ sở.");
         setIsOpen(false);
-      } catch {
+      } catch (error) {
+        if (error instanceof Error && error.message) {
+          showAdminToast("error", error.message);
+          return;
+        }
         showAdminToast("error", "Không thể cập nhật cơ sở. Vui lòng thử lại.");
       }
     });
@@ -42,8 +49,8 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
         Chỉnh sửa thông tin
       </button>
 
-      {isOpen && (
-        <div className="admin-dialog-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-4 backdrop-blur-sm sm:p-6 sm:pt-8">
+      {isOpen && typeof document !== "undefined" && createPortal(
+        <div className="admin-dialog-overlay fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-24 backdrop-blur-sm sm:p-6 sm:pt-24">
           <div className="admin-dialog-panel relative flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-2xl sm:max-h-[calc(100dvh-4rem)]">
             <div className="admin-dialog-header flex shrink-0 items-center justify-between border-b border-border-subtle/60 px-5 pb-4 pt-5 text-left sm:px-7 sm:pt-6">
               <div className="flex items-center gap-2.5">
@@ -64,6 +71,16 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
             </div>
 
             <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
+              <div>
+                <ImageUploadField
+                  aspect={16 / 9}
+                  label="Ảnh cơ sở *"
+                  onChange={(image) => setFormData((current) => ({ ...current, image }))}
+                  required
+                  value={formData.image}
+                />
+              </div>
+
               <div>
                 <label className="block font-semibold text-text-primary mb-1">Tên cơ sở *</label>
                 <input
@@ -138,7 +155,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
             </form>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }

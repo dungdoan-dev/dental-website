@@ -1,4 +1,5 @@
 import { StarRating } from "@/components/ui/StarRating";
+import Image from "next/image";
 import { getHomeSectionCopy, getTestimonials } from "../services/home.service";
 
 const accentClass = { blue: "bg-brand-blue", green: "bg-brand-green", "blue-dark": "bg-brand-blue-dark" } as const;
@@ -33,9 +34,7 @@ export async function TestimonialsSection() {
                 <p className="leading-relaxed text-text-primary italic">{testimonial.content}</p>
               </div>
               <div className="mt-6 flex items-center gap-3 border-t border-surface-container-high pt-6">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-bold text-white ${accentClass[testimonial.accent]}`}>
-                  {testimonial.initials}
-                </div>
+                {testimonial.avatar ? <Image alt={`Ảnh ${testimonial.customerName}`} className="h-11 w-11 rounded-full object-cover" height={44} src={testimonial.avatar} unoptimized width={44} /> : <div className={`flex h-11 w-11 items-center justify-center rounded-full text-[15px] font-bold text-white ${accentClass[testimonial.accent]}`}>{testimonial.initials}</div>}
                 <div>
                   <h3 className="font-bold text-text-primary">{testimonial.customerName}</h3>
                   <p className="text-xs text-text-secondary">{testimonial.source}</p>

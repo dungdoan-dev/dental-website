@@ -20,6 +20,10 @@ export const serviceFormSchema = z.object({
   badge: optionalText(120), badgeVariant: z.enum(["blue", "green"]), featured: z.boolean(),
   category: z.enum(["pediatric", "general", "aesthetic", "orthodontics", "implant", "periodontics", "other"]),
 });
+export const serviceSortOrderSchema = z.object({
+  id: recordIdSchema,
+  sortOrder: z.number().int().min(0).max(99999),
+});
 const list = z.array(text(2000)).max(50);
 export const doctorFormSchema = z.object({
   id: recordIdSchema, name: text(200), slug: slugSchema, avatar: imagePathSchema,

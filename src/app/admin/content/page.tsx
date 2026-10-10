@@ -2,8 +2,8 @@ import { ContentDatabaseManager, type SiteContentRecord } from "@/features/admin
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { db } from "@/lib/db";
 import { getContactCtaSettings } from "@/features/content/services/contact-cta.service";
-import { getClinics } from "@/features/clinics/services/clinic.service";
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
+import { getClinics } from "@/features/clinics/services/clinic.service";
 
 export const metadata = { title: "Nội dung website | Admin Nha Khoa 2000" };
 

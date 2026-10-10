@@ -6,12 +6,13 @@ import { Icon } from "@/components/ui/Icon";
 import { siteConfig } from "@/config/site";
 import { ClinicCard } from "@/features/clinics/components/ClinicCard";
 import { getClinics } from "@/features/clinics/services/clinic.service";
+import { getContactCtaSettings } from "@/features/content/services/contact-cta.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = generateSeoMetadata({ title: "Liên hệ và đặt lịch", url: "/lien-he" });
 
 export default async function ContactPage() {
-  const clinics = await getClinics().catch(() => []);
+  const [clinics, contactSettings] = await Promise.all([getClinics().catch(() => []), getContactCtaSettings()]);
 
   return (
     <main className="bg-surface">
@@ -62,6 +63,7 @@ export default async function ContactPage() {
                   <span><span className="block text-xs font-semibold text-white/65">Email</span><span className="mt-1 block break-all font-medium">{siteConfig.contact.email}</span></span>
                   <Icon className="h-5 w-5 shrink-0" name="arrow-right" />
                 </a>
+                {[{ label: "Viber", href: contactSettings.viberUrl }, { label: "WhatsApp", href: contactSettings.whatsappUrl }].some((channel) => channel.href) ? <div className="border-t border-white/15 py-4"><p className="text-xs font-semibold text-white/65">Liên hệ cho khách nước ngoài</p><div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">{[{ label: "Viber", href: contactSettings.viberUrl }, { label: "WhatsApp", href: contactSettings.whatsappUrl }].filter((channel): channel is { label: string; href: string } => Boolean(channel.href)).map((channel) => <a className="text-sm font-bold underline decoration-white/40 underline-offset-4 transition-colors hover:text-brand-green-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white" href={channel.href} key={channel.label} rel="noreferrer" target="_blank">{channel.label}<span className="sr-only"> (mở trong tab mới)</span></a>)}</div></div> : null}
               </div>
               <p className="mt-4 text-xs leading-5 text-white/65">Gửi yêu cầu đặt lịch trực tuyến để chúng tôi chủ động liên hệ xác nhận thời gian phù hợp.</p>
             </aside>

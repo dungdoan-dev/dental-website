@@ -4,7 +4,7 @@ import type { DentalService, ServiceCategory } from "../types/service.type";
 export const serviceRepository = {
   async findAll(): Promise<readonly DentalService[]> {
     const services = await db.service.findMany({
-      orderBy: { id: "asc" },
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
     });
 
     return services.map((s) => ({
@@ -17,6 +17,7 @@ export const serviceRepository = {
       badge: s.badge,
       badgeVariant: s.badgeVariant as "blue" | "green",
       featured: s.featured,
+      sortOrder: s.sortOrder,
       category: s.category as ServiceCategory,
     }));
   },
@@ -38,6 +39,7 @@ export const serviceRepository = {
       badge: s.badge,
       badgeVariant: s.badgeVariant as "blue" | "green",
       featured: s.featured,
+      sortOrder: s.sortOrder,
       category: s.category as ServiceCategory,
     };
   },

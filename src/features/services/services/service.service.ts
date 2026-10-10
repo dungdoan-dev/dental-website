@@ -28,7 +28,7 @@ export async function getServiceBySlug(slug: string): Promise<DentalService | nu
 }
 
 export async function getFeaturedServices(): Promise<readonly DentalService[]> {
-  return (await getServices()).filter((service) => service.featured);
+  return getServices();
 }
 
 export async function getImplantDetailData(): Promise<ImplantDetailData | null> {

@@ -9,6 +9,7 @@ import { contactCtaSchema } from "@/features/content/schemas/contact-cta.schema"
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
 import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
 import { serviceDetailSchema, serviceDetailContentKey } from "@/features/services/schemas/service-detail.schema";
+import { servicePriceCategoriesSchema } from "@/features/services/schemas/service-price-categories.schema";
 import type { MutationResult } from "./services/mutation";
 import { validationFailure } from "./services/mutation";
 import { imagePathSchema } from "./schemas/admin.schema";
@@ -117,8 +118,12 @@ export async function updateServiceDetail(_previous: State, formData: FormData):
     });
     if (!parsed.success) return validationFailure(parsed.error);
 
+    const image = imagePathSchema.safeParse(formData.get("image"));
+    if (!image.success) return validationFailure(image.error);
+
     const key = serviceDetailContentKey(service.id);
     await saveSiteRecord(key, `Chi tiết dịch vụ: ${service.name}`, parsed.data);
+    await db.service.update({ where: { id: service.id }, data: { image: image.data } });
     revalidatePath("/admin/services");
     revalidatePath(`/dich-vu/${service.slug}`);
     revalidatePath("/dich-vu");
@@ -160,12 +165,30 @@ export async function updateContactCta(_previous: State, formData: FormData): Pr
       showPhone: formData.get("showPhone") === "on",
       facebookUrl: readField(formData, "facebookUrl"),
       zaloLinks: Object.fromEntries(clinics.map((clinic) => [clinic.id, readField(formData, `zaloUrl-${clinic.id}`)])),
+      viberUrl: readField(formData, "viberUrl"),
+      whatsappUrl: readField(formData, "whatsappUrl"),
     });
     if (!settings.success) return validationFailure(settings.error);
     await saveSiteRecord("contact_cta", "CTA liên hệ", settings.data);
   } catch { return { success: false, error: "Không thể lưu CTA liên hệ. Vui lòng kiểm tra các liên kết." }; }
   revalidatePath("/admin");
   revalidatePath("/admin/content");
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function updateServicePriceCategories(_previous: State, formData: FormData): Promise<MutationResult> {
+  await requireAdmin();
+  try {
+    const rows = readRowList(formData, "rows", ["category", "label", "price"]);
+    const parsed = servicePriceCategoriesSchema.safeParse({ title: readField(formData, "title"), description: readField(formData, "description"), rows });
+    if (!parsed.success) return validationFailure(parsed.error);
+    await saveSiteRecord("service_price_categories", "Bảng giá theo danh mục kỹ thuật", parsed.data);
+  } catch {
+    return { success: false, error: "Không thể lưu bảng giá danh mục. Vui lòng kiểm tra lại nội dung." };
+  }
+  revalidatePath("/bang-gia");
+  revalidatePath("/dich-vu");
   revalidatePath("/");
   return { success: true };
 }

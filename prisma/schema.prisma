@@ -49,6 +49,7 @@ model Service {
   badge            String
   badgeVariant     BadgeVariant    @map("badge_variant")
   featured         Boolean         @default(false)
+  sortOrder        Int             @default(0) @map("sort_order")
   category         ServiceCategory
   createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -56,6 +57,7 @@ model Service {
 
   @@index([category])
   @@index([featured])
+  @@index([sortOrder, id])
   @@map("services")
 }
 

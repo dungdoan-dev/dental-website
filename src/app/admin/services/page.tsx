@@ -8,6 +8,13 @@ import { ServiceDetailFormDialog } from "@/features/admin/components/ServiceDeta
 import type { DentalService } from "@/features/services/types/service.type";
 import { serviceDetailSchema, serviceDetailContentKey, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
 import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
+import { updateServicePriceCategories } from "@/features/admin/content-actions";
+import { AdminActionForm } from "@/features/admin/components/AdminActionForm";
+import { ServicePriceCategoriesEditor } from "@/features/admin/components/ServicePriceCategoriesEditor";
+import { defaultServicePriceCategories } from "@/features/services/data/service-price-categories";
+import { servicePriceCategoriesSchema } from "@/features/services/schemas/service-price-categories.schema";
+import { ServiceSortOrderControl } from "@/features/admin/components/ServiceSortOrderControl";
+import { serviceIconByCategory } from "@/features/services/data/service-filter.data";
 
 export const metadata = {
   title: "Quản Lý Dịch Vụ | Admin Nha Khoa 2000",
@@ -16,13 +23,15 @@ export const metadata = {
 export default async function AdminServicesPage() {
   await requireAdmin();
   const services = await db.service.findMany({
-    orderBy: { id: "asc" },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
   });
   const detailRecords = await db.siteContent.findMany({
-    where: { key: { in: [...services.map((service) => serviceDetailContentKey(service.id)), "implant_detail"] } },
+    where: { key: { in: [...services.map((service) => serviceDetailContentKey(service.id)), "implant_detail", "service_price_categories"] } },
     select: { key: true, content: true },
   });
   const detailByKey = new Map(detailRecords.map((record) => [record.key, record.content]));
+  const pricingParse = servicePriceCategoriesSchema.safeParse(detailByKey.get("service_price_categories"));
+  const pricing = pricingParse.success ? pricingParse.data : defaultServicePriceCategories;
 
   return (
     <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
@@ -53,16 +62,24 @@ export default async function AdminServicesPage() {
         </div>
       </div>
 
+      <section className="overflow-hidden rounded-2xl border border-border-subtle/50 bg-white shadow-sm">
+        <div className="border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4"><h2 className="text-base font-bold text-text-primary">Bảng giá theo danh mục kĩ thuật</h2><p className="text-xs text-text-secondary">Cấu hình tiêu đề, ghi chú và các danh mục hiển thị tại trang /bang-gia.</p></div>
+        <AdminActionForm action={updateServicePriceCategories} submitLabel="Lưu bảng giá danh mục" className="space-y-4 p-6">
+          <div className="grid gap-4 md:grid-cols-2"><label className="block text-xs font-semibold text-text-secondary">Tiêu đề<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={pricing.title} maxLength={160} name="title" required /></label><label className="block text-xs font-semibold text-text-secondary">Ghi chú bên dưới<textarea className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={pricing.description} maxLength={500} name="description" rows={2} /></label></div>
+          <fieldset className="space-y-3 rounded-xl border border-border-subtle p-3"><legend className="px-1 text-sm font-semibold text-text-primary">Danh mục và mức giá</legend><ServicePriceCategoriesEditor initialRows={pricing.rows} /></fieldset>
+        </AdminActionForm>
+      </section>
+
       {/* Services Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm border-collapse">
             <thead>
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="px-6 py-4">Ảnh</th>
+                <th className="px-6 py-4">Icon</th>
                 <th className="px-6 py-4">Tên dịch vụ &amp; Slug</th>
                 <th className="px-4 py-4">Danh mục</th>
-                <th className="px-4 py-4">Nổi bật</th>
+                <th className="px-4 py-4">Thứ tự</th>
                 <th className="px-6 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
@@ -98,13 +115,13 @@ export default async function AdminServicesPage() {
                     }`}
                   >
                     <td className="px-6 py-3.5">
-                      <div className="relative h-12 w-16 overflow-hidden rounded-xl bg-slate-100 border border-border-subtle shadow-sm">
+                      <div className="grid h-12 w-16 place-items-center rounded-xl bg-slate-100 border border-border-subtle shadow-sm">
                         <Image
-                          src={service.image}
-                          alt={service.name}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
+                          src={serviceIconByCategory[service.category as DentalService["category"]]}
+                          alt=""
+                          height={36}
+                          width={36}
+                          className="object-contain"
                         />
                       </div>
                     </td>
@@ -127,16 +144,7 @@ export default async function AdminServicesPage() {
                       </span>
                     </td>
 
-                    <td className="px-4 py-3.5">
-                      {service.featured ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-green-dark">
-                          <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                          <span>Trang chủ</span>
-                        </span>
-                      ) : (
-                        <span className="text-xs text-text-secondary">—</span>
-                      )}
-                    </td>
+                    <td className="px-4 py-3.5"><ServiceSortOrderControl id={service.id} initialValue={service.sortOrder} /></td>
 
                     <td className="px-6 py-3.5 text-right">
                       <div className="inline-flex items-center gap-2">

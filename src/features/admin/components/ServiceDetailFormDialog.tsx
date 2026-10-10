@@ -4,6 +4,8 @@ import { useActionState, useState } from "react";
 import type { DentalService } from "@/features/services/types/service.type";
 import { serviceDetailSchema, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
 import { EditableRows } from "./EditableRows";
+import { PriceTableEditor } from "./PriceTableEditor";
+import { ImageUploadField } from "./ImageUploadField";
 import { FormFeedback } from "./FormFeedback";
 import { updateServiceDetail } from "../content-actions";
 import { useMutationToast } from "./AdminToast";
@@ -47,6 +49,7 @@ export function ServiceDetailFormDialog({ service, detail }: Props) {
             <form action={formAction} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <input name="serviceId" type="hidden" value={service.id} />
+              <ImageUploadField aspect={16 / 9} label="Ảnh trang chi tiết dịch vụ" defaultValue={service.image} name="image" required />
               <div className="grid gap-4 sm:grid-cols-2">
                 <label>Dòng giới thiệu nhỏ<input defaultValue={initial.eyebrow} maxLength={120} name="eyebrow" placeholder="Ví dụ: Nha khoa thẩm mỹ" /></label>
                 <label>Tiêu đề chính *<input defaultValue={initial.title} maxLength={240} name="title" required /></label>
@@ -57,7 +60,7 @@ export function ServiceDetailFormDialog({ service, detail }: Props) {
               <section className="space-y-3 rounded-2xl border border-border-subtle p-4">
                 <div><h3 className="text-sm font-bold text-text-primary">Bảng giá tham khảo</h3><p className="mt-1 text-xs text-text-secondary">Có thể để trống nếu dịch vụ chưa công khai giá.</p></div>
                 <label>Liên kết bảng giá gốc (không bắt buộc)<input defaultValue={initial.priceSourceUrl} maxLength={2000} name="priceSourceUrl" placeholder="https://..." type="url" /></label>
-                <EditableRows label="Các hạng mục" name="prices" columns={[{ key: "name", label: "Tên hạng mục" }, { key: "detail", label: "Ghi chú" }, { key: "price", label: "Giá tham khảo" }]} initialRows={initial.prices} />
+                <div className="space-y-2"><h4 className="text-xs font-semibold text-text-secondary">Các hạng mục giá</h4><PriceTableEditor initialRows={initial.prices} /></div>
               </section>
               <EditableRows label="Quy trình thực hiện" name="steps" columns={[{ key: "number", label: "Số thứ tự" }, { key: "title", label: "Tên bước" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={initial.steps} />
               <EditableRows label="Câu hỏi thường gặp" name="faqs" columns={[{ key: "question", label: "Câu hỏi", multiline: true }, { key: "answer", label: "Câu trả lời", multiline: true }]} initialRows={initial.faqs} />

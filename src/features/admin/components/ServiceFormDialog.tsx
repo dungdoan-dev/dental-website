@@ -194,19 +194,7 @@ export function ServiceFormDialog({
                 />
               </div>
 
-              <ImageUploadField label="Ảnh trang chi tiết và SEO *" onChange={(image) => setFormData({ ...formData, image })} required value={formData.image} />
-
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-text-primary font-medium">
-                  <input
-                    type="checkbox"
-                    checked={formData.featured}
-                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    className="h-4 w-4 rounded border-border-subtle text-brand-blue-dark accent-brand-blue-dark cursor-pointer"
-                  />
-                  <span>Đánh dấu dịch vụ nổi bật</span>
-                </label>
-              </div>
+              {!service ? <ImageUploadField label="Ảnh trang chi tiết *" onChange={(image) => setFormData({ ...formData, image })} required value={formData.image} /> : null}
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button

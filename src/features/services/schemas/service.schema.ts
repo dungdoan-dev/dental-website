@@ -10,5 +10,6 @@ export const serviceSchema = z.object({
   badge: z.string().min(1),
   badgeVariant: z.enum(["blue", "green"]),
   featured: z.boolean(),
+  sortOrder: z.number().int().min(0).max(99999),
   category: z.enum(["pediatric", "general", "aesthetic", "orthodontics", "implant", "periodontics", "other"]),
 });

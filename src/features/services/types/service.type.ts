@@ -17,5 +17,6 @@ export type DentalService = {
   badge: string;
   badgeVariant: "blue" | "green";
   featured: boolean;
+  sortOrder: number;
   category: ServiceCategory;
 };

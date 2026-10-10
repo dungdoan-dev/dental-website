@@ -4,7 +4,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { requireAdmin } from "./auth/admin-auth";
 import { z } from "zod";
-import { serviceFormSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
+import { serviceFormSchema, serviceSortOrderSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
 import { runMutation, validationFailure, saveRevision, SlugConflictError } from "./services/mutation";
 import { publicDataTags } from "@/lib/public-data-cache";
 import { sanitizeArticleContent } from "@/features/articles/lib/article-content";
@@ -23,6 +23,16 @@ const coreValueSchema = z.object({
   description: z.string().trim().min(1).max(1200),
   iconKey: z.enum(["heart", "care", "honesty", "innovation"]),
   sortOrder: z.number().int().min(0).max(999),
+});
+
+const clinicFormSchema = z.object({
+  id: recordIdSchema,
+  name: z.string().trim().min(1).max(200),
+  address: z.string().trim().min(1).max(500),
+  phone: z.string().trim().min(1).max(100),
+  workingHours: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000),
+  image: imagePathSchema,
 });
 
 export async function updateCoreValue(_previous: import("./services/mutation").MutationResult | null, formData: FormData) {
@@ -114,6 +124,16 @@ export async function upsertService(input: ServiceFormData) {
       await saveRevision(tx, "service", data.id, data.name, data);
     });
     revalidateContent(["/admin/services", "/dich-vu", "/dich-vu/[slug]", "/"]);
+  });
+}
+
+export async function updateServiceSortOrder(input: { id: string; sortOrder: number }) {
+  await requireAdmin();
+  const parsed = serviceSortOrderSchema.safeParse(input);
+  if (!parsed.success) return validationFailure(parsed.error);
+  return runMutation(async () => {
+    await db.service.update({ where: { id: parsed.data.id }, data: { sortOrder: parsed.data.sortOrder } });
+    revalidateContent(["/admin/services", "/dich-vu", "/"]);
   });
 }
 
@@ -269,6 +289,7 @@ export async function upsertTestimonial(data: {
   initials: string;
   accent: string;
   sortOrder?: number;
+  avatar?: string;
 }) {
   await requireAdmin();
   await db.testimonial.upsert({
@@ -278,6 +299,7 @@ export async function upsertTestimonial(data: {
       customerName: data.customerName,
       rating: Number(data.rating),
       content: data.content,
+      avatar: data.avatar || null,
       source: data.source ?? "",
       initials: data.initials,
       accent: data.accent,
@@ -287,6 +309,7 @@ export async function upsertTestimonial(data: {
       customerName: data.customerName,
       rating: Number(data.rating),
       content: data.content,
+      avatar: data.avatar || null,
       source: data.source ?? "",
       initials: data.initials,
       accent: data.accent,
@@ -319,21 +342,17 @@ export async function updateClinic(data: {
   phone: string;
   workingHours: string;
   description: string;
+  image: string;
 }) {
   await requireAdmin();
-  await db.clinic.update({
-    where: { id: data.id },
-    data: {
-      name: data.name,
-      address: data.address,
-      phone: data.phone,
-      workingHours: data.workingHours,
-      description: data.description,
-    },
+  const parsed = clinicFormSchema.safeParse(data);
+  if (!parsed.success) return validationFailure(parsed.error);
+  return runMutation(async () => {
+    const { id, ...clinicData } = parsed.data;
+    await db.clinic.update({ where: { id }, data: clinicData });
+    revalidatePath("/admin/clinics");
+    revalidatePath("/");
+    revalidatePath("/lien-he");
+    updateTag(publicDataTags.clinics);
   });
-
-  revalidatePath("/admin/clinics");
-  revalidatePath("/");
-  updateTag(publicDataTags.clinics);
-  return { success: true };
 }

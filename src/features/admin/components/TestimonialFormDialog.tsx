@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { upsertTestimonial } from "../actions";
 import { showAdminToast } from "./AdminToast";
+import { ImageUploadField } from "./ImageUploadField";
 
 export function TestimonialFormDialog({
   testimonial,
@@ -18,6 +19,7 @@ export function TestimonialFormDialog({
     initials: string;
     accent: string;
     sortOrder: number;
+    avatar?: string | null;
   };
   buttonLabel?: string;
   buttonClassName?: string;
@@ -34,6 +36,7 @@ export function TestimonialFormDialog({
     initials: testimonial?.initials ?? "KH",
     accent: testimonial?.accent ?? "blue",
     sortOrder: testimonial?.sortOrder ?? 0,
+    avatar: testimonial?.avatar ?? "",
   });
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +133,8 @@ export function TestimonialFormDialog({
                   />
                 </div>
               </div>
+
+              <ImageUploadField aspect={1} label="Ảnh khách hàng (không bắt buộc)" onChange={(avatar) => setFormData((prev) => ({ ...prev, avatar }))} value={formData.avatar} />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
