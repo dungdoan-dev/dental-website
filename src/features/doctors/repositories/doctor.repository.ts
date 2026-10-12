@@ -1,5 +1,4 @@
-import { db } from "@/lib/db";
-import type { Prisma } from "@prisma/client";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import type { Doctor, DoctorCategory } from "../types/doctor.type";
 
 function mapDoctor(d: {
@@ -10,24 +9,24 @@ function mapDoctor(d: {
   position: string;
   specialty: string;
   experience: number;
-  sortOrder: number;
-  nameLines: number;
-  nameLine2: string | null;
+  sort_order: number;
+  name_lines: number;
+  name_line_2: string | null;
   description: string;
   badge: string;
   highlight: string;
   category: string;
-  directoryTitle: string;
-  licenseNumber: string | null;
+  directory_title: string;
+  license_number: string | null;
   quote: string | null;
-  languages: Prisma.JsonValue | null;
-  sourceUrl: string | null;
-  specialties?: { specialty: string }[];
-  education?: { content: string }[];
-  experienceHighlights?: { content: string }[];
-  certificates?: { title: string; issuer: string; detail: string; image: string }[];
+  languages: unknown;
+  source_url: string | null;
+  doctor_specialties?: { specialty: string; sort_order?: number }[];
+  doctor_experience_highlights?: { content: string; sort_order?: number }[];
+  doctor_certificates?: { title: string; issuer: string; detail: string; image: string; sort_order?: number }[];
+  doctor_education?: { content: string; sort_order?: number }[];
 }): Doctor {
-  const hasProfile = Boolean(d.licenseNumber || d.quote || d.sourceUrl || d.specialties?.length || d.education?.length || d.experienceHighlights?.length || d.certificates?.length);
+  const hasProfile = Boolean(d.license_number || d.quote || d.source_url || d.doctor_specialties?.length || d.doctor_education?.length || d.doctor_experience_highlights?.length || d.doctor_certificates?.length);
   const languages = Array.isArray(d.languages)
     ? d.languages.filter((language): language is string => typeof language === "string")
     : typeof d.languages === "string"
@@ -42,30 +41,30 @@ function mapDoctor(d: {
     position: d.position,
     specialty: d.specialty,
     experience: d.experience,
-    sortOrder: d.sortOrder,
-    nameLines: (d.nameLines === 2 ? 2 : 1),
-    nameLine2: d.nameLine2 ?? "",
+    sortOrder: d.sort_order,
+    nameLines: (d.name_lines === 2 ? 2 : 1),
+    nameLine2: d.name_line_2 ?? "",
     description: d.description,
     badge: d.badge,
     highlight: d.highlight,
     category: d.category as DoctorCategory,
-    directoryTitle: d.directoryTitle,
+    directoryTitle: d.directory_title,
     profile: hasProfile
       ? {
-          licenseNumber: d.licenseNumber!,
+          licenseNumber: d.license_number!,
           quote: d.quote ?? "",
-          specialties: d.specialties?.map((s) => s.specialty) ?? [],
+          specialties: d.doctor_specialties?.map((s) => s.specialty) ?? [],
           languages,
-          education: d.education?.map((e) => e.content) ?? [],
-          experienceHighlights: d.experienceHighlights?.map((e) => e.content) ?? [],
+          education: d.doctor_education?.map((e) => e.content) ?? [],
+          experienceHighlights: d.doctor_experience_highlights?.map((e) => e.content) ?? [],
           certificates:
-            d.certificates?.map((c) => ({
+            d.doctor_certificates?.map((c) => ({
               title: c.title,
               issuer: c.issuer,
               detail: c.detail,
               image: c.image,
             })) ?? [],
-          sourceUrl: d.sourceUrl ?? "",
+          sourceUrl: d.source_url ?? "",
         }
       : undefined,
   };
@@ -73,30 +72,32 @@ function mapDoctor(d: {
 
 export const doctorRepository = {
   async findAll(): Promise<readonly Doctor[]> {
-    const doctors = await db.doctor.findMany({
-      include: {
-        specialties: { orderBy: { sortOrder: "asc" } },
-        education: { orderBy: { sortOrder: "asc" } },
-        experienceHighlights: { orderBy: { sortOrder: "asc" } },
-        certificates: { orderBy: { sortOrder: "asc" } },
-      },
-      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-    });
+    const { data: doctors, error } = await getPublicSupabaseClient().from("doctors").select(
+      "*, doctor_specialties(specialty,sort_order), doctor_education(content,sort_order), doctor_experience_highlights(content,sort_order), doctor_certificates(title,issuer,detail,image,sort_order)",
+    ).order("sort_order").order("id");
+    if (error) throw error;
 
-    return doctors.map(mapDoctor);
+    return doctors.map((doctor) => mapDoctor({
+      ...doctor,
+      doctor_specialties: doctor.doctor_specialties?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_education: doctor.doctor_education?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_experience_highlights: doctor.doctor_experience_highlights?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_certificates: doctor.doctor_certificates?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+    }));
   },
 
   async findBySlug(slug: string): Promise<Doctor | null> {
-    const doctor = await db.doctor.findUnique({
-      where: { slug },
-      include: {
-        specialties: { orderBy: { sortOrder: "asc" } },
-        education: { orderBy: { sortOrder: "asc" } },
-        experienceHighlights: { orderBy: { sortOrder: "asc" } },
-        certificates: { orderBy: { sortOrder: "asc" } },
-      },
-    });
+    const { data: doctor, error } = await getPublicSupabaseClient().from("doctors").select(
+      "*, doctor_specialties(specialty,sort_order), doctor_education(content,sort_order), doctor_experience_highlights(content,sort_order), doctor_certificates(title,issuer,detail,image,sort_order)",
+    ).eq("slug", slug).maybeSingle();
+    if (error) throw error;
 
-    return doctor ? mapDoctor(doctor) : null;
+    return doctor ? mapDoctor({
+      ...doctor,
+      doctor_specialties: doctor.doctor_specialties?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_education: doctor.doctor_education?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_experience_highlights: doctor.doctor_experience_highlights?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_certificates: doctor.doctor_certificates?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+    }) : null;
   },
 };

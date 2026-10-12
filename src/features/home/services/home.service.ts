@@ -1,26 +1,35 @@
-import { db } from "@/lib/db";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import { getSiteContent } from "@/features/content/services/site-content.service";
 import { z } from "zod";
 import type { CoreValue, FAQItem, HeroSlide, InsurancePartner, Testimonial } from "../types/home.type";
 import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
 import { HOME_SECTION_COPY, type HomeSectionCopyMap } from "../home-section-copy";
 
-const getCachedHeroSlides = cachePublicData("home:hero-slides", [publicDataTags.heroSlides], () => db.heroSlide.findMany({ orderBy: { sortOrder: "asc" } }));
-const getCachedCoreValues = cachePublicData("home:core-values", [publicDataTags.coreValues], () => db.coreValue.findMany({
-  select: { title: true, slogan: true, description: true, iconKey: true, sortOrder: true },
-  orderBy: { sortOrder: "asc" },
-}));
-const getCachedInsurancePartners = cachePublicData("home:insurance-partners", [publicDataTags.insurancePartners], () => db.$queryRaw<Array<{
-  code: string; name: string; description: string; accent: string; logoSrc: string | null;
-}>>`
-  SELECT code, name, description, accent, logo_src AS "logoSrc"
-  FROM insurance_partners ORDER BY sort_order ASC
-`);
-const getCachedFaqItems = cachePublicData("home:faqs", [publicDataTags.faqs], () => db.faqItem.findMany({
-  select: { question: true, answer: true, sortOrder: true },
-  orderBy: { sortOrder: "asc" },
-}));
-const getCachedTestimonials = cachePublicData("home:testimonials", [publicDataTags.testimonials], () => db.testimonial.findMany({ orderBy: { sortOrder: "asc" } }));
+const getCachedHeroSlides = cachePublicData("home:hero-slides", [publicDataTags.heroSlides], async () => {
+  const { data, error } = await getPublicSupabaseClient().from("hero_slides").select("*").order("sort_order");
+  if (error) throw error;
+  return data;
+});
+const getCachedCoreValues = cachePublicData("home:core-values", [publicDataTags.coreValues], async () => {
+  const { data, error } = await getPublicSupabaseClient().from("core_values").select("title,slogan,description,icon_key,sort_order").order("sort_order");
+  if (error) throw error;
+  return data;
+});
+const getCachedInsurancePartners = cachePublicData("home:insurance-partners", [publicDataTags.insurancePartners], async () => {
+  const { data, error } = await getPublicSupabaseClient().from("insurance_partners").select("code,name,description,accent,logo_src").order("sort_order");
+  if (error) throw error;
+  return data;
+});
+const getCachedFaqItems = cachePublicData("home:faqs", [publicDataTags.faqs], async () => {
+  const { data, error } = await getPublicSupabaseClient().from("faq_items").select("question,answer,sort_order").order("sort_order");
+  if (error) throw error;
+  return data;
+});
+const getCachedTestimonials = cachePublicData("home:testimonials", [publicDataTags.testimonials], async () => {
+  const { data, error } = await getPublicSupabaseClient().from("testimonials").select("*").order("sort_order");
+  if (error) throw error;
+  return data;
+});
 
 export async function getHeroSlides(): Promise<readonly HeroSlide[]> {
   try {
@@ -28,11 +37,11 @@ export async function getHeroSlides(): Promise<readonly HeroSlide[]> {
     return slides.map((s) => ({
       id: s.id,
       image: s.image,
-      imageAlt: s.imageAlt,
+      imageAlt: s.image_alt,
       badge: s.badge,
       title: s.title,
-      badgeVariant: s.badgeVariant as "blue" | "green",
-      objectPosition: s.objectPosition as "center" | "top",
+      badgeVariant: s.badge_variant as "blue" | "green",
+      objectPosition: s.object_position as "center" | "top",
     }));
   } catch {
     return [];
@@ -46,7 +55,7 @@ export async function getCoreValues(): Promise<readonly CoreValue[]> {
       title: v.title,
       slogan: v.slogan,
       description: v.description,
-      iconKey: v.iconKey as "heart" | "care" | "honesty" | "innovation",
+      iconKey: v.icon_key as "heart" | "care" | "honesty" | "innovation",
     }));
   } catch {
     return [];
@@ -63,7 +72,7 @@ export async function getInsurancePartners(): Promise<
       name: p.name,
       description: p.description,
       accent: p.accent as "blue" | "green",
-      logoSrc: p.logoSrc ?? undefined,
+      logoSrc: p.logo_src ?? undefined,
     }));
   } catch {
     return [];
@@ -114,7 +123,7 @@ export async function getTestimonials(): Promise<readonly Testimonial[]> {
     const list = await getCachedTestimonials();
     return list.map((t) => ({
       id: t.id,
-      customerName: t.customerName,
+      customerName: t.customer_name,
       rating: t.rating,
       content: t.content,
       avatar: t.avatar ?? undefined,

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { db } from "@/lib/db";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
+import { doctorRepository } from "@/features/doctors/repositories/doctor.repository";
 import { DoctorFormDialog } from "@/features/admin/components/DoctorFormDialog";
 import { DeleteDoctorButton } from "@/features/admin/components/DeleteButtons";
 import { DoctorSortOrderInput } from "@/features/admin/components/DoctorSortOrderInput";
@@ -13,15 +13,7 @@ export const metadata = {
 
 export default async function AdminDoctorsPage() {
   await requireAdmin();
-  const doctors = await db.doctor.findMany({
-    include: {
-      specialties: { orderBy: { sortOrder: "asc" } },
-      education: { orderBy: { sortOrder: "asc" } },
-      experienceHighlights: { orderBy: { sortOrder: "asc" } },
-      certificates: { orderBy: { sortOrder: "asc" } },
-    },
-    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-  });
+  const doctors = await doctorRepository.findAll();
 
   return (
     <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
@@ -72,16 +64,7 @@ export default async function AdminDoctorsPage() {
                   nameLines: doctor.nameLines === 2 ? 2 : 1,
                   nameLine2: doctor.nameLine2 ?? "",
                   category: doctor.category as Doctor["category"],
-                  profile: {
-                    licenseNumber: doctor.licenseNumber ?? "",
-                    quote: doctor.quote ?? "",
-                    sourceUrl: doctor.sourceUrl ?? "",
-                    languages: Array.isArray(doctor.languages) ? doctor.languages.filter((value): value is string => typeof value === "string") : [],
-                    specialties: doctor.specialties.map((item) => item.specialty),
-                    education: doctor.education.map((item) => item.content),
-                    experienceHighlights: doctor.experienceHighlights.map((item) => item.content),
-                    certificates: doctor.certificates.map(({ title, issuer, detail, image }) => ({ title, issuer, detail, image })),
-                  },
+                  profile: doctor.profile ?? { licenseNumber: "", quote: "", sourceUrl: "", languages: [], specialties: [], education: [], experienceHighlights: [], certificates: [] },
                 };
 
                 return (

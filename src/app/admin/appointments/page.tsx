@@ -1,10 +1,24 @@
-import { db } from "@/lib/db";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/features/admin/components/StatusBadge";
 import { AppointmentActions } from "@/features/admin/components/AppointmentActions";
-import type { Prisma } from "@prisma/client";
 import { appointmentQuerySchema } from "@/features/admin/schemas/admin.schema";
 import Link from "next/link";
+import type { AppointmentStatus } from "@/features/appointments/types/appointment.type";
+
+type AppointmentRow = {
+  id: string | number;
+  name: string;
+  phone: string;
+  email: string | null;
+  appointment_date: string;
+  created_at: string;
+  note: string | null;
+  status: AppointmentStatus;
+  clinic_id: string | null;
+  clinic: { name: string; label: string } | null;
+  service: { name: string } | null;
+};
 
 export const metadata = {
   title: "Quản Lý Đặt Hẹn | Admin Nha Khoa 2000",
@@ -18,34 +32,53 @@ export default async function AdminAppointmentsPage({
   await requireAdmin();
   const raw = await searchParams;
   const filters = appointmentQuerySchema.parse(Object.fromEntries(Object.entries(raw).filter((entry): entry is [string, string] => typeof entry[1] === "string")));
-  const clinics = await db.clinic.findMany({ select: { id: true, label: true }, orderBy: { id: "asc" } });
+  const supabase = await getSupabaseServerClient();
+  const { data: clinics, error: clinicsError } = await supabase.from("clinics").select("id,label").order("id");
+  if (clinicsError) throw clinicsError;
   const clinicId = clinics.some((clinic) => clinic.id === filters.clinicId) ? filters.clinicId : undefined;
   const status = filters.status;
-  const baseWhere: Prisma.AppointmentWhereInput = {};
-  if (clinicId) baseWhere.clinicId = clinicId;
-  if (filters.q) {
-    const digits = filters.q.replace(/[^0-9]/g, "");
-    baseWhere.OR = [{ name: { contains: filters.q, mode: "insensitive" } }, ...(digits ? [{ phone: { contains: digits } }] : [])];
-  }
-  if (filters.date) {
-    const from = new Date(filters.date + "T00:00:00+07:00");
-    baseWhere.appointmentDate = { gte: from, lt: new Date(from.getTime() + 86400000) };
-  }
-  const whereClause = { ...baseWhere, ...(status ? { status } : {}) };
-  const [total, counts] = await Promise.all([
-    db.appointment.count({ where: whereClause }),
-    db.appointment.groupBy({ by: ["status"], where: baseWhere, _count: true }),
-  ]);
+  const statuses = ["pending", "confirmed", "completed", "cancelled"] as const;
+  const countResults = await Promise.all(statuses.map((value) => {
+    let query = supabase.from("appointments").select("id", { count: "exact", head: true });
+    if (clinicId) query = query.eq("clinic_id", clinicId);
+    if (filters.q) {
+      const safeName = filters.q.replace(/[,%()\\"\\\\]/g, " ").trim();
+      const digits = filters.q.replace(/[^0-9]/g, "");
+      query = query.or([`name.ilike.%${safeName}%`, ...(digits ? [`phone.ilike.%${digits}%`] : [])].join(","));
+    }
+    if (filters.date) {
+      const from = new Date(`${filters.date}T00:00:00+07:00`);
+      query = query.gte("appointment_date", from.toISOString()).lt("appointment_date", new Date(from.getTime() + 86400000).toISOString());
+    }
+    return query.eq("status", value);
+  }));
+  for (const result of countResults) if (result.error) throw result.error;
+  const countMap = Object.fromEntries(statuses.map((value, index) => [value, countResults[index].count ?? 0]));
+  const totalCount = statuses.reduce((sum, value) => sum + countMap[value], 0);
+  const total = status ? countMap[status] : totalCount;
   const pageSize = 25;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const page = Math.min(filters.page, pageCount);
-  const appointments = await db.appointment.findMany({
-    where: whereClause, orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    skip: (page - 1) * pageSize, take: pageSize,
-    include: { service: { select: { name: true } }, clinic: { select: { name: true, label: true } } },
-  });
-  const countMap = Object.fromEntries(counts.map((row) => [row.status, row._count]));
-  const totalCount = counts.reduce((sum, row) => sum + row._count, 0);
+  let appointmentsQuery = supabase.from("appointments").select("*, service:services(name), clinic:clinics(name,label)");
+  if (clinicId) appointmentsQuery = appointmentsQuery.eq("clinic_id", clinicId);
+  if (filters.q) {
+    const safeName = filters.q.replace(/[,%()\\"\\\\]/g, " ").trim();
+    const digits = filters.q.replace(/[^0-9]/g, "");
+    appointmentsQuery = appointmentsQuery.or([`name.ilike.%${safeName}%`, ...(digits ? [`phone.ilike.%${digits}%`] : [])].join(","));
+  }
+  if (filters.date) {
+    const from = new Date(`${filters.date}T00:00:00+07:00`);
+    appointmentsQuery = appointmentsQuery.gte("appointment_date", from.toISOString()).lt("appointment_date", new Date(from.getTime() + 86400000).toISOString());
+  }
+  if (status) appointmentsQuery = appointmentsQuery.eq("status", status);
+  const { data: appointmentRows, error: appointmentsError } = await appointmentsQuery
+    .order("created_at", { ascending: false }).order("id", { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+  if (appointmentsError) throw appointmentsError;
+  const appointments = (appointmentRows as AppointmentRow[]).map((row) => ({
+    ...row, clinicId: row.clinic_id, createdAt: row.created_at, appointmentDate: new Date(row.appointment_date),
+    clinic: row.clinic, service: row.service,
+  }));
 
   function filterUrl(nextStatus: typeof status | "" = status ?? "", nextPage = 1) {
     const query = new URLSearchParams();

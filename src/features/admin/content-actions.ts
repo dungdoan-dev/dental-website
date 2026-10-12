@@ -1,10 +1,9 @@
 "use server";
 
 import { revalidatePath, updateTag } from "next/cache";
-import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { db } from "@/lib/db";
 import { requireAdmin } from "./auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { contactCtaSchema } from "@/features/content/schemas/contact-cta.schema";
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
 import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
@@ -14,6 +13,7 @@ import type { MutationResult } from "./services/mutation";
 import { validationFailure } from "./services/mutation";
 import { imagePathSchema } from "./schemas/admin.schema";
 import { publicDataTags } from "@/lib/public-data-cache";
+import { saveRevision } from "./services/mutation";
 
 type State = MutationResult | null;
 type ListRow = Record<string, string>;
@@ -37,10 +37,10 @@ function readField(formData: FormData, name: string) {
 }
 
 async function saveSiteRecord(key: string, title: string, content: unknown) {
-  await db.$transaction(async (tx) => {
-    await tx.siteContent.upsert({ where: { key }, create: { key, content: content as Prisma.InputJsonValue }, update: { content: content as Prisma.InputJsonValue } });
-    await tx.adminContentRevision.create({ data: { kind: "site-content", entityId: key, title, snapshot: content as Prisma.InputJsonValue, actor: process.env.ADMIN_USERNAME?.trim() || "admin" } });
-  });
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase.from("site_content").upsert({ key, content });
+  if (error) throw error;
+  await saveRevision("site-content", key, title, content);
   updateTag(publicDataTags.siteContent);
 }
 
@@ -113,7 +113,9 @@ export async function updateServiceDetail(_previous: State, formData: FormData):
   await requireAdmin();
   try {
     const serviceId = readField(formData, "serviceId");
-    const service = await db.service.findUnique({ where: { id: serviceId }, select: { id: true, name: true, slug: true } });
+    const supabase = await getSupabaseServerClient();
+    const { data: service, error: serviceError } = await supabase.from("services").select("id,name,slug").eq("id", serviceId).maybeSingle();
+    if (serviceError) throw serviceError;
     if (!service) return { success: false, error: "Không tìm thấy dịch vụ cần cập nhật." };
 
     const parsed = serviceDetailSchema.safeParse({
@@ -133,7 +135,8 @@ export async function updateServiceDetail(_previous: State, formData: FormData):
 
     const key = serviceDetailContentKey(service.id);
     await saveSiteRecord(key, `Chi tiết dịch vụ: ${service.name}`, parsed.data);
-    await db.service.update({ where: { id: service.id }, data: { image: image.data } });
+    const { error: updateError } = await supabase.from("services").update({ image: image.data, updated_at: new Date().toISOString() }).eq("id", service.id);
+    if (updateError) throw updateError;
     revalidatePath("/admin/services");
     revalidatePath(`/dich-vu/${service.slug}`);
     revalidatePath("/dich-vu");
@@ -157,8 +160,12 @@ export async function updateInsurancePartner(_previous: State, formData: FormDat
   if (!parsed.success) return validationFailure(parsed.error);
   try {
     const data = parsed.data;
-    const count = await db.$executeRaw`UPDATE insurance_partners SET name = ${data.name}, description = ${data.description}, accent = ${data.accent}, logo_src = ${data.logoSrc || null}, sort_order = ${data.sortOrder} WHERE code = ${data.code}`;
-    if (!count) return { success: false, error: "Không tìm thấy đối tác bảo hiểm này." };
+    const { data: updated, error } = await (await getSupabaseServerClient()).from("insurance_partners").update({
+      name: data.name, description: data.description, accent: data.accent,
+      logo_src: data.logoSrc || null, sort_order: data.sortOrder,
+    }).eq("code", data.code).select("code");
+    if (error) throw error;
+    if (!updated?.length) return { success: false, error: "Không tìm thấy đối tác bảo hiểm này." };
   } catch { return { success: false, error: "Không thể lưu thông tin bảo hiểm. Vui lòng thử lại." }; }
   revalidatePath("/admin");
   revalidatePath("/admin/content");
@@ -170,7 +177,8 @@ export async function updateInsurancePartner(_previous: State, formData: FormDat
 export async function updateContactCta(_previous: State, formData: FormData): Promise<MutationResult> {
   await requireAdmin();
   try {
-    const clinics = await db.clinic.findMany({ select: { id: true } });
+    const { data: clinics, error } = await (await getSupabaseServerClient()).from("clinics").select("id");
+    if (error) throw error;
     const settings = contactCtaSchema.safeParse({
       showPhone: formData.get("showPhone") === "on",
       facebookUrl: readField(formData, "facebookUrl"),

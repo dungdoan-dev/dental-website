@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { db } from "@/lib/db";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { FaqFormDialog } from "@/features/admin/components/FaqFormDialog";
 import { TestimonialFormDialog } from "@/features/admin/components/TestimonialFormDialog";
 import { DeleteFaqButton, DeleteHeroSlideButton, DeleteTestimonialButton } from "@/features/admin/components/DeleteButtons";
@@ -18,23 +18,38 @@ export const metadata = {
 
 export default async function AdminHomePage() {
   await requireAdmin();
+  const supabase = await getSupabaseServerClient();
   const [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent] = await Promise.all([
-    db.faqItem.findMany({ orderBy: [{ sortOrder: "asc" }, { id: "asc" }] }),
-    db.testimonial.findMany({ orderBy: { sortOrder: "asc" } }),
-    db.coreValue.findMany({ orderBy: { sortOrder: "asc" } }),
-    db.heroSlide.findMany({ orderBy: { sortOrder: "asc" } }),
-    db.$queryRaw<InsurancePartnerRecord[]>`
-      SELECT code, name, description, accent, logo_src AS "logoSrc", sort_order AS "sortOrder"
-      FROM insurance_partners ORDER BY sort_order ASC
-    `,
-    db.siteContent.findUnique({ where: { key: "home_why_choose" }, select: { content: true } }),
-    db.siteContent.findUnique({ where: { key: "home_faq_heading" }, select: { content: true } }),
-    db.siteContent.findUnique({ where: { key: "home_section_copy" }, select: { content: true } }),
+    supabase.from("faq_items").select("*").order("sort_order").order("id"),
+    supabase.from("testimonials").select("*").order("sort_order"),
+    supabase.from("core_values").select("*").order("sort_order"),
+    supabase.from("hero_slides").select("*").order("sort_order"),
+    supabase.from("insurance_partners").select("code,name,description,accent,logo_src,sort_order").order("sort_order"),
+    supabase.from("site_content").select("content").eq("key", "home_why_choose").maybeSingle(),
+    supabase.from("site_content").select("content").eq("key", "home_faq_heading").maybeSingle(),
+    supabase.from("site_content").select("content").eq("key", "home_section_copy").maybeSingle(),
   ]);
-  const whyChooseImage = whyChooseContent?.content && typeof whyChooseContent.content === "object" && !Array.isArray(whyChooseContent.content) && "image" in whyChooseContent.content && typeof whyChooseContent.content.image === "string" ? whyChooseContent.content.image : "";
-  const faqHeading = faqHeadingContent?.content && typeof faqHeadingContent.content === "object" && !Array.isArray(faqHeadingContent.content) ? faqHeadingContent.content : {};
+  for (const result of [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent]) {
+    if (result.error) throw result.error;
+  }
+  const faqRows = faqs.data ?? [];
+  const testimonialRows = testimonials.data ?? [];
+  const coreValueRows = coreValues.data ?? [];
+  const heroSlideRows = (heroSlides.data ?? []).map((row) => ({
+    ...row, imageAlt: row.image_alt, badgeVariant: row.badge_variant,
+    objectPosition: row.object_position, sortOrder: row.sort_order,
+  }));
+  const insurancePartnerRows: InsurancePartnerRecord[] = (insurancePartners.data ?? []).map((row) => ({
+    code: row.code, name: row.name, description: row.description, accent: row.accent,
+    logoSrc: row.logo_src, sortOrder: row.sort_order,
+  }));
+  const whyChooseRecord = whyChooseContent.data;
+  const faqHeadingRecord = faqHeadingContent.data;
+  const sectionCopyRecord = sectionCopyContent.data;
+  const whyChooseImage = whyChooseRecord?.content && typeof whyChooseRecord.content === "object" && !Array.isArray(whyChooseRecord.content) && "image" in whyChooseRecord.content && typeof whyChooseRecord.content.image === "string" ? whyChooseRecord.content.image : "";
+  const faqHeading = faqHeadingRecord?.content && typeof faqHeadingRecord.content === "object" && !Array.isArray(faqHeadingRecord.content) ? faqHeadingRecord.content : {};
   const sectionCopy = { ...HOME_SECTION_COPY } as unknown as HomeSectionCopyMap;
-  const savedCopy = sectionCopyContent?.content && typeof sectionCopyContent.content === "object" && !Array.isArray(sectionCopyContent.content) ? sectionCopyContent.content : {};
+  const savedCopy = sectionCopyRecord?.content && typeof sectionCopyRecord.content === "object" && !Array.isArray(sectionCopyRecord.content) ? sectionCopyRecord.content : {};
   for (const key of Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>) {
     const value = key === "faq" && !(key in savedCopy) ? faqHeading : (key in savedCopy ? (savedCopy as Record<string, unknown>)[key] : null);
     if (value && typeof value === "object" && !Array.isArray(value)) {
@@ -95,7 +110,7 @@ export default async function AdminHomePage() {
         </div>
 
         <div className="divide-y divide-slate-100">
-          {faqs.map((faq) => (
+          {faqRows.map((faq) => (
             <div key={faq.id} className="flex items-start justify-between gap-4 p-5 hover:bg-background-secondary transition">
               <div className="space-y-1.5">
                 <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
@@ -133,7 +148,9 @@ export default async function AdminHomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-          {testimonials.map((item) => (
+          {testimonialRows.map((row) => {
+            const item = { ...row, customerName: row.customer_name };
+            return (
             <div key={item.id} className="p-5 flex flex-col justify-between space-y-4 hover:bg-background-secondary transition">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -162,7 +179,8 @@ export default async function AdminHomePage() {
                 <DeleteTestimonialButton id={item.id} />
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -174,7 +192,9 @@ export default async function AdminHomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          {coreValues.map((cv) => (
+          {coreValueRows.map((row) => {
+            const cv = { ...row, iconKey: row.icon_key, sortOrder: row.sort_order };
+            return (
             <div key={cv.id} className="p-5">
               <span className="text-[11px] font-bold uppercase tracking-wider text-brand-blue-dark">{cv.title}</span>
               <h3 className="mt-2 text-xs font-bold text-text-primary">{cv.slogan}</h3>
@@ -193,7 +213,8 @@ export default async function AdminHomePage() {
                 </AdminActionForm>
               </details>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -208,7 +229,7 @@ export default async function AdminHomePage() {
         </div>
 
         <div className="divide-y divide-slate-100">
-          {heroSlides.map((slide) => (
+          {heroSlideRows.map((slide) => (
             <div key={slide.id} className="flex flex-col gap-4 p-4 transition hover:bg-background-secondary sm:flex-row sm:items-center">
               <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-surface-container-low sm:w-40">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -226,7 +247,7 @@ export default async function AdminHomePage() {
               </div>
             </div>
           ))}
-          {heroSlides.length === 0 ? <p className="p-6 text-sm text-text-secondary">Chưa có slide nào. Thêm slide để hiển thị slider ở đầu trang chủ.</p> : null}
+          {heroSlideRows.length === 0 ? <p className="p-6 text-sm text-text-secondary">Chưa có slide nào. Thêm slide để hiển thị slider ở đầu trang chủ.</p> : null}
         </div>
       </section>
 
@@ -253,7 +274,7 @@ export default async function AdminHomePage() {
         <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/clinics">Quản lý cơ sở →</Link>
       </section>
 
-      <div className="order-7"><InsurancePartnersManager partners={insurancePartners} /></div>
+      <div className="order-7"><InsurancePartnersManager partners={insurancePartnerRows} /></div>
     </div>
   );
 }

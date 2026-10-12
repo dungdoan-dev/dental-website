@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { hasAdminSession } from "@/features/admin/auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -36,11 +36,7 @@ export async function POST(request: Request) {
   const isWebp = buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP";
   if (!(isJpeg || isPng || isWebp)) return NextResponse.json({ error: "Định dạng nội dung ảnh không hợp lệ." }, { status: 415 });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseKey) return NextResponse.json({ error: "Thiếu cấu hình Supabase Storage phía máy chủ." }, { status: 503 });
-
-  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const supabase = await getSupabaseServerClient();
   const path = `admin/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${extension}`;
   const { error } = await supabase.storage.from("site-media").upload(path, buffer, {
     contentType: file.type,

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { ServiceFormDialog } from "@/features/admin/components/ServiceFormDialog";
 import { DeleteServiceButton } from "@/features/admin/components/DeleteButtons";
@@ -22,13 +22,18 @@ export const metadata = {
 
 export default async function AdminServicesPage() {
   await requireAdmin();
-  const services = await db.service.findMany({
-    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-  });
-  const detailRecords = await db.siteContent.findMany({
-    where: { key: { in: [...services.map((service) => serviceDetailContentKey(service.id)), "implant_detail", "service_price_categories"] } },
-    select: { key: true, content: true },
-  });
+  const supabase = await getSupabaseServerClient();
+  const { data: serviceRows, error: serviceError } = await supabase.from("services").select("*").order("sort_order").order("id");
+  if (serviceError) throw serviceError;
+  const services = serviceRows.map((service) => ({
+    id: service.id, name: service.name, slug: service.slug, shortDescription: service.short_description,
+    description: service.description, image: service.image, badge: service.badge,
+    badgeVariant: service.badge_variant as "blue" | "green", featured: service.featured,
+    sortOrder: service.sort_order, category: service.category,
+  }));
+  const { data: detailRecords, error: detailError } = await supabase.from("site_content").select("key,content")
+    .in("key", [...services.map((service) => serviceDetailContentKey(service.id)), "implant_detail", "service_price_categories"]);
+  if (detailError) throw detailError;
   const detailByKey = new Map(detailRecords.map((record) => [record.key, record.content]));
   const pricingParse = servicePriceCategoriesSchema.safeParse(detailByKey.get("service_price_categories"));
   const pricing = pricingParse.success ? pricingParse.data : defaultServicePriceCategories;
@@ -101,11 +106,7 @@ export default async function AdminServicesPage() {
                     ...legacy.data,
                   };
                 }
-                const dentalService: DentalService = {
-                  ...service,
-                  badgeVariant: service.badgeVariant as "blue" | "green",
-                  category: service.category as DentalService["category"],
-                };
+                const dentalService: DentalService = { ...service, category: service.category as DentalService["category"] };
 
                 return (
                   <tr

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
-import type { AppointmentStatus } from "@prisma/client";
+import type { AppointmentStatus } from "@/features/appointments/types/appointment.type";
 import { deleteAppointment, updateAppointmentStatus } from "../actions";
 import { showMutationToast } from "./AdminToast";
 

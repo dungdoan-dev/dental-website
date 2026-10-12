@@ -1,12 +1,11 @@
-import { db } from "@/lib/db";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import type { Article, ArticleCategory } from "../types/article.type";
 
 export const articleRepository = {
   async findAll(): Promise<readonly Article[]> {
-    const articles = await db.article.findMany({
-      where: { status: "published", publishedAt: { lte: new Date() } },
-      orderBy: { publishedAt: "desc" },
-    });
+    const { data: articles, error } = await getPublicSupabaseClient().from("articles").select("*")
+      .eq("status", "published").lte("published_at", new Date().toISOString()).order("published_at", { ascending: false });
+    if (error) throw error;
 
     return articles.map((a) => ({
       id: a.id,
@@ -15,19 +14,19 @@ export const articleRepository = {
       excerpt: a.excerpt,
       content: a.content,
       thumbnail: a.thumbnail,
-      publishedAt: a.publishedAt.toISOString(),
+      publishedAt: a.published_at,
       author: a.author,
       category: a.category as ArticleCategory,
-      readingMinutes: a.readingMinutes,
+      readingMinutes: a.reading_minutes,
       featured: a.featured,
       status: a.status,
     }));
   },
 
   async findBySlug(slug: string): Promise<Article | null> {
-    const a = await db.article.findFirst({
-      where: { slug, status: "published", publishedAt: { lte: new Date() } },
-    });
+    const { data: a, error } = await getPublicSupabaseClient().from("articles").select("*")
+      .eq("slug", slug).eq("status", "published").lte("published_at", new Date().toISOString()).maybeSingle();
+    if (error) throw error;
 
     if (!a) return null;
 
@@ -38,10 +37,10 @@ export const articleRepository = {
       excerpt: a.excerpt,
       content: a.content,
       thumbnail: a.thumbnail,
-      publishedAt: a.publishedAt.toISOString(),
+      publishedAt: a.published_at,
       author: a.author,
       category: a.category as ArticleCategory,
-      readingMinutes: a.readingMinutes,
+      readingMinutes: a.reading_minutes,
       featured: a.featured,
       status: a.status,
     };

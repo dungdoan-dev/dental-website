@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { db } from "@/lib/db";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ClinicCard } from "@/features/clinics/components/ClinicCard";
 import { ClinicFormDialog } from "@/features/admin/components/ClinicFormDialog";
 import type { Clinic } from "@/features/clinics/types/clinic.type";
@@ -11,10 +11,16 @@ export const metadata = {
 
 export default async function AdminClinicsPage() {
   await requireAdmin();
-  const clinics = await db.clinic.findMany({
-    include: { facilities: { orderBy: { sortOrder: "asc" } } },
-    orderBy: { id: "asc" },
-  });
+  const supabase = await getSupabaseServerClient();
+  const { data: clinicRows, error } = await supabase.from("clinics").select("*, clinic_facilities(name,sort_order)").order("id");
+  if (error) throw error;
+  const clinics = clinicRows.map((clinic) => ({
+    ...clinic,
+    workingHours: clinic.working_hours,
+    googleMapsUrl: clinic.google_maps_url,
+    accent: clinic.accent,
+    facilities: (clinic.clinic_facilities ?? []).sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+  }));
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 py-8 sm:px-8 sm:py-10">
@@ -34,7 +40,7 @@ export default async function AdminClinicsPage() {
           {clinics.map((clinic) => {
             const clinicRecord: Clinic = {
               ...clinic,
-              facilities: clinic.facilities.map((facility) => facility.name),
+              facilities: clinic.facilities.map((facility: { name: string }) => facility.name),
               googleMapsUrl: clinic.googleMapsUrl ?? undefined,
               accent: clinic.accent as Clinic["accent"],
             };

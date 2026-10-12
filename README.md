@@ -1,63 +1,41 @@
 # Dental Website
 
-Website giới thiệu nha khoa được xây dựng bằng Next.js App Router, TypeScript, Tailwind CSS, Prisma và Zod. Nội dung hiển thị được đọc từ PostgreSQL/Supabase; các hằng số giao diện như bộ lọc và ca khám vẫn được quản lý trong code.
+Website nha khoa xây dựng bằng Next.js App Router, TypeScript, Tailwind CSS và Supabase. Ứng dụng truy cập dữ liệu qua Supabase Data API; runtime không cần `DATABASE_URL`, `DIRECT_URL` hay khóa service-role.
 
-## Cài đặt
+## Cài đặt và chạy
 
 ```bash
 npm install
-```
-
-Sao chép `.env.example` thành `.env` và cập nhật biến môi trường khi cần.
-
-## Chạy development
-
-```bash
 npm run dev
 ```
 
-Mở [http://localhost:3000](http://localhost:3000).
+Tạo `.env.local` từ `.env.example`, sau đó điền `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_ANON_KEY` từ Supabase Dashboard → Project Settings → API.
 
-## Prisma
+## Database và quyền truy cập
 
-```bash
-npx prisma generate
-```
+Các thay đổi schema/policy được quản lý bằng SQL trong `supabase/migrations`. Với database hiện có, chạy migration mới theo thứ tự sau các migration trước đó; **không chạy lại** `20251006_init.sql` trên database đã có dữ liệu vì file khởi tạo có thao tác xóa bảng.
 
-Sau khi cấu hình `DATABASE_URL` và `DIRECT_URL`, chạy migration SQL trong Supabase Dashboard → SQL Editor:
+`20261012_supabase_auth_admin_rls.sql` chuyển quyền quản trị sang Supabase Auth và RLS. Public key chỉ được phép đọc dữ liệu công khai và tạo lịch hẹn; thao tác quản trị yêu cầu người dùng Supabase Auth có `app_metadata.role = "admin"`.
 
-1. Với database mới hoàn toàn, chạy `supabase/migrations/20251006_init.sql` một lần.
-2. Với database đã có dữ liệu, **không chạy lại** file khởi tạo: file đó có `DROP TABLE`. Chỉ chạy `supabase/migrations/20261007_content_to_database.sql` để thêm nội dung còn thiếu mà không ghi đè chỉnh sửa trong admin.
-3. Dừng server development (nếu đang chạy), rồi chạy `npm run prisma:generate` và khởi động lại server.
+## Đăng nhập quản trị
 
-Không dùng `prisma db push` thay cho migration SQL này vì migration còn chứa dữ liệu trang Giới thiệu, Implant và đường dẫn logo bảo hiểm.
+1. Trong Supabase Dashboard → Authentication → Users, tạo tài khoản quản trị bằng email và mật khẩu.
+2. Đặt `app_metadata` của tài khoản thành `{ "role": "admin" }` trong dashboard.
+3. Truy cập `/admin/login` và đăng nhập bằng email/mật khẩu. Nếu vừa thay đổi metadata, đăng xuất/đăng nhập lại để nhận JWT mới.
 
-## Kiểm tra code
+Không đặt service-role/secret key trong trình duyệt hoặc trong biến `NEXT_PUBLIC_*`. RLS kiểm tra quyền đọc/ghi ở database; không cấp quyền ghi công khai cho anon.
+
+## Kiểm tra và build
 
 ```bash
 npm run typecheck
 npm run lint
-```
-
-## Build
-
-```bash
 npm run build
 ```
 
-## Đăng nhập admin
-
-Chạy `npm run admin:credentials`, nhập mật khẩu tối thiểu 12 ký tự, rồi lưu `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` và `ADMIN_SESSION_SECRET` vào `.env.local` (không commit). Khởi động lại server và truy cập `/admin/login`. Khi chưa cấu hình đủ ba biến, admin sẽ không cho đăng nhập. Phiên đăng nhập hết hạn sau 8 giờ; nút **Đăng xuất** ở thanh trên cùng sẽ xóa cookie.
-
-Tài khoản qua biến môi trường phù hợp cho một quản trị viên. Trước khi dùng công khai, cần HTTPS và giới hạn số lần thử đăng nhập ở tầng hạ tầng hoặc dịch vụ xác thực chuyên dụng.
-
 ## Cấu trúc chính
 
-- `src/app`: routing, layout, page và API route.
-- `src/components`: component UI, layout và component dùng chung.
-- `src/features`: business domain, tổ chức theo component → service → repository → data.
-- `src/lib`: hạ tầng và helper có mục đích cụ thể như Prisma, SEO, Cloudinary và mail.
-- `src/config`: cấu hình website và navigation.
-- `prisma`: database schema.
-
-Các trang không truy vấn Prisma trực tiếp. Nội dung của trang Giới thiệu, chi tiết Implant và ảnh “Vì sao chọn” nằm trong bảng `site_content`; logo bảo hiểm nằm trong cột `insurance_partners.logo_src`. Dữ liệu dịch vụ, bác sĩ, bài viết, hero, FAQ và đánh giá đã nằm trong các bảng riêng.
+- `src/app`: routes, layout, pages và API routes.
+- `src/features`: các domain nội dung, dịch vụ, bác sĩ, lịch hẹn và quản trị.
+- `src/lib/supabase`: client public và client server có cookie Auth.
+- `supabase/migrations`: schema, dữ liệu khởi tạo và RLS policies.

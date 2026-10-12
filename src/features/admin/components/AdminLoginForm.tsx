@@ -10,9 +10,9 @@ export function AdminLoginForm() {
 
   return (
     <form action={formAction} className="mt-7 space-y-5">
-      <label className="block text-sm font-semibold text-slate-700" htmlFor="admin-username">
-        Tên đăng nhập
-        <input autoComplete="username" className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" id="admin-username" maxLength={100} name="username" required type="text" />
+      <label className="block text-sm font-semibold text-slate-700" htmlFor="admin-email">
+        Email quản trị
+        <input autoComplete="username" className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" id="admin-email" maxLength={254} name="email" required type="email" />
       </label>
       <label className="block text-sm font-semibold text-slate-700" htmlFor="admin-password">
         Mật khẩu

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { db } from "@/lib/db";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ArticleFormDialog } from "@/features/admin/components/ArticleFormDialog";
 import { DeleteArticleButton } from "@/features/admin/components/DeleteButtons";
 import type { Article } from "@/features/articles/types/article.type";
@@ -20,16 +20,26 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
     page: typeof raw.page === "string" ? raw.page : 1,
   });
   const pageSize = 20;
-  const where = query.status === "all" ? undefined : { status: query.status };
-  const total = await db.article.count({ where });
+  const supabase = await getSupabaseServerClient();
+  let countQuery = supabase.from("articles").select("id", { count: "exact", head: true });
+  let articleQuery = supabase.from("articles").select("*");
+  if (query.status !== "all") {
+    countQuery = countQuery.eq("status", query.status);
+    articleQuery = articleQuery.eq("status", query.status);
+  }
+  const { count, error: countError } = await countQuery;
+  if (countError) throw countError;
+  const total = count ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const page = Math.min(query.page, pageCount);
-  const articles = await db.article.findMany({
-    where,
-    orderBy: { publishedAt: "desc" },
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  });
+  const { data: articleRows, error } = await articleQuery.order("published_at", { ascending: false })
+    .range((page - 1) * pageSize, page * pageSize - 1);
+  if (error) throw error;
+  const articles = articleRows.map((article) => ({
+    ...article,
+    publishedAt: new Date(article.published_at),
+    readingMinutes: article.reading_minutes,
+  }));
 
   function pageHref(nextPage: number) {
     const params = new URLSearchParams();

@@ -15,3 +15,5 @@ export type AppointmentResult = {
   success: true;
   message: string;
 };
+
+export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";

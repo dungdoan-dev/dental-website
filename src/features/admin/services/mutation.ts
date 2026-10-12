@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export type MutationResult = { success: true } | { success: false; error: string; fieldErrors?: Record<string, string> };
 
@@ -14,18 +14,26 @@ export async function runMutation(work: () => Promise<unknown>): Promise<Mutatio
   try { await work(); return { success: true }; }
   catch (error) {
     if (error instanceof SlugConflictError) return { success: false, error: "Slug này đã được sử dụng bởi bản ghi khác.", fieldErrors: { slug: "Slug đã tồn tại." } };
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === "P2002") return { success: false, error: "Slug hoặc mã bản ghi đã tồn tại. Hãy dùng giá trị khác.", fieldErrors: { slug: "Slug hoặc mã đã được sử dụng." } };
-      if (error.code === "P2003") return { success: false, error: "Bản ghi đang được sử dụng. Không thể xóa hoặc tham chiếu bản ghi không tồn tại." };
-      if (error.code === "P2025") return { success: false, error: "Bản ghi không còn tồn tại. Hãy tải lại trang." };
+    const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
+    if (code === "23505") return { success: false, error: "Slug hoặc mã bản ghi đã tồn tại. Hãy dùng giá trị khác.", fieldErrors: { slug: "Slug hoặc mã đã được sử dụng." } };
+    if (code === "23503") return { success: false, error: "Bản ghi đang được sử dụng. Không thể xóa hoặc tham chiếu bản ghi không tồn tại." };
+    if (code === "PGRST116") return { success: false, error: "Bản ghi không còn tồn tại. Hãy tải lại trang." };
+    if (error instanceof Error && error.message.includes("JWT")) {
+      return { success: false, error: "Phiên quản trị hết hạn. Vui lòng đăng nhập lại." };
     }
     return { success: false, error: "Không thể lưu thay đổi. Kiểm tra kết nối và migration database rồi thử lại." };
   }
 }
 
-export async function saveRevision(tx: Prisma.TransactionClient, kind: string, entityId: string, title: string, snapshot: unknown) {
-  await tx.adminContentRevision.create({ data: {
-    kind, entityId, title, snapshot: JSON.parse(JSON.stringify(snapshot)) as Prisma.InputJsonValue,
-    actor: process.env.ADMIN_USERNAME?.trim() || "admin",
-  } });
+export async function saveRevision(kind: string, entityId: string, title: string, snapshot: unknown) {
+  const supabase = await getSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { error } = await supabase.from("admin_content_revisions").insert({
+    kind,
+    entity_id: entityId,
+    title,
+    snapshot: JSON.parse(JSON.stringify(snapshot)),
+    actor: user?.email ?? "admin",
+  });
+  if (error) throw error;
 }

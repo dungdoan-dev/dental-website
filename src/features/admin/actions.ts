@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath, updateTag } from "next/cache";
-import { db } from "@/lib/db";
 import { requireAdmin } from "./auth/admin-auth";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { serviceFormSchema, serviceSortOrderSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
 import { runMutation, validationFailure, saveRevision, SlugConflictError } from "./services/mutation";
@@ -48,7 +48,12 @@ export async function updateCoreValue(_previous: import("./services/mutation").M
   if (!parsed.success) return validationFailure(parsed.error);
   const { id, ...data } = parsed.data;
   return runMutation(async () => {
-    await db.coreValue.update({ where: { id: BigInt(id) }, data });
+    const supabase = await getSupabaseServerClient();
+    const { error } = await supabase.from("core_values").update({
+      title: data.title, slogan: data.slogan, description: data.description,
+      icon_key: data.iconKey, sort_order: data.sortOrder,
+    }).eq("id", id);
+    if (error) throw error;
     revalidatePath("/admin/home");
     revalidatePath("/");
     updateTag(publicDataTags.coreValues);
@@ -75,10 +80,14 @@ export async function upsertHeroSlide(input: z.infer<typeof heroSlideSchema>) {
   const parsed = heroSlideSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.$transaction(async (tx) => {
-      await tx.heroSlide.upsert({ where: { id: parsed.data.id }, create: parsed.data, update: parsed.data });
-      await saveRevision(tx, "slider", parsed.data.id, parsed.data.title, parsed.data);
+    const supabase = await getSupabaseServerClient();
+    const { error } = await supabase.from("hero_slides").upsert({
+      id: parsed.data.id, image: parsed.data.image, image_alt: parsed.data.imageAlt, badge: parsed.data.badge,
+      title: parsed.data.title, badge_variant: parsed.data.badgeVariant, object_position: parsed.data.objectPosition,
+      sort_order: parsed.data.sortOrder,
     });
+    if (error) throw error;
+    await saveRevision("slider", parsed.data.id, parsed.data.title, parsed.data);
     revalidateContent(["/admin/home", "/"]);
   });
 }
@@ -88,7 +97,8 @@ export async function deleteHeroSlide(id: string) {
   const parsed = recordIdSchema.safeParse(id);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.heroSlide.delete({ where: { id: parsed.data } });
+    const { error } = await (await getSupabaseServerClient()).from("hero_slides").delete().eq("id", parsed.data);
+    if (error) throw error;
     revalidateContent(["/admin/home", "/"]);
   });
 }
@@ -98,7 +108,8 @@ export async function updateAppointmentStatus(id: string, status: unknown) {
   const parsed = z.object({ id: numericIdSchema, status: appointmentStatusSchema }).safeParse({ id, status });
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.appointment.update({ where: { id: BigInt(parsed.data.id) }, data: { status: parsed.data.status } });
+    const { error } = await (await getSupabaseServerClient()).from("appointments").update({ status: parsed.data.status }).eq("id", parsed.data.id);
+    if (error) throw error;
     revalidateContent(["/admin/appointments"]);
   });
 }
@@ -108,7 +119,8 @@ export async function deleteAppointment(id: string) {
   const parsed = numericIdSchema.safeParse(id);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.appointment.delete({ where: { id: BigInt(parsed.data) } });
+    const { error } = await (await getSupabaseServerClient()).from("appointments").delete().eq("id", parsed.data);
+    if (error) throw error;
     revalidateContent(["/admin/appointments"]);
   });
 }
@@ -120,12 +132,20 @@ export async function upsertService(input: ServiceFormData) {
   if (!parsed.success) return validationFailure(parsed.error);
   const data = parsed.data;
   return runMutation(async () => {
-    await db.$transaction(async (tx) => {
-      const duplicate = await tx.service.findUnique({ where: { slug: data.slug }, select: { id: true } });
-      if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
-      await tx.service.upsert({ where: { id: data.id }, create: data, update: data });
-      await saveRevision(tx, "service", data.id, data.name, data);
+    const supabase = await getSupabaseServerClient();
+    const { data: duplicate, error: duplicateError } = await supabase.from("services").select("id").eq("slug", data.slug).maybeSingle();
+    if (duplicateError) throw duplicateError;
+    if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
+    const { data: existing, error: existingError } = await supabase.from("services").select("sort_order").eq("id", data.id).maybeSingle();
+    if (existingError) throw existingError;
+    const { error } = await supabase.from("services").upsert({
+      id: data.id, name: data.name, slug: data.slug, short_description: data.shortDescription,
+      description: data.description, image: data.image, badge: data.badge, badge_variant: data.badgeVariant,
+      featured: data.featured, sort_order: existing?.sort_order ?? 0, category: data.category,
+      updated_at: new Date().toISOString(),
     });
+    if (error) throw error;
+    await saveRevision("service", data.id, data.name, data);
     revalidateContent(["/admin/services", "/dich-vu", "/dich-vu/[slug]", "/"]);
   });
 }
@@ -135,7 +155,8 @@ export async function updateServiceSortOrder(input: { id: string; sortOrder: num
   const parsed = serviceSortOrderSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.service.update({ where: { id: parsed.data.id }, data: { sortOrder: parsed.data.sortOrder } });
+    const { error } = await (await getSupabaseServerClient()).from("services").update({ sort_order: parsed.data.sortOrder, updated_at: new Date().toISOString() }).eq("id", parsed.data.id);
+    if (error) throw error;
     revalidateContent(["/admin/services", "/dich-vu", "/"]);
   });
 }
@@ -145,7 +166,8 @@ export async function deleteService(id: string) {
   const parsed = recordIdSchema.safeParse(id);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.service.delete({ where: { id: parsed.data } });
+    const { error } = await (await getSupabaseServerClient()).from("services").delete().eq("id", parsed.data);
+    if (error) throw error;
     revalidateContent(["/admin/services", "/dich-vu", "/"]);
   });
 }
@@ -158,28 +180,33 @@ export async function upsertDoctor(input: DoctorFormData) {
   const { education, specialties, experienceHighlights, certificates, ...data } = parsed.data;
   const base = { ...data, nameLine2: data.nameLine2 || null, licenseNumber: data.licenseNumber || null, quote: data.quote || null, sourceUrl: data.sourceUrl || null };
   return runMutation(async () => {
-    await db.$transaction(async (tx) => {
-      const duplicate = await tx.doctor.findUnique({ where: { slug: data.slug }, select: { id: true } });
-      if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
-      await tx.doctor.upsert({ where: { id: data.id }, create: base, update: base });
-      if (education) {
-        await tx.doctorEducation.deleteMany({ where: { doctorId: data.id } });
-        await tx.doctorEducation.createMany({ data: education.map((content, sortOrder) => ({ doctorId: data.id, content, sortOrder })) });
-      }
-      if (specialties) {
-        await tx.doctorSpecialty.deleteMany({ where: { doctorId: data.id } });
-        await tx.doctorSpecialty.createMany({ data: specialties.map((specialty, sortOrder) => ({ doctorId: data.id, specialty, sortOrder })) });
-      }
-      if (experienceHighlights) {
-        await tx.doctorExperienceHighlight.deleteMany({ where: { doctorId: data.id } });
-        await tx.doctorExperienceHighlight.createMany({ data: experienceHighlights.map((content, sortOrder) => ({ doctorId: data.id, content, sortOrder })) });
-      }
-      if (certificates) {
-        await tx.doctorCertificate.deleteMany({ where: { doctorId: data.id } });
-        await tx.doctorCertificate.createMany({ data: certificates.map((certificate, sortOrder) => ({ ...certificate, doctorId: data.id, sortOrder })) });
-      }
-      await saveRevision(tx, "doctor", data.id, data.name, parsed.data);
+    const supabase = await getSupabaseServerClient();
+    const { data: duplicate, error: duplicateError } = await supabase.from("doctors").select("id").eq("slug", data.slug).maybeSingle();
+    if (duplicateError) throw duplicateError;
+    if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
+    const { error } = await supabase.from("doctors").upsert({
+      id: base.id, name: base.name, slug: base.slug, avatar: base.avatar, position: base.position,
+      specialty: base.specialty, experience: base.experience, sort_order: base.sortOrder,
+      name_lines: base.nameLines, name_line_2: base.nameLine2, description: base.description,
+      badge: base.badge, highlight: base.highlight, category: base.category, directory_title: base.directoryTitle,
+      license_number: base.licenseNumber, quote: base.quote, languages: base.languages, source_url: base.sourceUrl,
+      updated_at: new Date().toISOString(),
     });
+    if (error) throw error;
+    const replaceRows = async (table: string, rows: Record<string, unknown>[] | undefined) => {
+      if (!rows) return;
+      const { error: deleteError } = await supabase.from(table).delete().eq("doctor_id", data.id);
+      if (deleteError) throw deleteError;
+      if (rows.length) {
+        const { error: insertError } = await supabase.from(table).insert(rows);
+        if (insertError) throw insertError;
+      }
+    };
+    await replaceRows("doctor_education", education?.map((content, sortOrder) => ({ doctor_id: data.id, content, sort_order: sortOrder })));
+    await replaceRows("doctor_specialties", specialties?.map((specialty, sortOrder) => ({ doctor_id: data.id, specialty, sort_order: sortOrder })));
+    await replaceRows("doctor_experience_highlights", experienceHighlights?.map((content, sortOrder) => ({ doctor_id: data.id, content, sort_order: sortOrder })));
+    await replaceRows("doctor_certificates", certificates?.map((certificate, sortOrder) => ({ ...certificate, doctor_id: data.id, sort_order: sortOrder })));
+    await saveRevision("doctor", data.id, data.name, parsed.data);
     revalidateContent(["/admin/doctors", "/bac-si", "/bac-si/[slug]", "/"]);
   });
 }
@@ -189,10 +216,8 @@ export async function updateDoctorSortOrder(input: { id: string; sortOrder: numb
   const parsed = doctorSortOrderSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.doctor.update({
-      where: { id: parsed.data.id },
-      data: { sortOrder: parsed.data.sortOrder },
-    });
+    const { error } = await (await getSupabaseServerClient()).from("doctors").update({ sort_order: parsed.data.sortOrder, updated_at: new Date().toISOString() }).eq("id", parsed.data.id);
+    if (error) throw error;
     revalidateContent(["/admin/doctors", "/bac-si", "/"]);
   });
 }
@@ -202,7 +227,8 @@ export async function deleteDoctor(id: string) {
   const parsed = recordIdSchema.safeParse(id);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.doctor.delete({ where: { id: parsed.data } });
+    const { error } = await (await getSupabaseServerClient()).from("doctors").delete().eq("id", parsed.data);
+    if (error) throw error;
     revalidateContent(["/admin/doctors", "/bac-si", "/"]);
   });
 }
@@ -214,14 +240,21 @@ export async function upsertArticle(input: ArticleFormData) {
   if (!parsed.success) return validationFailure(parsed.error);
   const data = { ...parsed.data, content: sanitizeArticleContent(parsed.data.content) };
   return runMutation(async () => {
-    await db.$transaction(async (tx) => {
-      const duplicate = await tx.article.findUnique({ where: { slug: data.slug }, select: { id: true } });
-      if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
-      const previous = await tx.article.findUnique({ where: { id: data.id }, select: { status: true, publishedAt: true } });
-      const publishedAt = data.status === "published" && previous?.status !== "published" ? new Date() : previous?.publishedAt ?? new Date();
-      await tx.article.upsert({ where: { id: data.id }, create: { ...data, publishedAt }, update: { ...data, publishedAt } });
-      await saveRevision(tx, "article", data.id, data.title, { ...data, publishedAt });
+    const supabase = await getSupabaseServerClient();
+    const { data: duplicate, error: duplicateError } = await supabase.from("articles").select("id").eq("slug", data.slug).maybeSingle();
+    if (duplicateError) throw duplicateError;
+    if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
+    const { data: previous, error: previousError } = await supabase.from("articles").select("status,published_at").eq("id", data.id).maybeSingle();
+    if (previousError) throw previousError;
+    const publishedAt = data.status === "published" && previous?.status !== "published" ? new Date().toISOString() : previous?.published_at ?? new Date().toISOString();
+    const { error } = await supabase.from("articles").upsert({
+      id: data.id, title: data.title, slug: data.slug, excerpt: data.excerpt, content: data.content,
+      thumbnail: data.thumbnail, published_at: publishedAt, author: data.author, category: data.category,
+      reading_minutes: data.readingMinutes, featured: data.featured, status: data.status,
+      updated_at: new Date().toISOString(),
     });
+    if (error) throw error;
+    await saveRevision("article", data.id, data.title, { ...data, publishedAt });
     revalidateContent(["/admin/articles", "/tin-tuc", "/tin-tuc/[slug]", "/"]);
   });
 }
@@ -231,7 +264,8 @@ export async function deleteArticle(id: string) {
   const parsed = recordIdSchema.safeParse(id);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    await db.article.delete({ where: { id: parsed.data } });
+    const { error } = await (await getSupabaseServerClient()).from("articles").delete().eq("id", parsed.data);
+    if (error) throw error;
     revalidateContent(["/admin/articles", "/tin-tuc", "/"]);
   });
 }
@@ -247,22 +281,11 @@ export async function upsertFaq(data: {
 }) {
   await requireAdmin();
   if (data.id) {
-    await db.faqItem.update({
-      where: { id: BigInt(data.id) },
-      data: {
-        question: data.question,
-        answer: data.answer,
-        sortOrder: data.sortOrder ?? 0,
-      },
-    });
+    const { error } = await (await getSupabaseServerClient()).from("faq_items").update({ question: data.question, answer: data.answer, sort_order: data.sortOrder ?? 0 }).eq("id", data.id);
+    if (error) throw error;
   } else {
-    await db.faqItem.create({
-      data: {
-        question: data.question,
-        answer: data.answer,
-        sortOrder: data.sortOrder ?? 0,
-      },
-    });
+    const { error } = await (await getSupabaseServerClient()).from("faq_items").insert({ question: data.question, answer: data.answer, sort_order: data.sortOrder ?? 0 });
+    if (error) throw error;
   }
 
   revalidatePath("/admin/home");
@@ -273,7 +296,8 @@ export async function upsertFaq(data: {
 
 export async function deleteFaq(id: string) {
   await requireAdmin();
-  await db.faqItem.delete({ where: { id: BigInt(id) } });
+  const { error } = await (await getSupabaseServerClient()).from("faq_items").delete().eq("id", id);
+  if (error) throw error;
   revalidatePath("/admin/home");
   revalidatePath("/");
   updateTag(publicDataTags.faqs);
@@ -295,30 +319,12 @@ export async function upsertTestimonial(data: {
   avatar?: string;
 }) {
   await requireAdmin();
-  await db.testimonial.upsert({
-    where: { id: data.id },
-    create: {
-      id: data.id,
-      customerName: data.customerName,
-      rating: Number(data.rating),
-      content: data.content,
-      avatar: data.avatar || null,
-      source: data.source ?? "",
-      initials: data.initials,
-      accent: data.accent,
-      sortOrder: data.sortOrder ?? 0,
-    },
-    update: {
-      customerName: data.customerName,
-      rating: Number(data.rating),
-      content: data.content,
-      avatar: data.avatar || null,
-      source: data.source ?? "",
-      initials: data.initials,
-      accent: data.accent,
-      sortOrder: data.sortOrder ?? 0,
-    },
+  const { error } = await (await getSupabaseServerClient()).from("testimonials").upsert({
+    id: data.id, customer_name: data.customerName, rating: Number(data.rating), content: data.content,
+    avatar: data.avatar || null, source: data.source ?? "", initials: data.initials,
+    accent: data.accent, sort_order: data.sortOrder ?? 0,
   });
+  if (error) throw error;
 
   revalidatePath("/admin/home");
   revalidatePath("/");
@@ -328,7 +334,8 @@ export async function upsertTestimonial(data: {
 
 export async function deleteTestimonial(id: string) {
   await requireAdmin();
-  await db.testimonial.delete({ where: { id } });
+  const { error } = await (await getSupabaseServerClient()).from("testimonials").delete().eq("id", id);
+  if (error) throw error;
   revalidatePath("/admin/home");
   revalidatePath("/");
   updateTag(publicDataTags.testimonials);
@@ -352,7 +359,12 @@ export async function updateClinic(data: {
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
     const { id, ...clinicData } = parsed.data;
-    await db.clinic.update({ where: { id }, data: clinicData });
+    const { error } = await (await getSupabaseServerClient()).from("clinics").update({
+      name: clinicData.name, address: clinicData.address, phone: clinicData.phone,
+      working_hours: clinicData.workingHours, description: clinicData.description, image: clinicData.image,
+      updated_at: new Date().toISOString(),
+    }).eq("id", id);
+    if (error) throw error;
     revalidatePath("/admin/clinics");
     revalidatePath("/");
     revalidatePath("/lien-he");

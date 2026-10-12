@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import { sendAppointmentNotification } from "@/lib/mail";
 import { appointmentShifts } from "../data/appointment-shifts";
 import { appointmentSchema } from "../schemas/appointment.schema";
@@ -13,7 +13,9 @@ export class InvalidAppointmentClinicError extends Error {
 
 export async function createAppointment(input: unknown): Promise<AppointmentResult> {
   const appointment = appointmentSchema.parse(input);
-  const clinic = await db.clinic.findUnique({ where: { id: appointment.clinicId }, select: { id: true } });
+  const supabase = getPublicSupabaseClient();
+  const { data: clinic, error: clinicError } = await supabase.from("clinics").select("id").eq("id", appointment.clinicId).maybeSingle();
+  if (clinicError) throw clinicError;
   if (!clinic) {
     throw new InvalidAppointmentClinicError();
   }
@@ -22,19 +24,18 @@ export async function createAppointment(input: unknown): Promise<AppointmentResu
     .filter(Boolean)
     .join("\n") || undefined;
 
-  await db.appointment.create({
-    data: {
+  const { error } = await supabase.from("appointments").insert({
       name: appointment.name,
       phone: appointment.phone,
-      email: appointment.email,
-      serviceId: appointment.serviceId,
-      doctorId: appointment.doctorId,
-      clinicId: appointment.clinicId,
-      appointmentDate: new Date(appointment.appointmentDate),
+      email: appointment.email || null,
+      service_id: appointment.serviceId || null,
+      doctor_id: appointment.doctorId || null,
+      clinic_id: appointment.clinicId,
+      appointment_date: new Date(appointment.appointmentDate).toISOString(),
       note,
       status: "pending",
-    },
   });
+  if (error) throw error;
 
   await sendAppointmentNotification(appointment);
   return { success: true, message: "Đặt lịch thành công" };

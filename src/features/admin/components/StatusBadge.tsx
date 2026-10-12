@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from "@prisma/client";
+import type { AppointmentStatus } from "@/features/appointments/types/appointment.type";
 
 const STATUS_CONFIG: Record<
   AppointmentStatus,
