@@ -1,4 +1,5 @@
 export const siteConfig = {
+  url: "https://nhakhoa2000.com",
   name: "Nha Khoa 2000",
   description: "Hơn 25 năm kiến tạo hàng ngàn nụ cười hạnh phúc, tiên phong cấy ghép kỹ thuật số và nha khoa chuyên sâu chuẩn quốc tế tại TP.HCM.",
   contact: {

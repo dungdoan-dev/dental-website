@@ -57,7 +57,10 @@ export async function updateCoreValue(_previous: import("./services/mutation").M
 
 function revalidateContent(paths: string[]) {
   revalidatePath("/admin");
-  for (const path of paths) revalidatePath(path);
+  for (const path of paths) {
+    if (path.includes("[") && path.includes("]")) revalidatePath(path, "page");
+    else revalidatePath(path);
+  }
   if (paths.includes("/admin/services")) {
     updateTag(publicDataTags.services);
     updateTag(publicDataTags.siteContent);

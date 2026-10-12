@@ -5,7 +5,7 @@ import { generateSeoMetadata } from "@/lib/seo";
 type SearchPageProps = { searchParams: Promise<{ q?: string | string[] }> };
 
 export const metadata: Metadata = {
-  ...generateSeoMetadata({ title: "Tìm kiếm", description: "Tìm dịch vụ, bác sĩ và bài viết tại Nha Khoa 2000." }),
+  ...generateSeoMetadata({ title: "Tìm kiếm", description: "Tìm dịch vụ, bác sĩ và bài viết tại Nha Khoa 2000.", url: "/tim-kiem" }),
   robots: { index: false, follow: true },
 };
 

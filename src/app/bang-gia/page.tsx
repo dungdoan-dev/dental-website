@@ -7,7 +7,7 @@ import { servicePriceCategoriesSchema } from "@/features/services/schemas/servic
 import { getSiteContent } from "@/features/content/services/site-content.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = generateSeoMetadata({ title: "Bảng giá" });
+export const metadata: Metadata = generateSeoMetadata({ title: "Bảng giá", url: "/bang-gia" });
 
 export default async function PricingPage() {
   const content = await getSiteContent("service_price_categories", servicePriceCategoriesSchema);

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Manrope } from "next/font/google";
 import { FloatingContactActions } from "@/components/common/FloatingContactActions";
@@ -16,6 +16,11 @@ import "react-phone-input-2/lib/style.css";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = generateSeoMetadata();
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#f7f9ff",
+};
 export const dynamic = "force-dynamic";
 
 const manrope = Manrope({ subsets: ["latin", "vietnamese"], display: "swap" });

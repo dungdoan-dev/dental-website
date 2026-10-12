@@ -1,9 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { Icon } from "@/components/ui/Icon";
 import type { AppointmentClinicOption } from "../types/appointment.type";
-import { AppointmentForm } from "./AppointmentForm";
+
+const AppointmentForm = dynamic(
+  () => import("./AppointmentForm").then((module) => module.AppointmentForm),
+  { loading: () => <div aria-busy="true" className="min-h-72 rounded-2xl bg-white" /> },
+);
 
 type ServiceOption = { id: string; name: string };
 type AppointmentDialogProviderProps = { children: ReactNode; services: readonly ServiceOption[]; clinics: readonly AppointmentClinicOption[] };
