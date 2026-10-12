@@ -47,7 +47,7 @@ function clinicDisplay(clinic: Clinic, index: number) {
 export function Footer({ clinics }: { clinics: readonly Clinic[] }) {
   return (
     <footer className="w-full border-t border-border-subtle bg-surface-container-high">
-      <div className="mx-auto max-w-7xl px-margin-mobile py-16 md:px-margin lg:py-20">
+      <div className="mx-auto max-w-7xl px-margin-mobile pt-16 pb-5 md:px-margin lg:pt-20 lg:pb-6">
         <div className="grid grid-cols-1 gap-10 text-black md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           <div className="space-y-4"><div className="flex flex-col items-start gap-0"><Link className="inline-block" href="/"><Image alt="Nha Khoa 2000" className="h-11 w-auto object-contain" height={42} src="/images/logo/nha-khoa-2000.png" width={126} /></Link><p className="-mt-1 text-lg font-bold italic leading-tight text-brand-blue">You Smile, We Smile</p></div><p className="text-sm leading-relaxed text-black">Hơn 25 năm kiến tạo hàng ngàn nụ cười hạnh phúc, tiên phong cấy ghép kỹ thuật số và nha khoa chuyên sâu chuẩn quốc tế tại TP.HCM.</p><div className="space-y-1 pt-2 text-xs text-black"><p className="font-semibold">CÔNG TY TNHH NHA KHOA 2000</p><p>GPĐKKD: 0302396828 do Sở KH&amp;ĐT TP.HCM cấp</p><p>GPHĐ: 00128/SYT-GPHĐ &amp; 05037/HCM-GPHĐ</p></div></div>
           {clinics.map((clinic, index) => {
