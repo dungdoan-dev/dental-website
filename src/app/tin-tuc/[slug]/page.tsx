@@ -7,6 +7,11 @@ import { generateSeoMetadata } from "@/lib/seo";
 
 type ArticleDetailPageProps = { params: Promise<{ slug: string }> };
 
+export async function generateStaticParams() {
+  const articles = await getArticles();
+  return articles.map((article) => ({ slug: article.slug }));
+}
+
 export async function generateMetadata({ params }: ArticleDetailPageProps): Promise<Metadata> {
   const article = await getArticleBySlug((await params).slug);
   return article ? generateSeoMetadata({ title: article.title, description: article.excerpt, image: article.thumbnail, url: `/tin-tuc/${article.slug}` }) : generateSeoMetadata({ title: "Không tìm thấy bài viết" });

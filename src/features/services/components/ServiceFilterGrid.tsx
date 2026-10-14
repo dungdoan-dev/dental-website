@@ -1,16 +1,39 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { serviceFilters, serviceIconByCategory, servicePriceLink, type ServiceFilter } from "../data/service-filter.data";
+import { resolveServiceFilter, serviceFilters, serviceIconByCategory, servicePriceLink, type ServiceFilter } from "../data/service-filter.data";
 import type { DentalService } from "../types/service.type";
 import { ServiceCard } from "./ServiceCard";
 
 type ServiceFilterGridProps = {
   services: readonly DentalService[];
-  activeFilter: ServiceFilter;
 };
 
-export function ServiceFilterGrid({ services, activeFilter }: ServiceFilterGridProps) {
+function readFilterFromUrl(): ServiceFilter {
+  return resolveServiceFilter(new URLSearchParams(window.location.search).get("nhom") ?? undefined);
+}
+
+export function ServiceFilterGrid({ services }: ServiceFilterGridProps) {
+  const [activeFilter, setActiveFilter] = useState<ServiceFilter>("all");
+
+  useEffect(() => {
+    const syncFilter = () => setActiveFilter(readFilterFromUrl());
+    syncFilter();
+    window.addEventListener("popstate", syncFilter);
+    return () => window.removeEventListener("popstate", syncFilter);
+  }, []);
+
+  function selectFilter(filter: ServiceFilter) {
+    setActiveFilter(filter);
+    const url = new URL(window.location.href);
+    if (filter === "all") url.searchParams.delete("nhom");
+    else url.searchParams.set("nhom", filter);
+    window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }
+
   const filteredServices = activeFilter === "all"
     ? services
     : services.filter((service) => service.category === activeFilter);
@@ -32,18 +55,17 @@ export function ServiceFilterGrid({ services, activeFilter }: ServiceFilterGridP
           <nav aria-label="Lọc theo nhóm dịch vụ" className="flex flex-wrap gap-2.5 pt-6">
             {serviceFilters.map((filter) => {
               const isActive = filter.value === activeFilter;
-              const href = filter.value === "all" ? "/dich-vu" : `/dich-vu?nhom=${filter.value}`;
               return (
-                <Link
-                  aria-current={isActive ? "page" : undefined}
+                <button
+                  aria-pressed={isActive}
                   className={`inline-flex min-h-14 items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-dark ${isActive ? "border-brand-blue-dark bg-brand-blue-dark text-white shadow-sm" : "border-border-subtle bg-background-secondary text-text-secondary hover:border-brand-blue hover:bg-brand-blue-light hover:text-brand-blue-dark"}`}
-                  href={href}
                   key={filter.value}
-                  scroll={false}
+                  onClick={() => selectFilter(filter.value)}
+                  type="button"
                 >
                   {filter.value !== "all" ? <Image alt="" className={`h-8 w-8 shrink-0 object-contain ${isActive ? "brightness-0 invert" : ""}`} height={32} src={serviceIconByCategory[filter.value]} width={32} /> : null}
                   {filter.label}
-                </Link>
+                </button>
               );
             })}
           </nav>

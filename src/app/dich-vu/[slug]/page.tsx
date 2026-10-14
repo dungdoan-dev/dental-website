@@ -5,10 +5,15 @@ import { Container } from "@/components/common/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { ImplantServiceDetail } from "@/features/services/components/ImplantServiceDetail";
 import { ServiceDetailPageContent } from "@/features/services/components/ServiceDetailPageContent";
-import { getImplantDetailData, getServiceBySlug, getServiceDetailData } from "@/features/services/services/service.service";
+import { getImplantDetailData, getServiceBySlug, getServiceDetailData, getServices } from "@/features/services/services/service.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
 type ServiceDetailPageProps = { params: Promise<{ slug: string }> };
+
+export async function generateStaticParams() {
+  const services = await getServices();
+  return services.map((service) => ({ slug: service.slug }));
+}
 
 export async function generateMetadata({ params }: ServiceDetailPageProps): Promise<Metadata> {
   const service = await getServiceBySlug((await params).slug);

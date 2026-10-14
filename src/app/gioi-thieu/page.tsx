@@ -11,8 +11,6 @@ export const metadata: Metadata = generateSeoMetadata({
   url: "/gioi-thieu",
 });
 
-export const dynamic = "force-dynamic";
-
 export default async function AboutPage() {
   const [content, clinics] = await Promise.all([getAboutPageData(), getClinics()]);
 

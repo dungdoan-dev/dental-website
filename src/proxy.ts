@@ -18,7 +18,9 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  // Verify locally from the cached JWKS where possible; getClaims also refreshes
+  // expiring sessions and avoids a remote Auth lookup on every admin request.
+  await supabase.auth.getClaims();
   return response;
 }
 

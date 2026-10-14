@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DoctorDetailView } from "@/features/doctors/components/DoctorDetailView";
-import { getDoctorBySlug } from "@/features/doctors/services/doctor.service";
+import { getDoctorBySlug, getDoctors } from "@/features/doctors/services/doctor.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
 type DoctorDetailPageProps = { params: Promise<{ slug: string }> };
+
+export async function generateStaticParams() {
+  const doctors = await getDoctors();
+  return doctors.map((doctor) => ({ slug: doctor.slug }));
+}
 
 export async function generateMetadata({ params }: DoctorDetailPageProps): Promise<Metadata> {
   const doctor = await getDoctorBySlug((await params).slug);

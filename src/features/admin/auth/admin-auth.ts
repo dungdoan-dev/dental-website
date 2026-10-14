@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -9,16 +10,18 @@ export function isAdminUser(user: { app_metadata?: Record<string, unknown> } | n
 
 export async function hasAdminSession(): Promise<boolean> {
   const supabase = await getSupabaseServerClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  return !error && isAdminUser(user);
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  return !error && isAdminUser(claims);
 }
 
-export async function requireAdmin() {
+export const requireAdmin = cache(async () => {
   const supabase = await getSupabaseServerClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user || !isAdminUser(user)) redirect("/admin/login");
-  return user;
-}
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (error || !claims || !isAdminUser(claims)) redirect("/admin/login");
+  return claims;
+});
 
 export async function clearAdminSession() {
   const supabase = await getSupabaseServerClient();

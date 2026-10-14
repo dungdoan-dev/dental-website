@@ -21,7 +21,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   themeColor: "#f7f9ff",
 };
-export const dynamic = "force-dynamic";
+// Public routes can be statically rendered and refreshed on the same cadence
+// as the tagged public-data cache. Routes using cookies/headers remain dynamic.
+export const revalidate = 300;
 
 const manrope = Manrope({ subsets: ["latin", "vietnamese"], display: "swap" });
 

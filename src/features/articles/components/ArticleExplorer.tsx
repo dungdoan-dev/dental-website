@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { articleCategories } from "../data/article-categories.data";
 import type { Article, ArticleCategory } from "../types/article.type";
@@ -20,6 +20,16 @@ export function ArticleExplorer({ articles, featuredArticle, initialCategory = "
   const [category, setCategory] = useState<CategoryFilter>(initialCategory);
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedCategory = params.get("category");
+    if (requestedCategory && articleCategories.some((item) => item.value === requestedCategory)) {
+      setCategory(requestedCategory as CategoryFilter);
+    }
+    const requestedQuery = params.get("q");
+    if (requestedQuery) setQuery(requestedQuery.slice(0, 100));
+  }, []);
 
   const filteredArticles = useMemo(() => {
     const normalizedQuery = normalizeSearch(query);

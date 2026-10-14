@@ -27,13 +27,14 @@ export async function runMutation(work: () => Promise<unknown>): Promise<Mutatio
 
 export async function saveRevision(kind: string, entityId: string, title: string, snapshot: unknown) {
   const supabase = await getSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
   const { error } = await supabase.from("admin_content_revisions").insert({
     kind,
     entity_id: entityId,
     title,
     snapshot: JSON.parse(JSON.stringify(snapshot)),
-    actor: user?.email ?? "admin",
+    actor: typeof claims?.email === "string" ? claims.email : "admin",
   });
   if (error) throw error;
 }
