@@ -34,10 +34,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     getClinics().catch(() => []),
     getContactCtaSettings(),
   ]);
-  const appointmentClinics = clinics.map(({ id, label, address }) => ({ id, label, address }));
+  const appointmentClinics = clinics.map(({ id, name, address }) => ({ id, label: name, address }));
 
   return (
-    <html lang="vi">
+    <html lang="vi" data-scroll-behavior="smooth">
       <body className={`${manrope.className} bg-surface text-on-surface antialiased`}>
         <AppointmentDialogProvider clinics={appointmentClinics} services={services}>
           <AppShell

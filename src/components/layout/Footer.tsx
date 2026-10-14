@@ -30,16 +30,10 @@ function ClinicContact({ title, address, phone, qrLabel, qrSrc }: ClinicContactP
 }
 
 function clinicDisplay(clinic: Clinic, index: number) {
-  if (clinic.id === "clinic-1") {
-    return { title: "Cơ Sở Quận 1", address: "99 Hồ Hảo Hớn, P. Cầu Ông Lãnh, TP. HCM", qrLabel: "QR Zalo OA Cơ sở Quận 1", qrSrc: "/images/qr/CS1-QROA.jpg" };
-  }
-  if (clinic.id === "clinic-2") {
-    return { title: "Cơ Sở Quận 5", address: "502 Ngô Gia Tự, P. An Đông, TP. HCM", qrLabel: "QR Zalo OA Cơ sở Quận 5", qrSrc: "/images/qr/CS2-QROA.jpg" };
-  }
   return {
-    title: clinic.label,
+    title: clinic.name,
     address: clinic.address,
-    qrLabel: `QR Zalo OA ${clinic.label}`,
+    qrLabel: `QR Zalo OA ${clinic.name}`,
     qrSrc: index === 0 ? "/images/qr/CS1-QROA.jpg" : "/images/qr/CS2-QROA.jpg",
   };
 }

@@ -6,7 +6,6 @@ export const doctorSchema = z.object({
   slug: z.string().min(1),
   avatar: z.string(),
   position: z.string().min(1),
-  specialty: z.string().min(1),
   experience: z.number().int().nonnegative(),
   sortOrder: z.number().int().nonnegative(),
   nameLines: z.union([z.literal(1), z.literal(2)]).default(1),

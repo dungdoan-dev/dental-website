@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
 import type { Clinic } from "@/features/clinics/types/clinic.type";
 
 type ArticleConsultationSectionProps = {
-  clinics: readonly Pick<Clinic, "id" | "label" | "address">[];
+  clinics: readonly Pick<Clinic, "id" | "name" | "address">[];
 };
 
 export function ArticleConsultationSection({ clinics }: ArticleConsultationSectionProps) {
@@ -48,7 +48,7 @@ export function ArticleConsultationSection({ clinics }: ArticleConsultationSecti
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-text-secondary">
               {clinics.map((clinic) => (
                 <span className="inline-flex items-center gap-1.5" key={clinic.id}>
-                  <Icon className="h-4 w-4 text-brand-blue-dark" name="location" />{clinic.label}: {clinic.address}
+                  <Icon className="h-4 w-4 text-brand-blue-dark" name="location" />{clinic.name}: {clinic.address}
                 </span>
               ))}
             </div>

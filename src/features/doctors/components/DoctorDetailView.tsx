@@ -25,7 +25,7 @@ function DetailList({ title, items, markerColor }: { title: string; items: reado
 
 export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
   const profile = doctor.profile;
-  const specialties = profile?.specialties.length ? profile.specialties : [doctor.specialty];
+  const specialties = profile?.specialties ?? [];
 
   return (
     <>
@@ -53,7 +53,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
                   <span className="rounded bg-brand-green-light px-2.5 py-1 text-xs font-bold tracking-wide text-brand-green-dark">{profile.licenseNumber}</span>
                 </div>
               ) : null}
-              <div className="rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+              {specialties.length ? <div className="rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
                 <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chuyên môn</div>
                 <div className="flex flex-wrap gap-2">
                   {specialties.map((specialty) => (
@@ -62,7 +62,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
                     </span>
                   ))}
                 </div>
-              </div>
+              </div> : null}
               {profile?.languages.length ? (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
                   <span className="text-sm font-medium text-text-secondary">Ngôn ngữ</span>
@@ -87,7 +87,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
               </>
             ) : (
               <div className="space-y-4">
-                <DetailList items={[`${doctor.experience} năm kinh nghiệm`, doctor.specialty]} markerColor="bg-brand-green-dark" title="Chuyên môn & Kinh nghiệm" />
+                <DetailList items={[`${doctor.experience} năm kinh nghiệm`, ...specialties]} markerColor="bg-brand-green-dark" title="Chuyên môn & Kinh nghiệm" />
               </div>
             )}
             <div className="pt-2">

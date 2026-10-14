@@ -186,7 +186,7 @@ export async function upsertDoctor(input: DoctorFormData) {
     if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
     const { error } = await supabase.from("doctors").upsert({
       id: base.id, name: base.name, slug: base.slug, avatar: base.avatar, position: base.position,
-      specialty: base.specialty, experience: base.experience, sort_order: base.sortOrder,
+      experience: base.experience, sort_order: base.sortOrder,
       name_lines: base.nameLines, name_line_2: base.nameLine2, description: base.description,
       badge: base.badge, highlight: base.highlight, category: base.category, directory_title: base.directoryTitle,
       license_number: base.licenseNumber, quote: base.quote, languages: base.languages, source_url: base.sourceUrl,

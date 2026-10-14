@@ -100,7 +100,7 @@ export default async function AdminDoctorsPage() {
 
                     <td className="px-4 py-3.5">
                       <div className="font-semibold text-text-primary text-xs">{doctor.position}</div>
-                      <div className="text-[11px] text-text-secondary">{doctor.specialty}</div>
+                      <div className="text-[11px] text-text-secondary">{doctor.profile?.specialties.join(" · ") || "—"}</div>
                     </td>
 
                     <td className="px-4 py-3.5 font-bold text-xs text-text-primary">

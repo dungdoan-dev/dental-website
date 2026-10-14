@@ -24,7 +24,6 @@ export type Doctor = {
   slug: string;
   avatar: string;
   position: string;
-  specialty: string;
   experience: number;
   sortOrder: number;
   nameLines: 1 | 2;

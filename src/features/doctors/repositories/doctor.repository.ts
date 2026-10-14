@@ -1,13 +1,14 @@
 import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import type { Doctor, DoctorCategory } from "../types/doctor.type";
 
+const DOCTOR_SELECT = "id,name,slug,avatar,position,experience,sort_order,name_lines,name_line_2,description,badge,highlight,category,directory_title,license_number,quote,languages,source_url,doctor_specialties(specialty,sort_order),doctor_education(content,sort_order),doctor_experience_highlights(content,sort_order),doctor_certificates(title,issuer,detail,image,sort_order)";
+
 function mapDoctor(d: {
   id: string;
   name: string;
   slug: string;
   avatar: string;
   position: string;
-  specialty: string;
   experience: number;
   sort_order: number;
   name_lines: number;
@@ -39,7 +40,6 @@ function mapDoctor(d: {
     slug: d.slug,
     avatar: d.avatar,
     position: d.position,
-    specialty: d.specialty,
     experience: d.experience,
     sortOrder: d.sort_order,
     nameLines: (d.name_lines === 2 ? 2 : 1),
@@ -72,9 +72,7 @@ function mapDoctor(d: {
 
 export const doctorRepository = {
   async findAll(): Promise<readonly Doctor[]> {
-    const { data: doctors, error } = await getPublicSupabaseClient().from("doctors").select(
-      "*, doctor_specialties(specialty,sort_order), doctor_education(content,sort_order), doctor_experience_highlights(content,sort_order), doctor_certificates(title,issuer,detail,image,sort_order)",
-    ).order("sort_order").order("id");
+    const { data: doctors, error } = await getPublicSupabaseClient().from("doctors").select(DOCTOR_SELECT).order("sort_order").order("id");
     if (error) throw error;
 
     return doctors.map((doctor) => mapDoctor({
@@ -87,9 +85,7 @@ export const doctorRepository = {
   },
 
   async findBySlug(slug: string): Promise<Doctor | null> {
-    const { data: doctor, error } = await getPublicSupabaseClient().from("doctors").select(
-      "*, doctor_specialties(specialty,sort_order), doctor_education(content,sort_order), doctor_experience_highlights(content,sort_order), doctor_certificates(title,issuer,detail,image,sort_order)",
-    ).eq("slug", slug).maybeSingle();
+    const { data: doctor, error } = await getPublicSupabaseClient().from("doctors").select(DOCTOR_SELECT).eq("slug", slug).maybeSingle();
     if (error) throw error;
 
     return doctor ? mapDoctor({

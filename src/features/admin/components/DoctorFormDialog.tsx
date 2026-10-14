@@ -40,7 +40,6 @@ export function DoctorFormDialog({
     slug: doctor?.slug ?? "",
     avatar: doctor?.avatar ?? "/images/doctors/vo-van-tu-hien.jpg",
     position: doctor?.position ?? "Bác Sĩ Chuyên Khoa",
-    specialty: doctor?.specialty ?? "Nha khoa tổng quát",
     experience: doctor?.experience ?? 10,
     sortOrder: doctor?.sortOrder ?? 0,
     nameLines: doctor?.nameLines ?? 1,
@@ -190,7 +189,7 @@ export function DoctorFormDialog({
                 ) : null}
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <div>
                   <label className="block font-semibold text-text-primary mb-1">
                     Chức vụ *
@@ -204,21 +203,6 @@ export function DoctorFormDialog({
                     }
                     className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
                     placeholder="Trưởng khoa Chỉnh nha"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Chuyên khoa *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.specialty}
-                    onChange={(e) =>
-                      setFormData({ ...formData, specialty: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="Cấy ghép Implant"
                   />
                 </div>
                 <div>

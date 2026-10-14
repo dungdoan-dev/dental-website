@@ -55,7 +55,7 @@ export default async function ContactPage() {
               <div className="mt-6 divide-y divide-white/15">
                 {clinics.map((clinic, index) => (
                   <a className="flex min-h-16 items-center justify-between gap-4 py-4 transition-colors hover:text-brand-green-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white" href={`tel:${clinic.phone.replace(/[^\d+]/g, "")}`} key={clinic.id}>
-                    <span><span className="block text-xs font-semibold text-white/65">CS{index + 1} · {clinic.label}</span><span className="mt-1 block font-bold">{clinic.phone}</span></span>
+                    <span><span className="block text-xs font-semibold text-white/65">CS{index + 1} · {clinic.name}</span><span className="mt-1 block font-bold">{clinic.phone}</span></span>
                     <Icon className="h-5 w-5 shrink-0" name="arrow-right" />
                   </a>
                 ))}

@@ -41,7 +41,7 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
       contentRecords={editableContent}
       contentWarning={aboutContentWarning}
       contactCtaSettings={contactCtaSettings}
-      clinics={clinics.map(({ id, label }) => ({ id, label }))}
+      clinics={clinics.map(({ id, name }) => ({ id, name }))}
       section={section}
     />
   );
