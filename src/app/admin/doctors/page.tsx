@@ -47,14 +47,14 @@ export default async function AdminDoctorsPage() {
       {/* Doctors Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div aria-label="Danh sách bác sĩ" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
-          <table className="admin-responsive-table w-full min-w-[1040px] table-fixed border-collapse text-left text-sm">
+          <table className="admin-responsive-table w-full min-w-[1090px] table-fixed border-collapse text-left text-sm">
             <thead>
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="w-[310px] px-4 py-4">Bác sĩ</th>
-                <th className="w-[360px] px-4 py-4">Chức vụ &amp; Chuyên khoa</th>
-                <th className="w-[120px] px-4 py-4">Kinh nghiệm</th>
-                <th className="w-[100px] px-4 py-4">Thứ tự</th>
-                <th className="w-[150px] px-4 py-4 text-right">Thao tác</th>
+                <th className="w-[290px] px-4 py-4">Bác sĩ</th>
+                <th className="w-[330px] px-4 py-4">Chức vụ &amp; Chuyên khoa</th>
+                <th className="w-[110px] px-4 py-4">Kinh nghiệm</th>
+                <th className="w-[180px] px-4 py-4">Thứ tự</th>
+                <th className="w-[180px] px-4 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">
@@ -112,7 +112,7 @@ export default async function AdminDoctorsPage() {
                     </td>
 
                     <td className="px-4 py-3.5 text-right" data-label="Thao tác">
-                      <div className="inline-flex items-center gap-2">
+                      <div className="inline-flex items-center gap-2 whitespace-nowrap">
                         <DoctorFormDialog
                           doctor={docObj}
                           buttonLabel="Sửa"

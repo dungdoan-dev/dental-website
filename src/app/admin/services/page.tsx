@@ -77,14 +77,14 @@ export default async function AdminServicesPage() {
       {/* Services Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div aria-label="Danh sách dịch vụ" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
-          <table className="admin-responsive-table w-full min-w-[1020px] table-fixed border-collapse text-left text-sm">
+          <table className="admin-responsive-table w-full min-w-[1076px] table-fixed border-collapse text-left text-sm">
             <thead>
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
                 <th className="w-[108px] px-4 py-4">Icon</th>
-                <th className="w-[422px] px-4 py-4">Tên dịch vụ &amp; Slug</th>
+                <th className="w-[380px] px-4 py-4">Tên dịch vụ &amp; Slug</th>
                 <th className="w-[138px] px-4 py-4">Danh mục</th>
-                <th className="w-[112px] px-4 py-4">Thứ tự</th>
-                <th className="w-[240px] px-4 py-4 text-right">Thao tác</th>
+                <th className="w-[180px] px-4 py-4">Thứ tự</th>
+                <th className="w-[270px] px-4 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">

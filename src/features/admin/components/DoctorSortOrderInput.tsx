@@ -32,7 +32,7 @@ export function DoctorSortOrderInput({ id, sortOrder }: { id: string; sortOrder:
     <form className="flex items-center gap-2" onSubmit={handleSubmit}>
       <label className="sr-only" htmlFor={`doctor-sort-${id}`}>Thứ tự hiển thị</label>
       <input
-        className="w-20 rounded-lg border border-border-subtle bg-white px-2.5 py-2 text-center text-sm tabular-nums text-text-primary focus:border-brand-blue-dark focus:outline-none"
+        className="w-16 rounded-lg border border-border-subtle bg-white px-2.5 py-2 text-center text-sm tabular-nums text-text-primary focus:border-brand-blue-dark focus:outline-none"
         id={`doctor-sort-${id}`}
         max={99999}
         min={0}
