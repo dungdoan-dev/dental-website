@@ -137,13 +137,15 @@ a {
   }
 }
 
-.home-section-reveal--pending {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0);
-}
-
-.home-section-reveal--visible {
-  animation: home-section-enter 1.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* CSS-only scroll reveal: no JS, and browsers without scroll timelines (or with reduced motion) just show the content. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-section-reveal {
+      animation: home-section-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0px entry 260px;
+    }
+  }
 }
 
 .insurance-marquee:hover {
@@ -219,13 +221,6 @@ a {
     scroll-behavior: auto;
   }
   .insurance-marquee {
-    animation: none;
-  }
-  .home-section-reveal--pending {
-    opacity: 1;
-    transform: none;
-  }
-  .home-section-reveal--visible {
     animation: none;
   }
   .vision-mission-reveal--pending {

@@ -23,13 +23,13 @@ export default function HomePage() {
       <HeroCarousel />
       <VisionMissionSection />
       <CoreValuesSection />
-      <FeaturedServicesSection />
-      <DoctorTeamSection />
-      <WhyChooseSection />
-      <ClinicFacilitiesSection />
-      <InsurancePartnersSection />
-      <FAQSection />
-      <TestimonialsSection />
+      <div className="home-section-reveal"><FeaturedServicesSection /></div>
+      <div className="home-section-reveal"><DoctorTeamSection /></div>
+      <div className="home-section-reveal"><WhyChooseSection /></div>
+      <div className="home-section-reveal"><ClinicFacilitiesSection /></div>
+      <div className="home-section-reveal"><InsurancePartnersSection /></div>
+      <div className="home-section-reveal"><FAQSection /></div>
+      <div className="home-section-reveal"><TestimonialsSection /></div>
     </>
   );
 }
