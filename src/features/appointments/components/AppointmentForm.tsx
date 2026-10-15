@@ -3,10 +3,8 @@
 import { useId, useRef, useState, type FormEvent } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { appointmentShifts } from "../data/appointment-shifts";
-import {
-  appointmentSchema,
-  type AppointmentSchemaInput,
-} from "../schemas/appointment.schema";
+// Type-only: the schema (and zod) stays on the server, which validates and returns per-field errors.
+import type { AppointmentSchemaInput } from "../schemas/appointment.schema";
 import type { AppointmentClinicOption } from "../types/appointment.type";
 import { DatePickerField } from "./DatePickerField";
 import { PhoneNumberField } from "./PhoneNumberField";
@@ -82,24 +80,8 @@ export function AppointmentForm({
       preferredShift: shift?.id,
       note: String(data.get("note") ?? ""),
     };
-    const validation = appointmentSchema.safeParse(input);
-
-    if (!validation.success || !shift) {
-      const errors = validation.success
-        ? undefined
-        : validation.error.flatten().fieldErrors;
-      setFieldErrors({
-        name: errors?.name?.[0],
-        phone: errors?.phone?.[0],
-        email: errors?.email?.[0],
-        serviceId: errors?.serviceId?.[0],
-        clinicId: errors?.clinicId?.[0],
-        appointmentDate: errors?.appointmentDate?.[0],
-        preferredShift: !shift
-          ? "Vui lòng chọn ca khám"
-          : errors?.preferredShift?.[0],
-        note: errors?.note?.[0],
-      });
+    if (!shift) {
+      setFieldErrors({ preferredShift: "Vui lòng chọn ca khám" });
       setStatus("error");
       setMessage("Vui lòng kiểm tra lại thông tin đặt lịch.");
       focusErrors();
@@ -113,7 +95,7 @@ export function AppointmentForm({
       const response = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validation.data),
+        body: JSON.stringify(input),
       });
       const result = (await response.json()) as {
         message?: string;
