@@ -43,7 +43,7 @@ export function HeroCarouselView({ slides }: { slides: readonly HeroSlide[] }) {
 
   return (
     <section aria-roledescription="carousel" aria-label="Giới thiệu Nha Khoa 2000" className="relative mx-auto w-full max-w-[1920px] select-none overflow-hidden bg-slate-950" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} onFocusCapture={() => setHasFocus(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false); }}>
-      <div className="relative h-[clamp(15rem,68vw,22rem)] w-full overflow-hidden sm:h-[clamp(20rem,42vw,29rem)] lg:h-[clamp(25rem,28vw,35rem)]">
+      <div className="relative aspect-[16/9] max-h-[80vh] w-full overflow-hidden">
         {slides.map((slide, index) => {
           const isActive = currentIndex === index;
           return (
