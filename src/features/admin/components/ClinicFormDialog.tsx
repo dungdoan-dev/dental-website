@@ -50,7 +50,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
       </button>
 
       {isOpen && typeof document !== "undefined" && createPortal(
-        <div className="admin-dialog-overlay fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-24 backdrop-blur-sm sm:p-6 sm:pt-24">
+        <div className="admin-dialog-overlay fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-3 backdrop-blur-sm sm:p-6 sm:pt-6">
           <div className="admin-dialog-panel relative flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-2xl sm:max-h-[calc(100dvh-4rem)]">
             <div className="admin-dialog-header flex shrink-0 items-center justify-between border-b border-border-subtle/60 px-5 pb-4 pt-5 text-left sm:px-7 sm:pt-6">
               <div className="flex items-center gap-2.5">

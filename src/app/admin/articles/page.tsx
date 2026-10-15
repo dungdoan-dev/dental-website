@@ -22,7 +22,8 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
   const pageSize = 20;
   const supabase = await getSupabaseServerClient();
   let countQuery = supabase.from("articles").select("id", { count: "exact", head: true });
-  let articleQuery = supabase.from("articles").select("*");
+  let articleQuery = supabase.from("articles")
+    .select("id,title,slug,excerpt,thumbnail,published_at,author,category,reading_minutes,featured,status");
   if (query.status !== "all") {
     countQuery = countQuery.eq("status", query.status);
     articleQuery = articleQuery.eq("status", query.status);
@@ -83,23 +84,23 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
 
       {/* Articles Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
+        <div aria-label="Danh sách bài viết" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
+          <table className="admin-responsive-table w-full min-w-[1320px] table-fixed border-collapse text-left text-sm">
             <thead>
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="px-6 py-4">Ảnh</th>
-                <th className="px-6 py-4">Tiêu đề &amp; Slug</th>
-                <th className="px-4 py-4">Trạng thái</th>
-                <th className="px-4 py-4">Chuyên mục</th>
-                <th className="px-4 py-4">Tác giả</th>
-                <th className="px-4 py-4">Ngày đăng</th>
-                <th className="px-4 py-4">Nổi bật</th>
-                <th className="px-6 py-4 text-right">Thao tác</th>
+                <th className="w-24 px-4 py-4">Ảnh</th>
+                <th className="w-[360px] px-4 py-4">Tiêu đề &amp; Slug</th>
+                <th className="w-[130px] px-3 py-4">Trạng thái</th>
+                <th className="w-[150px] px-3 py-4">Chuyên mục</th>
+                <th className="w-[180px] px-3 py-4">Tác giả</th>
+                <th className="w-[132px] px-3 py-4">Ngày đăng</th>
+                <th className="w-24 px-3 py-4">Nổi bật</th>
+                <th className="w-[176px] px-4 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">
               {articles.map((article, idx) => {
-                const articleObj: Article = {
+                const articleObj: Omit<Article, "content"> = {
                   ...article,
                   publishedAt: article.publishedAt.toISOString(),
                   category: article.category as Article["category"],
@@ -112,7 +113,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                       idx % 2 === 1 ? "bg-background-secondary/30" : ""
                     }`}
                   >
-                    <td className="px-6 py-3.5">
+                    <td className="px-4 py-3.5" data-label="Ảnh">
                       <div className="relative h-12 w-16 overflow-hidden rounded-xl bg-slate-100 border border-border-subtle shadow-sm">
                         <Image
                           src={article.thumbnail}
@@ -124,7 +125,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                       </div>
                     </td>
 
-                    <td className="px-6 py-3.5 max-w-sm">
+                    <td className="px-4 py-3.5" data-label="Bài viết">
                       <div className="font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors line-clamp-1">
                         <Link href={article.status === "published" ? `/tin-tuc/${article.slug}` : "/admin/articles"} target={article.status === "published" ? "_blank" : undefined}>
                           {article.title}
@@ -135,21 +136,21 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                       </div>
                     </td>
 
-                    <td className="px-4 py-3.5">
-                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${article.status === "published" ? "bg-brand-green-light text-brand-green-dark" : "bg-surface-container text-text-secondary"}`}>{article.status === "published" ? "Đã xuất bản" : "Bản nháp"}</span>
+                    <td className="px-3 py-3.5" data-label="Trạng thái">
+                      <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold ${article.status === "published" ? "bg-brand-green-light text-brand-green-dark" : "bg-surface-container text-text-secondary"}`}>{article.status === "published" ? "Đã xuất bản" : "Bản nháp"}</span>
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-3 py-3.5" data-label="Chuyên mục">
                       <span className="inline-flex items-center rounded-full bg-brand-blue-light px-2.5 py-0.5 text-[11px] font-bold text-brand-blue-dark">
                         {getArticleCategoryLabel(article.category as Article["category"])}
                       </span>
                     </td>
 
-                    <td className="px-4 py-3.5 text-xs text-text-primary font-medium">
-                      {article.author}
+                    <td className="px-3 py-3.5 text-xs font-medium text-text-primary" data-label="Tác giả">
+                      <span className="line-clamp-2" title={article.author}>{article.author}</span>
                     </td>
 
-                    <td className="px-4 py-3.5 font-mono text-xs text-text-secondary">
+                    <td className="whitespace-nowrap px-3 py-3.5 font-mono text-xs text-text-secondary" data-label="Ngày đăng">
                       {new Date(article.publishedAt).toLocaleDateString("vi-VN", {
                         day: "2-digit",
                         month: "2-digit",
@@ -157,7 +158,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                       })}
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-3 py-3.5" data-label="Nổi bật">
                       {article.featured ? (
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-green-dark">
                           <span className="material-symbols-outlined text-[16px]">check_circle</span>
@@ -168,8 +169,8 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                       )}
                     </td>
 
-                    <td className="px-6 py-3.5 text-right">
-                      <div className="inline-flex items-center gap-2">
+                    <td className="px-4 py-3.5 text-right" data-label="Thao tác">
+                      <div className="inline-flex items-center gap-2 whitespace-nowrap">
                         <ArticleFormDialog
                           article={articleObj}
                           buttonLabel="Sửa"

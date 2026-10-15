@@ -19,7 +19,7 @@ export function ImplantServiceDetail({ service, content }: ImplantServiceDetailP
               <h1 className="mt-6 max-w-2xl text-4xl font-extrabold leading-tight tracking-tight text-text-primary md:text-5xl lg:text-[3.5rem]">Dịch vụ cấy ghép <span className="text-brand-blue-dark">Implant kỹ thuật số</span></h1>
               <p className="mt-6 max-w-xl text-base leading-8 text-text-secondary md:text-lg">Phục hồi răng mất bằng kế hoạch điều trị cá nhân hóa. Bác sĩ thăm khám, đánh giá xương hàm và lựa chọn phương án cấy ghép phù hợp với tình trạng của bạn.</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a className="rounded-full bg-brand-blue-dark px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-blue/20 transition hover:bg-[#056697]" href="/lien-he">Đặt lịch tư vấn</a>
+                <Link className="rounded-full bg-brand-blue-dark px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-blue/20 transition hover:bg-[#056697]" href="/lien-he">Đặt lịch tư vấn</Link>
                 <a className="rounded-full border border-brand-blue-dark px-6 py-3.5 text-sm font-bold text-brand-blue-dark transition hover:bg-brand-blue-light" href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}>Gọi {siteConfig.contact.phone}</a>
               </div>
               <div className="mt-10 grid max-w-xl gap-3 border-t border-border-subtle pt-6 text-sm text-text-secondary sm:grid-cols-3">

@@ -8,7 +8,8 @@ export async function getSiteContent<T>(key: string, schema: z.ZodType<T>): Prom
   try {
     const content = await getCachedSiteContent(key);
     return content === null ? null : schema.parse(content);
-  } catch {
+  } catch (error) {
+    console.error("[site-content.service] public data load failed", error);
     return null;
   }
 }

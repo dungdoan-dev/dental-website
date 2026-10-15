@@ -14,6 +14,7 @@ export async function runMutation(work: () => Promise<unknown>): Promise<Mutatio
   try { await work(); return { success: true }; }
   catch (error) {
     if (error instanceof SlugConflictError) return { success: false, error: "Slug này đã được sử dụng bởi bản ghi khác.", fieldErrors: { slug: "Slug đã tồn tại." } };
+    console.error("Admin mutation failed", error);
     const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
     if (code === "23505") return { success: false, error: "Slug hoặc mã bản ghi đã tồn tại. Hãy dùng giá trị khác.", fieldErrors: { slug: "Slug hoặc mã đã được sử dụng." } };
     if (code === "23503") return { success: false, error: "Bản ghi đang được sử dụng. Không thể xóa hoặc tham chiếu bản ghi không tồn tại." };

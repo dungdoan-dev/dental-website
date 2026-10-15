@@ -43,7 +43,8 @@ export async function getHeroSlides(): Promise<readonly HeroSlide[]> {
       badgeVariant: s.badge_variant as "blue" | "green",
       objectPosition: s.object_position as "center" | "top",
     }));
-  } catch {
+  } catch (error) {
+    console.error("[home.service] public data load failed", error);
     return [];
   }
 }
@@ -57,7 +58,8 @@ export async function getCoreValues(): Promise<readonly CoreValue[]> {
       description: v.description,
       iconKey: v.icon_key as "heart" | "care" | "honesty" | "innovation",
     }));
-  } catch {
+  } catch (error) {
+    console.error("[home.service] public data load failed", error);
     return [];
   }
 }
@@ -74,7 +76,8 @@ export async function getInsurancePartners(): Promise<
       accent: p.accent as "blue" | "green",
       logoSrc: p.logo_src ?? undefined,
     }));
-  } catch {
+  } catch (error) {
+    console.error("[home.service] public data load failed", error);
     return [];
   }
 }
@@ -83,7 +86,8 @@ export async function getWhyChooseImage(): Promise<string | null> {
   try {
     const content = await getSiteContent("home_why_choose", z.object({ image: z.string().min(1) }));
     return content?.image ?? null;
-  } catch {
+  } catch (error) {
+    console.error("[home.service] public data load failed", error);
     return null;
   }
 }
@@ -92,7 +96,8 @@ export async function getFaqItems(): Promise<readonly FAQItem[]> {
   try {
     const items = await getCachedFaqItems();
     return items.map((i) => ({ question: i.question, answer: i.answer }));
-  } catch {
+  } catch (error) {
+    console.error("[home.service] public data load failed", error);
     return [];
   }
 }
@@ -131,7 +136,8 @@ export async function getTestimonials(): Promise<readonly Testimonial[]> {
       initials: t.initials,
       accent: t.accent as "blue" | "green" | "blue-dark",
     }));
-  } catch {
+  } catch (error) {
+    console.error("[home.service] public data load failed", error);
     return [];
   }
 }

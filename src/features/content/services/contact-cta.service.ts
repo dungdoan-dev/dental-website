@@ -5,7 +5,8 @@ import type { ContactCtaSettings } from "../schemas/contact-cta.schema";
 export async function getContactCtaSettings(): Promise<ContactCtaSettings> {
   try {
     return await getSiteContent("contact_cta", contactCtaSchema) ?? defaultContactCtaSettings;
-  } catch {
+  } catch (error) {
+    console.error("[contact-cta.service] public data load failed", error);
     return defaultContactCtaSettings;
   }
 }

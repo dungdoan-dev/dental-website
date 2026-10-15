@@ -46,15 +46,15 @@ export default async function AdminDoctorsPage() {
 
       {/* Doctors Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
+        <div aria-label="Danh sách bác sĩ" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
+          <table className="admin-responsive-table w-full min-w-[1040px] table-fixed border-collapse text-left text-sm">
             <thead>
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="px-6 py-4">Bác sĩ</th>
-                <th className="px-4 py-4">Chức vụ &amp; Chuyên khoa</th>
-                <th className="px-4 py-4">Kinh nghiệm</th>
-                <th className="px-4 py-4">Thứ tự</th>
-                <th className="px-6 py-4 text-right">Thao tác</th>
+                <th className="w-[310px] px-4 py-4">Bác sĩ</th>
+                <th className="w-[360px] px-4 py-4">Chức vụ &amp; Chuyên khoa</th>
+                <th className="w-[120px] px-4 py-4">Kinh nghiệm</th>
+                <th className="w-[100px] px-4 py-4">Thứ tự</th>
+                <th className="w-[150px] px-4 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">
@@ -74,7 +74,7 @@ export default async function AdminDoctorsPage() {
                       idx % 2 === 1 ? "bg-background-secondary/30" : ""
                     }`}
                   >
-                    <td className="px-6 py-3.5">
+                    <td className="px-4 py-3.5" data-label="Bác sĩ">
                       <div className="flex items-center gap-3">
                         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-slate-100 border border-border-subtle shadow-sm">
                           <Image
@@ -85,33 +85,33 @@ export default async function AdminDoctorsPage() {
                             sizes="44px"
                           />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors">
                             <Link href={`/bac-si/${doctor.slug}`} target="_blank">
                               {doctor.name}
                             </Link>
                           </div>
-                          <div className="text-[11px] text-text-secondary font-mono">
+                          <div className="truncate text-[11px] text-text-secondary font-mono">
                             /bac-si/{doctor.slug}
                           </div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" data-label="Chức vụ & chuyên khoa">
                       <div className="font-semibold text-text-primary text-xs">{doctor.position}</div>
                       <div className="text-[11px] text-text-secondary">{doctor.profile?.specialties.join(" · ") || "—"}</div>
                     </td>
 
-                    <td className="px-4 py-3.5 font-bold text-xs text-text-primary">
+                    <td className="px-4 py-3.5 font-bold text-xs text-text-primary" data-label="Kinh nghiệm">
                       {doctor.experience} năm
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" data-label="Thứ tự">
                       <DoctorSortOrderInput id={doctor.id} sortOrder={doctor.sortOrder} />
                     </td>
 
-                    <td className="px-6 py-3.5 text-right">
+                    <td className="px-4 py-3.5 text-right" data-label="Thao tác">
                       <div className="inline-flex items-center gap-2">
                         <DoctorFormDialog
                           doctor={docObj}

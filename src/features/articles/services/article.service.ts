@@ -9,7 +9,8 @@ const getCachedArticleBySlug = cachePublicData("articles:by-slug", [publicDataTa
 export async function getArticles(): Promise<readonly Article[]> {
   try {
     return articleSchema.array().parse(await getCachedArticles());
-  } catch {
+  } catch (error) {
+    console.error("[article.service] public data load failed", error);
     return [];
   }
 }
@@ -18,7 +19,8 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
   try {
     const article = await getCachedArticleBySlug(slug);
     return article ? articleSchema.parse(article) : null;
-  } catch {
+  } catch (error) {
+    console.error("[article.service] public data load failed", error);
     return null;
   }
 }

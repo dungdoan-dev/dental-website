@@ -15,7 +15,7 @@ export function PriceTableEditor({ initialRows }: { initialRows: readonly PriceR
     <div className="space-y-3">
       <input name="prices" type="hidden" value={JSON.stringify(rows)} />
       <div className="overflow-x-auto rounded-xl border border-border-subtle">
-        <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+        <table className="admin-editable-table admin-prices-table w-full min-w-[760px] border-collapse text-left text-sm">
           <thead className="bg-surface-container-low text-xs font-semibold text-text-secondary">
             <tr><th className="px-3 py-3" scope="col">Tên hạng mục</th><th className="px-3 py-3" scope="col">Ghi chú</th><th className="w-48 px-3 py-3" scope="col">Giá tham khảo</th><th className="w-24 px-3 py-3 text-center" scope="col">Thao tác</th></tr>
           </thead>

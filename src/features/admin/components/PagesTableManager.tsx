@@ -15,24 +15,19 @@ const pageTargets: Record<string, string> = {
 export async function PagesTableManager() {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
-  const [services, doctors, publishedArticles, draftArticles, pendingAppointments, confirmedAppointments, revisions, slides, clinics] = await Promise.all([
-    supabase.from("services").select("id", { count: "exact", head: true }),
-    supabase.from("doctors").select("id", { count: "exact", head: true }),
-    supabase.from("articles").select("id", { count: "exact", head: true }).eq("status", "published"),
-    supabase.from("articles").select("id", { count: "exact", head: true }).eq("status", "draft"),
-    supabase.from("appointments").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("appointments").select("id", { count: "exact", head: true }).eq("status", "confirmed"),
+  const [summary, revisions] = await Promise.all([
+    supabase.rpc("admin_dashboard_counts"),
     supabase.from("admin_content_revisions").select("id,kind,entity_id,title,actor,created_at").order("created_at", { ascending: false }).limit(8),
-    supabase.from("hero_slides").select("id", { count: "exact", head: true }),
-    supabase.from("clinics").select("id", { count: "exact", head: true }),
   ]);
-  const errors = [services, doctors, publishedArticles, draftArticles, pendingAppointments, confirmedAppointments, revisions, slides, clinics].filter((item) => item.error);
-  if (errors.length) throw errors[0].error;
-  const serviceCount = services.count ?? 0;
-  const doctorCount = doctors.count ?? 0;
-  const publishedArticleCount = publishedArticles.count ?? 0;
-  const draftArticleCount = draftArticles.count ?? 0;
-  const publishedAppointments = (pendingAppointments.count ?? 0) + (confirmedAppointments.count ?? 0);
+  if (revisions.error) throw revisions.error;
+  if (summary.error) throw summary.error;
+  const counts = summary.data as Record<string, number>;
+
+  const serviceCount = counts.services ?? 0;
+  const doctorCount = counts.doctors ?? 0;
+  const publishedArticleCount = counts.published_articles ?? 0;
+  const draftArticleCount = counts.draft_articles ?? 0;
+  const publishedAppointments = (counts.pending_appointments ?? 0) + (counts.confirmed_appointments ?? 0);
 
   return <div className="flex flex-col gap-8">
     <header className="flex flex-wrap items-end justify-between gap-5">
@@ -51,8 +46,8 @@ export async function PagesTableManager() {
 
     <section aria-label="Trạng thái nội dung" className="grid gap-4 lg:grid-cols-3">
       <article className="rounded-2xl border border-border-subtle bg-white p-5"><p className="text-sm text-text-secondary">Bản nháp chưa xuất bản</p><p className="mt-2 text-2xl font-bold text-text-primary">{draftArticleCount}</p><Link className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-blue-dark" href="/admin/articles?status=draft">Xem bản nháp →</Link></article>
-      <article className="rounded-2xl border border-border-subtle bg-white p-5"><p className="text-sm text-text-secondary">Slider trang chủ</p><p className="mt-2 text-2xl font-bold text-text-primary">{slides.count ?? 0} slide</p><Link className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-blue-dark" href="/admin/home">Quản lý slider →</Link></article>
-      <article className="rounded-2xl border border-border-subtle bg-white p-5"><p className="text-sm text-text-secondary">Cơ sở</p><p className="mt-2 text-2xl font-bold text-text-primary">{clinics.count ?? 0}</p><Link className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-blue-dark" href="/admin/clinics">Quản lý cơ sở →</Link></article>
+      <article className="rounded-2xl border border-border-subtle bg-white p-5"><p className="text-sm text-text-secondary">Slider trang chủ</p><p className="mt-2 text-2xl font-bold text-text-primary">{counts.slides ?? 0} slide</p><Link className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-blue-dark" href="/admin/home">Quản lý slider →</Link></article>
+      <article className="rounded-2xl border border-border-subtle bg-white p-5"><p className="text-sm text-text-secondary">Cơ sở</p><p className="mt-2 text-2xl font-bold text-text-primary">{counts.clinics ?? 0}</p><Link className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-brand-blue-dark" href="/admin/clinics">Quản lý cơ sở →</Link></article>
     </section>
 
     <section aria-labelledby="admin-pages-heading" className="space-y-4">

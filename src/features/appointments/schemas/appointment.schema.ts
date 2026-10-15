@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { appointmentShiftIds } from "../data/appointment-shifts";
 
+const vietnamDay = (date: Date) => date.toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
+
 export const appointmentSchema = z.object({
   name: z.string().trim().min(2, "Họ tên phải có ít nhất 2 ký tự").max(100, "Họ tên không được vượt quá 100 ký tự"),
   phone: z.string().trim().regex(/^\+[1-9]\d{7,14}$/, "Số điện thoại quốc tế không hợp lệ"),
@@ -8,7 +10,8 @@ export const appointmentSchema = z.object({
   serviceId: z.string().trim().max(100).optional().transform((value) => value || undefined),
   doctorId: z.string().trim().max(100).optional().transform((value) => value || undefined),
   clinicId: z.string().trim().min(1, "Vui lòng chọn cơ sở thăm khám").max(100, "Cơ sở thăm khám không hợp lệ"),
-  appointmentDate: z.string().trim().min(1, "Vui lòng chọn ngày hẹn").refine((value) => !Number.isNaN(Date.parse(value)), "Ngày hẹn không hợp lệ"),
+  appointmentDate: z.string().trim().min(1, "Vui lòng chọn ngày hẹn").refine((value) => !Number.isNaN(Date.parse(value)), "Ngày hẹn không hợp lệ")
+    .refine((value) => Number.isNaN(Date.parse(value)) || vietnamDay(new Date(value)) >= vietnamDay(new Date()), "Ngày hẹn không được ở trong quá khứ"),
   preferredShift: z.enum(appointmentShiftIds).optional(),
   note: z.string().trim().max(1000, "Ghi chú không được vượt quá 1000 ký tự").optional().transform((value) => value || undefined),
 });

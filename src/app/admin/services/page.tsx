@@ -6,8 +6,6 @@ import { ServiceFormDialog } from "@/features/admin/components/ServiceFormDialog
 import { DeleteServiceButton } from "@/features/admin/components/DeleteButtons";
 import { ServiceDetailFormDialog } from "@/features/admin/components/ServiceDetailFormDialog";
 import type { DentalService } from "@/features/services/types/service.type";
-import { serviceDetailSchema, serviceDetailContentKey, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
-import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
 import { updateServicePriceCategories } from "@/features/admin/content-actions";
 import { AdminActionForm } from "@/features/admin/components/AdminActionForm";
 import { ServicePriceCategoriesEditor } from "@/features/admin/components/ServicePriceCategoriesEditor";
@@ -23,7 +21,9 @@ export const metadata = {
 export default async function AdminServicesPage() {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
-  const { data: serviceRows, error: serviceError } = await supabase.from("services").select("*").order("sort_order").order("id");
+  const { data: serviceRows, error: serviceError } = await supabase.from("services")
+    .select("id,name,slug,short_description,description,image,badge,badge_variant,featured,sort_order,category")
+    .order("sort_order").order("id");
   if (serviceError) throw serviceError;
   const services = serviceRows.map((service) => ({
     id: service.id, name: service.name, slug: service.slug, shortDescription: service.short_description,
@@ -31,11 +31,10 @@ export default async function AdminServicesPage() {
     badgeVariant: service.badge_variant as "blue" | "green", featured: service.featured,
     sortOrder: service.sort_order, category: service.category,
   }));
-  const { data: detailRecords, error: detailError } = await supabase.from("site_content").select("key,content")
-    .in("key", [...services.map((service) => serviceDetailContentKey(service.id)), "implant_detail", "service_price_categories"]);
-  if (detailError) throw detailError;
-  const detailByKey = new Map(detailRecords.map((record) => [record.key, record.content]));
-  const pricingParse = servicePriceCategoriesSchema.safeParse(detailByKey.get("service_price_categories"));
+  const { data: pricingRecord, error: pricingError } = await supabase.from("site_content")
+    .select("content").eq("key", "service_price_categories").maybeSingle();
+  if (pricingError) throw pricingError;
+  const pricingParse = servicePriceCategoriesSchema.safeParse(pricingRecord?.content);
   const pricing = pricingParse.success ? pricingParse.data : defaultServicePriceCategories;
 
   return (
@@ -77,35 +76,19 @@ export default async function AdminServicesPage() {
 
       {/* Services Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
+        <div aria-label="Danh sách dịch vụ" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
+          <table className="admin-responsive-table w-full min-w-[1020px] table-fixed border-collapse text-left text-sm">
             <thead>
               <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="px-6 py-4">Icon</th>
-                <th className="px-6 py-4">Tên dịch vụ &amp; Slug</th>
-                <th className="px-4 py-4">Danh mục</th>
-                <th className="px-4 py-4">Thứ tự</th>
-                <th className="px-6 py-4 text-right">Thao tác</th>
+                <th className="w-[108px] px-4 py-4">Icon</th>
+                <th className="w-[422px] px-4 py-4">Tên dịch vụ &amp; Slug</th>
+                <th className="w-[138px] px-4 py-4">Danh mục</th>
+                <th className="w-[112px] px-4 py-4">Thứ tự</th>
+                <th className="w-[240px] px-4 py-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">
               {services.map((service, idx) => {
-                const detailKey = serviceDetailContentKey(service.id);
-                let detail: ServiceDetailData | undefined;
-                const savedDetail = detailByKey.get(detailKey);
-                if (savedDetail) {
-                  const parsedDetail = serviceDetailSchema.safeParse(savedDetail);
-                  if (parsedDetail.success) detail = parsedDetail.data;
-                } else if (service.slug === "trong-rang-implant") {
-                  const legacy = implantDetailSchema.safeParse(detailByKey.get("implant_detail"));
-                  if (legacy.success) detail = {
-                    eyebrow: "Nha khoa chuyên sâu · Implant",
-                    title: service.name,
-                    introduction: service.description,
-                    highlights: [],
-                    ...legacy.data,
-                  };
-                }
                 const dentalService: DentalService = { ...service, category: service.category as DentalService["category"] };
 
                 return (
@@ -115,7 +98,7 @@ export default async function AdminServicesPage() {
                       idx % 2 === 1 ? "bg-background-secondary/30" : ""
                     }`}
                   >
-                    <td className="px-6 py-3.5">
+                    <td className="px-4 py-3.5" data-label="Icon">
                       <div className="grid h-12 w-16 place-items-center rounded-xl bg-slate-100 border border-border-subtle shadow-sm">
                         <Image
                           src={serviceIconByCategory[service.category as DentalService["category"]]}
@@ -127,34 +110,34 @@ export default async function AdminServicesPage() {
                       </div>
                     </td>
 
-                    <td className="px-6 py-3.5">
-                      <div className="font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors">
+                    <td className="px-4 py-3.5" data-label="Dịch vụ">
+                      <div className="truncate font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors" title={service.name}>
                         <Link href={`/dich-vu/${service.slug}`} target="_blank">
                           {service.name}
                         </Link>
                       </div>
-                      <div className="text-[11px] text-text-secondary font-mono mt-0.5">
+                      <div className="mt-0.5 truncate font-mono text-[11px] text-text-secondary">
                         /dich-vu/{service.slug}
                       </div>
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" data-label="Danh mục">
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-text-secondary">
                         <span className="material-symbols-outlined text-[15px] text-brand-blue-dark">category</span>
                         {service.category}
                       </span>
                     </td>
 
-                    <td className="px-4 py-3.5"><ServiceSortOrderControl id={service.id} initialValue={service.sortOrder} /></td>
+                    <td className="px-4 py-3.5" data-label="Thứ tự"><ServiceSortOrderControl id={service.id} initialValue={service.sortOrder} /></td>
 
-                    <td className="px-6 py-3.5 text-right">
-                      <div className="inline-flex items-center gap-2">
+                    <td className="px-4 py-3.5 text-right" data-label="Thao tác">
+                      <div className="inline-flex items-center gap-2 whitespace-nowrap">
                         <ServiceFormDialog
                           service={dentalService}
                           buttonLabel="Sửa"
                           buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                         />
-                        <ServiceDetailFormDialog detail={detail} service={dentalService} />
+                        <ServiceDetailFormDialog service={dentalService} />
                         <DeleteServiceButton id={service.id} />
                       </div>
                     </td>

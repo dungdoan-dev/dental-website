@@ -14,16 +14,11 @@ type AppShellProps = {
 
 export function AppShell({ topBar, header, footer, appointmentFooter, floatingContact, children }: AppShellProps) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin") ?? false;
   const appointmentFormExcludedRoutes = ["/gioi-thieu", "/dich-vu", "/bac-si", "/tin-tuc"];
   const normalizedPath = pathname?.replace(/\/$/, "") ?? "";
   const hideAppointmentFooter = appointmentFormExcludedRoutes.some(
     (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),
   );
-
-  if (isAdmin) {
-    return <div className="min-h-screen bg-[#f7f9ff] text-[#181c20] antialiased">{children}</div>;
-  }
 
   return (
     <>

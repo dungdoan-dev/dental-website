@@ -43,7 +43,9 @@ export function AdminSidebar() {
           onClick={() => setIsOpen(!isOpen)}
           className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-on-surface shadow-md border border-border-subtle"
           type="button"
-          aria-label="Toggle Navigation"
+          aria-label="Mở menu quản trị"
+          aria-controls="admin-sidebar"
+          aria-expanded={isOpen}
         >
           <span className="material-symbols-outlined text-[20px]">{isOpen ? "close" : "menu"}</span>
         </button>
@@ -51,14 +53,17 @@ export function AdminSidebar() {
 
       {/* Mobile Backdrop */}
       {isOpen && (
-        <div
+        <button
           onClick={() => setIsOpen(false)}
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+          aria-label="Đóng menu quản trị"
+          type="button"
         />
       )}
 
       {/* Sidebar Aside */}
       <aside
+        id="admin-sidebar"
         className={`fixed left-0 top-0 z-50 flex h-dvh w-72 flex-col justify-between border-r border-border-subtle/60 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
@@ -80,6 +85,7 @@ export function AdminSidebar() {
               <span className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse" />
               v4.8
             </span>
+            <button aria-label="Đóng menu" className="-mr-2 grid h-10 w-10 place-items-center rounded-xl text-text-secondary lg:hidden" onClick={() => setIsOpen(false)} type="button"><span className="material-symbols-outlined">close</span></button>
           </div>
 
           {/* Group 1: Quản Trị Nội Dung */}

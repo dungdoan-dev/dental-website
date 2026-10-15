@@ -21,6 +21,8 @@ export function ArticleExplorer({ articles, featuredArticle, initialCategory = "
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(1);
 
+  // Reads ?category/?q once after hydration so /tin-tuc stays statically cached (no searchParams on the server).
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const requestedCategory = params.get("category");
@@ -30,6 +32,7 @@ export function ArticleExplorer({ articles, featuredArticle, initialCategory = "
     const requestedQuery = params.get("q");
     if (requestedQuery) setQuery(requestedQuery.slice(0, 100));
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const filteredArticles = useMemo(() => {
     const normalizedQuery = normalizeSearch(query);

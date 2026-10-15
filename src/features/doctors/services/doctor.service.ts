@@ -9,7 +9,8 @@ const getCachedDoctorBySlug = cachePublicData("doctors:by-slug", [publicDataTags
 export async function getDoctors(): Promise<readonly Doctor[]> {
   try {
     return doctorSchema.array().parse(await getCachedDoctors());
-  } catch {
+  } catch (error) {
+    console.error("[doctor.service] public data load failed", error);
     return [];
   }
 }
@@ -18,7 +19,8 @@ export async function getDoctorBySlug(slug: string): Promise<Doctor | null> {
   try {
     const doctor = await getCachedDoctorBySlug(slug);
     return doctor ? doctorSchema.parse(doctor) : null;
-  } catch {
+  } catch (error) {
+    console.error("[doctor.service] public data load failed", error);
     return null;
   }
 }

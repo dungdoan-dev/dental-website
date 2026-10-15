@@ -33,7 +33,7 @@ export async function createAppointment(input: unknown): Promise<AppointmentResu
       clinic_id: appointment.clinicId,
       appointment_date: new Date(appointment.appointmentDate).toISOString(),
       note,
-      status: "pending",
+      // status defaults to pending; anon may not set it (see 20261016 migration).
   });
   if (error) throw error;
 

@@ -193,19 +193,15 @@ export async function upsertDoctor(input: DoctorFormData) {
       updated_at: new Date().toISOString(),
     });
     if (error) throw error;
-    const replaceRows = async (table: string, rows: Record<string, unknown>[] | undefined) => {
-      if (!rows) return;
-      const { error: deleteError } = await supabase.from(table).delete().eq("doctor_id", data.id);
-      if (deleteError) throw deleteError;
-      if (rows.length) {
-        const { error: insertError } = await supabase.from(table).insert(rows);
-        if (insertError) throw insertError;
-      }
-    };
-    await replaceRows("doctor_education", education?.map((content, sortOrder) => ({ doctor_id: data.id, content, sort_order: sortOrder })));
-    await replaceRows("doctor_specialties", specialties?.map((specialty, sortOrder) => ({ doctor_id: data.id, specialty, sort_order: sortOrder })));
-    await replaceRows("doctor_experience_highlights", experienceHighlights?.map((content, sortOrder) => ({ doctor_id: data.id, content, sort_order: sortOrder })));
-    await replaceRows("doctor_certificates", certificates?.map((certificate, sortOrder) => ({ ...certificate, doctor_id: data.id, sort_order: sortOrder })));
+    // One DB transaction: a failed insert keeps the old rows instead of leaving them deleted.
+    const { error: detailsError } = await supabase.rpc("replace_doctor_details", {
+      p_doctor_id: data.id,
+      p_education: education ?? null,
+      p_specialties: specialties ?? null,
+      p_experience_highlights: experienceHighlights ?? null,
+      p_certificates: certificates ?? null,
+    });
+    if (detailsError) throw detailsError;
     await saveRevision("doctor", data.id, data.name, parsed.data);
     revalidateContent(["/admin/doctors", "/bac-si", "/bac-si/[slug]", "/"]);
   });

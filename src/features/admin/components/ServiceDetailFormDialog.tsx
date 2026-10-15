@@ -1,21 +1,39 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import type { DentalService } from "@/features/services/types/service.type";
-import { serviceDetailSchema, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
 import { EditableRows } from "./EditableRows";
 import { PriceTableEditor } from "./PriceTableEditor";
+import type { DentalService } from "@/features/services/types/service.type";
+import { serviceDetailSchema, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
 import { ImageUploadField } from "./ImageUploadField";
 import { FormFeedback } from "./FormFeedback";
 import { updateServiceDetail } from "../content-actions";
+import { getAdminServiceDetailForEdit } from "../read-actions";
 import { useMutationToast } from "./AdminToast";
 
-type Props = { service: DentalService; detail?: ServiceDetailData };
+type Props = { service: DentalService };
 
-export function ServiceDetailFormDialog({ service, detail }: Props) {
+export function ServiceDetailFormDialog({ service }: Props) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [detail, setDetail] = useState<ServiceDetailData | null>(null);
   const [result, formAction, pending] = useActionState(updateServiceDetail, null);
   useMutationToast(result, "Đã cập nhật chi tiết dịch vụ.");
+
+  async function openEditor() {
+    setOpen(true);
+    setLoading(true);
+    setLoadError("");
+    try {
+      setDetail(await getAdminServiceDetailForEdit(service.id));
+    } catch {
+      setLoadError("Không thể tải chi tiết dịch vụ. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const initial = serviceDetailSchema.parse(detail ?? {
     eyebrow: service.category,
     title: service.name,
@@ -29,7 +47,7 @@ export function ServiceDetailFormDialog({ service, detail }: Props) {
 
   return (
     <>
-      <button className="inline-flex min-h-9 items-center gap-1 rounded-xl border border-brand-blue/30 bg-brand-blue-light px-3 text-xs font-bold text-brand-blue-dark transition hover:border-brand-blue hover:bg-brand-blue-dark hover:text-white" onClick={() => setOpen(true)} type="button">
+      <button className="inline-flex min-h-9 items-center gap-1 rounded-xl border border-brand-blue/30 bg-brand-blue-light px-3 text-xs font-bold text-brand-blue-dark transition hover:border-brand-blue hover:bg-brand-blue-dark hover:text-white" onClick={openEditor} type="button">
         <span aria-hidden="true" className="material-symbols-outlined text-base">edit_note</span>
         Chi tiết
       </button>
@@ -46,7 +64,9 @@ export function ServiceDetailFormDialog({ service, detail }: Props) {
               </button>
             </header>
 
-            <form action={formAction} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+            {loading ? <p className="p-7 text-sm text-text-secondary" role="status">Đang tải chi tiết dịch vụ…</p> : null}
+            {loadError ? <p className="p-7 text-sm text-error" role="alert">{loadError}</p> : null}
+            {!loading && !loadError ? <form action={formAction} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <input name="serviceId" type="hidden" value={service.id} />
               <ImageUploadField aspect={16 / 9} label="Ảnh trang chi tiết dịch vụ" defaultValue={service.image} name="image" required />
@@ -68,7 +88,7 @@ export function ServiceDetailFormDialog({ service, detail }: Props) {
                 <button className="min-h-11 rounded-xl border border-border-subtle px-4 text-sm font-semibold text-text-secondary hover:bg-surface-container-low" onClick={() => setOpen(false)} type="button">Đóng</button>
                 <button className="min-h-11 rounded-xl bg-brand-blue-dark px-5 text-sm font-bold text-white transition hover:bg-brand-blue-hover disabled:cursor-wait disabled:opacity-60" disabled={pending} type="submit">{pending ? "Đang lưu…" : "Lưu chi tiết dịch vụ"}</button>
               </div>
-            </form>
+            </form> : null}
           </section>
         </div>
       ) : null}

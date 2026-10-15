@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
-import { marked } from "marked";
 import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
 import type { Article, ArticleCategory } from "@/features/articles/types/article.type";
 import { upsertArticle } from "../actions";
+import { getAdminArticleForEdit } from "../read-actions";
 import { ImageUploadField } from "./ImageUploadField";
 import { useMutationToast } from "./AdminToast";
 
@@ -15,10 +15,10 @@ const TinyMceEditor = dynamic(() => import("./TinyMceEditor").then((module) => m
   loading: () => <div className="grid min-h-80 place-items-center rounded-xl border border-border-subtle bg-surface text-sm text-text-secondary">Đang tải trình soạn thảo…</div>,
 });
 
-function articleContentToHtml(content: string) {
-  return /<(?:p|h[1-6]|ul|ol|li|blockquote|table|strong|em|div|br|hr)\b/i.test(content)
-    ? content
-    : String(marked.parse(content, { async: false }));
+async function articleContentToHtml(content: string) {
+  if (!content || /<(?:p|h[1-6]|ul|ol|li|blockquote|table|strong|em|div|br|hr)\b/i.test(content)) return content;
+  const { marked } = await import("marked");
+  return String(marked.parse(content, { async: false }));
 }
 
 const CATEGORIES: { label: string; value: ArticleCategory }[] = [
@@ -35,11 +35,13 @@ export function ArticleFormDialog({
   buttonLabel = "Sửa",
   buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
 }: {
-  article?: Article;
+  article?: Omit<Article, "content">;
   buttonLabel?: string;
   buttonClassName?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
   useMutationToast(result, article ? "Đã cập nhật bài viết." : "Đã thêm bài viết.");
@@ -49,7 +51,7 @@ export function ArticleFormDialog({
     title: article?.title ?? "",
     slug: article?.slug ?? "",
     excerpt: article?.excerpt ?? "",
-    content: article?.content ?? "",
+    content: "",
     thumbnail: article?.thumbnail ?? "/images/articles/implant-guide.jpg",
     author: article?.author ?? "Đội ngũ Nha Khoa 2000",
     category: article?.category ?? ("implant" as ArticleCategory),
@@ -57,7 +59,35 @@ export function ArticleFormDialog({
     featured: article?.featured ?? false,
     status: article?.status ?? ("draft" as const),
   });
-  const [editorContent, setEditorContent] = useState(() => articleContentToHtml(article?.content ?? ""));
+  const [editorContent, setEditorContent] = useState("");
+
+  async function openEditor() {
+    setLoadError("");
+    setIsOpen(true);
+    if (!article) return;
+    setIsLoading(true);
+    try {
+      const fullArticle = await getAdminArticleForEdit(article.id);
+      setFormData({
+        id: fullArticle.id,
+        title: fullArticle.title,
+        slug: fullArticle.slug,
+        excerpt: fullArticle.excerpt,
+        content: fullArticle.content,
+        thumbnail: fullArticle.thumbnail,
+        author: fullArticle.author,
+        category: fullArticle.category,
+        readingMinutes: fullArticle.readingMinutes,
+        featured: fullArticle.featured,
+        status: fullArticle.status ?? "draft",
+      });
+      setEditorContent(await articleContentToHtml(fullArticle.content));
+    } catch {
+      setLoadError("Không thể tải nội dung bài viết. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const generateSlug = (title: string) => {
     return title
@@ -98,7 +128,7 @@ export function ArticleFormDialog({
     <>
       <button
         type="button"
-        onClick={() => { setEditorContent(articleContentToHtml(formData.content)); setIsOpen(true); }}
+        onClick={openEditor}
         className={buttonClassName}
       >
         {buttonLabel}
@@ -125,7 +155,9 @@ export function ArticleFormDialog({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+            {isLoading ? <p className="p-7 text-sm text-text-secondary" role="status">Đang tải nội dung bài viết…</p> : null}
+            {loadError ? <p className="p-7 text-sm text-error" role="alert">{loadError}</p> : null}
+            {!isLoading && !loadError ? <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <div>
                 <label className="block font-semibold text-text-primary mb-1">
@@ -269,7 +301,7 @@ export function ArticleFormDialog({
                   {isPending ? "Đang lưu..." : "Lưu Bài Viết"}
                 </button>
               </div>
-            </form>
+            </form> : null}
           </div>
         </div>
       )}

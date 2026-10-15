@@ -13,7 +13,8 @@ export async function getServices(): Promise<readonly DentalService[]> {
   try {
     const services = await getCachedServices();
     return serviceSchema.array().parse(services);
-  } catch {
+  } catch (error) {
+    console.error("[service.service] public data load failed", error);
     return [];
   }
 }
@@ -22,19 +23,17 @@ export async function getServiceBySlug(slug: string): Promise<DentalService | nu
   try {
     const service = await getCachedServiceBySlug(slug);
     return service ? serviceSchema.parse(service) : null;
-  } catch {
+  } catch (error) {
+    console.error("[service.service] public data load failed", error);
     return null;
   }
-}
-
-export async function getFeaturedServices(): Promise<readonly DentalService[]> {
-  return getServices();
 }
 
 export async function getImplantDetailData(): Promise<ImplantDetailData | null> {
   try {
     return await getSiteContent("implant_detail", implantDetailSchema);
-  } catch {
+  } catch (error) {
+    console.error("[service.service] public data load failed", error);
     return null;
   }
 }
@@ -42,7 +41,8 @@ export async function getImplantDetailData(): Promise<ImplantDetailData | null> 
 export async function getServiceDetailData(serviceId: string): Promise<ServiceDetailData | null> {
   try {
     return await getSiteContent(serviceDetailContentKey(serviceId), serviceDetailSchema);
-  } catch {
+  } catch (error) {
+    console.error("[service.service] public data load failed", error);
     return null;
   }
 }

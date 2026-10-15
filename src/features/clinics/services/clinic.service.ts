@@ -12,7 +12,8 @@ export function getClinicSummary(): ClinicSummary {
 export async function getClinics(): Promise<readonly Clinic[]> {
   try {
     return await getCachedClinics();
-  } catch {
+  } catch (error) {
+    console.error("[clinic.service] public data load failed", error);
     return [];
   }
 }

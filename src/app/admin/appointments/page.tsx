@@ -38,32 +38,26 @@ export default async function AdminAppointmentsPage({
   const clinicId = clinics.some((clinic) => clinic.id === filters.clinicId) ? filters.clinicId : undefined;
   const status = filters.status;
   const statuses = ["pending", "confirmed", "completed", "cancelled"] as const;
-  const countResults = await Promise.all(statuses.map((value) => {
-    let query = supabase.from("appointments").select("id", { count: "exact", head: true });
-    if (clinicId) query = query.eq("clinic_id", clinicId);
-    if (filters.q) {
-      const safeName = filters.q.replace(/[,%()\\"\\\\]/g, " ").trim();
-      const digits = filters.q.replace(/[^0-9]/g, "");
-      query = query.or([`name.ilike.%${safeName}%`, ...(digits ? [`phone.ilike.%${digits}%`] : [])].join(","));
-    }
-    if (filters.date) {
-      const from = new Date(`${filters.date}T00:00:00+07:00`);
-      query = query.gte("appointment_date", from.toISOString()).lt("appointment_date", new Date(from.getTime() + 86400000).toISOString());
-    }
-    return query.eq("status", value);
-  }));
-  for (const result of countResults) if (result.error) throw result.error;
-  const countMap = Object.fromEntries(statuses.map((value, index) => [value, countResults[index].count ?? 0]));
+  const safeName = (filters.q ?? "").replace(/[,%()\\"\\\\]/g, " ").trim();
+  // Phones are stored as +84…, so a local "09…" search must drop its leading 0 to match.
+  const digits = (filters.q ?? "").replace(/[^0-9]/g, "").replace(/^0/, "");
+  const { data: statusCounts, error: countsError } = await supabase.rpc("admin_appointment_status_counts", {
+    p_clinic_id: clinicId ?? null,
+    p_name_query: filters.q ? safeName : null,
+    p_phone_query: digits || null,
+    p_day: filters.date || null,
+  });
+  if (countsError) throw countsError;
+  const countMap: Record<string, number> = Object.fromEntries(statuses.map((value) => [value, 0]));
+  for (const row of statusCounts ?? []) countMap[row.status] = Number(row.total);
   const totalCount = statuses.reduce((sum, value) => sum + countMap[value], 0);
   const total = status ? countMap[status] : totalCount;
   const pageSize = 25;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const page = Math.min(filters.page, pageCount);
-  let appointmentsQuery = supabase.from("appointments").select("*, service:services(name), clinic:clinics(name,label)");
+  let appointmentsQuery = supabase.from("appointments").select("id,name,phone,email,appointment_date,created_at,note,status,clinic_id,service:services(name),clinic:clinics(name,label)");
   if (clinicId) appointmentsQuery = appointmentsQuery.eq("clinic_id", clinicId);
   if (filters.q) {
-    const safeName = filters.q.replace(/[,%()\\"\\\\]/g, " ").trim();
-    const digits = filters.q.replace(/[^0-9]/g, "");
     appointmentsQuery = appointmentsQuery.or([`name.ilike.%${safeName}%`, ...(digits ? [`phone.ilike.%${digits}%`] : [])].join(","));
   }
   if (filters.date) {
@@ -75,7 +69,7 @@ export default async function AdminAppointmentsPage({
     .order("created_at", { ascending: false }).order("id", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
   if (appointmentsError) throw appointmentsError;
-  const appointments = (appointmentRows as AppointmentRow[]).map((row) => ({
+  const appointments = (appointmentRows as unknown as AppointmentRow[]).map((row) => ({
     ...row, clinicId: row.clinic_id, createdAt: row.created_at, appointmentDate: new Date(row.appointment_date),
     clinic: row.clinic, service: row.service,
   }));
@@ -171,8 +165,8 @@ export default async function AdminAppointmentsPage({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1440px] table-fixed text-left text-sm border-collapse">
+          <div aria-label="Danh sách lịch hẹn" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
+            <table className="admin-responsive-table w-full min-w-[1440px] table-fixed text-left text-sm border-collapse">
               <thead>
                 <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
                   <th className="w-[72px] whitespace-nowrap px-3 py-4">Mã</th>
@@ -194,10 +188,10 @@ export default async function AdminAppointmentsPage({
                       idx % 2 === 1 ? "bg-background-secondary/30" : ""
                     }`}
                   >
-                    <td className="whitespace-nowrap px-3 py-4 font-mono text-xs font-semibold text-text-secondary">
+                    <td className="whitespace-nowrap px-3 py-4 font-mono text-xs font-semibold text-text-secondary" data-label="Mã">
                       #{app.id}
                     </td>
-                    <td className="px-3 py-4">
+                    <td className="px-3 py-4" data-label="Khách hàng">
                       <div className="truncate whitespace-nowrap font-bold text-text-primary" title={app.name}>{app.name}</div>
                       <div className="mt-0.5 whitespace-nowrap font-mono text-[11px] text-text-secondary">
                         {new Date(app.createdAt).toLocaleDateString("vi-VN", {
@@ -208,7 +202,7 @@ export default async function AdminAppointmentsPage({
                         })}
                       </div>
                     </td>
-                    <td className="px-3 py-4">
+                    <td className="px-3 py-4" data-label="Liên hệ">
                       <a
                         href={`tel:${app.phone}`}
                         className="block whitespace-nowrap font-mono text-xs font-bold text-brand-blue-dark hover:underline"
@@ -224,13 +218,13 @@ export default async function AdminAppointmentsPage({
                         </a>
                       )}
                     </td>
-                    <td className="px-3 py-4">
+                    <td className="px-3 py-4" data-label="Dịch vụ">
                       <span className="block truncate whitespace-nowrap text-xs font-semibold text-text-primary" title={app.service?.name ?? "Khám tổng quát"}>
                         {app.service?.name ?? "Khám tổng quát"}
                       </span>
                     </td>
-                    <td className="overflow-hidden px-3 py-4 text-xs font-semibold text-text-primary"><span className="block truncate whitespace-nowrap" title={app.clinic?.name ?? "Chưa chọn"}>{app.clinicId === "clinic-1" ? "CS1" : app.clinicId === "clinic-2" ? "CS2" : app.clinic?.label ?? "Chưa chọn"}</span></td>
-                    <td className="whitespace-nowrap px-3 py-4 font-mono text-xs font-medium text-text-primary">
+                    <td className="overflow-hidden px-3 py-4 text-xs font-semibold text-text-primary" data-label="Cơ sở"><span className="block truncate whitespace-nowrap" title={app.clinic?.name ?? "Chưa chọn"}>{app.clinicId === "clinic-1" ? "CS1" : app.clinicId === "clinic-2" ? "CS2" : app.clinic?.label ?? "Chưa chọn"}</span></td>
+                    <td className="whitespace-nowrap px-3 py-4 font-mono text-xs font-medium text-text-primary" data-label="Ngày hẹn">
                       {new Date(app.appointmentDate).toLocaleString("vi-VN", {
                         timeZone: "Asia/Ho_Chi_Minh",
                         day: "2-digit",
@@ -240,7 +234,7 @@ export default async function AdminAppointmentsPage({
                         minute: "2-digit",
                       })}
                     </td>
-                    <td className="max-w-[140px] px-3 py-4">
+                    <td className="max-w-[140px] px-3 py-4" data-label="Ghi chú">
                       {app.note ? (
                         <p className="text-xs text-text-secondary italic line-clamp-2" title={app.note}>
                           “{app.note}”
@@ -249,10 +243,10 @@ export default async function AdminAppointmentsPage({
                         <span className="text-text-secondary text-xs">—</span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4">
+                    <td className="whitespace-nowrap px-3 py-4" data-label="Trạng thái">
                       <StatusBadge status={app.status} />
                     </td>
-                    <td className="px-3 py-4 text-right">
+                    <td className="px-3 py-4 text-right" data-label="Thao tác">
                       <AppointmentActions id={app.id.toString()} currentStatus={app.status} />
                     </td>
                   </tr>
