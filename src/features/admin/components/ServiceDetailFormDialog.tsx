@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { EditableRows } from "./EditableRows";
 import { PriceTableEditor } from "./PriceTableEditor";
 import type { DentalService } from "@/features/services/types/service.type";
-import { serviceDetailSchema, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
+import type { ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
 import { ImageUploadField } from "./ImageUploadField";
 import { FormFeedback } from "./FormFeedback";
 import { updateServiceDetail } from "../content-actions";
@@ -34,7 +34,8 @@ export function ServiceDetailFormDialog({ service }: Props) {
     }
   }
 
-  const initial = serviceDetailSchema.parse(detail ?? {
+  // Saved detail is already validated on the server; parsing here would ship zod to the browser.
+  const initial: ServiceDetailData = detail ?? {
     eyebrow: service.category,
     title: service.name,
     introduction: service.description,
@@ -43,7 +44,7 @@ export function ServiceDetailFormDialog({ service }: Props) {
     prices: [],
     steps: [],
     faqs: [],
-  });
+  };
 
   return (
     <>

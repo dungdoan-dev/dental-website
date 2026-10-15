@@ -21,9 +21,12 @@ export const metadata = {
 export default async function AdminServicesPage() {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
-  const { data: serviceRows, error: serviceError } = await supabase.from("services")
-    .select("id,name,slug,short_description,description,image,badge,badge_variant,featured,sort_order,category")
-    .order("sort_order").order("id");
+  const [{ data: serviceRows, error: serviceError }, { data: pricingRecord, error: pricingError }] = await Promise.all([
+    supabase.from("services")
+      .select("id,name,slug,short_description,description,image,badge,badge_variant,featured,sort_order,category")
+      .order("sort_order").order("id"),
+    supabase.from("site_content").select("content").eq("key", "service_price_categories").maybeSingle(),
+  ]);
   if (serviceError) throw serviceError;
   const services = serviceRows.map((service) => ({
     id: service.id, name: service.name, slug: service.slug, shortDescription: service.short_description,
@@ -31,8 +34,6 @@ export default async function AdminServicesPage() {
     badgeVariant: service.badge_variant as "blue" | "green", featured: service.featured,
     sortOrder: service.sort_order, category: service.category,
   }));
-  const { data: pricingRecord, error: pricingError } = await supabase.from("site_content")
-    .select("content").eq("key", "service_price_categories").maybeSingle();
   if (pricingError) throw pricingError;
   const pricingParse = servicePriceCategoriesSchema.safeParse(pricingRecord?.content);
   const pricing = pricingParse.success ? pricingParse.data : defaultServicePriceCategories;

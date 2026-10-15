@@ -33,20 +33,23 @@ export default async function AdminAppointmentsPage({
   const raw = await searchParams;
   const filters = appointmentQuerySchema.parse(Object.fromEntries(Object.entries(raw).filter((entry): entry is [string, string] => typeof entry[1] === "string")));
   const supabase = await getSupabaseServerClient();
-  const { data: clinics, error: clinicsError } = await supabase.from("clinics").select("id,label").order("id");
-  if (clinicsError) throw clinicsError;
-  const clinicId = clinics.some((clinic) => clinic.id === filters.clinicId) ? filters.clinicId : undefined;
+  // clinicId is not checked against the clinic list so the counts can load in parallel; an unknown id just matches nothing.
+  const clinicId = filters.clinicId;
   const status = filters.status;
   const statuses = ["pending", "confirmed", "completed", "cancelled"] as const;
   const safeName = (filters.q ?? "").replace(/[,%()\\"\\\\]/g, " ").trim();
   // Phones are stored as +84…, so a local "09…" search must drop its leading 0 to match.
   const digits = (filters.q ?? "").replace(/[^0-9]/g, "").replace(/^0/, "");
-  const { data: statusCounts, error: countsError } = await supabase.rpc("admin_appointment_status_counts", {
-    p_clinic_id: clinicId ?? null,
-    p_name_query: filters.q ? safeName : null,
-    p_phone_query: digits || null,
-    p_day: filters.date || null,
-  });
+  const [{ data: clinics, error: clinicsError }, { data: statusCounts, error: countsError }] = await Promise.all([
+    supabase.from("clinics").select("id,label").order("id"),
+    supabase.rpc("admin_appointment_status_counts", {
+      p_clinic_id: clinicId ?? null,
+      p_name_query: filters.q ? safeName : null,
+      p_phone_query: digits || null,
+      p_day: filters.date || null,
+    }),
+  ]);
+  if (clinicsError) throw clinicsError;
   if (countsError) throw countsError;
   const countMap: Record<string, number> = Object.fromEntries(statuses.map((value) => [value, 0]));
   for (const row of statusCounts ?? []) countMap[row.status] = Number(row.total);
