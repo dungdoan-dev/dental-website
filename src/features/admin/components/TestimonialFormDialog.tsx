@@ -36,7 +36,7 @@ export function TestimonialFormDialog({
     content: testimonial?.content ?? "",
     source: testimonial?.source ?? "",
     initials: testimonial?.initials ?? "KH",
-    accent: testimonial?.accent ?? "blue",
+    accent: (testimonial?.accent ?? "blue") as "blue" | "green" | "blue-dark",
     sortOrder: testimonial?.sortOrder ?? nextSortOrder,
     avatar: testimonial?.avatar ?? "",
   });

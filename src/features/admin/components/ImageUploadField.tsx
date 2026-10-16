@@ -2,11 +2,14 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import type { Area } from "react-easy-crop";
 
 // Loaded only when the crop dialog opens, so pages with image fields do not ship the cropper up front.
-const Cropper = dynamic(() => import("react-easy-crop"), { ssr: false });
+type Point = { x: number; y: number };
+type CropperProps = { image: string; crop: Point; zoom: number; aspect: number; onCropChange: (crop: Point) => void; onZoomChange: (zoom: number) => void; onCropComplete: (area: Area, pixels: Area) => void };
+// dynamic() drops the library's defaultProps typing, so the props this file passes are declared here.
+const Cropper = dynamic(() => import("react-easy-crop") as unknown as Promise<{ default: ComponentType<CropperProps> }>, { ssr: false });
 
 async function createCroppedImage(image: string, area: Area): Promise<Blob> {
   const source = new window.Image();
