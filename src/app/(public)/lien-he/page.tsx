@@ -6,13 +6,14 @@ import { Icon } from "@/components/ui/Icon";
 import { siteConfig } from "@/config/site";
 import { ClinicCard } from "@/features/clinics/components/ClinicCard";
 import { getClinics } from "@/features/clinics/services/clinic.service";
+import { getDirectoryHero } from "@/features/content/services/directory-hero.service";
 import { getContactCtaSettings } from "@/features/content/services/contact-cta.service";
 import { generateSeoMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = generateSeoMetadata({ title: "Liên hệ và đặt lịch", url: "/lien-he" });
 
 export default async function ContactPage() {
-  const [clinics, contactSettings] = await Promise.all([getClinics().catch(() => []), getContactCtaSettings()]);
+  const [clinics, contactSettings, hero] = await Promise.all([getClinics().catch(() => []), getContactCtaSettings(), getDirectoryHero("contact")]);
 
   return (
     <main className="bg-surface">
@@ -27,10 +28,10 @@ export default async function ContactPage() {
                 Nha Khoa 2000 · TP. Hồ Chí Minh
               </p>
               <h1 className="mt-5 text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold leading-tight tracking-tight text-text-primary">
-                Chúng tôi luôn sẵn sàng <span className="text-brand-blue-dark">lắng nghe bạn.</span>
+                {hero.title}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-text-secondary sm:text-lg sm:leading-8">
-                Liên hệ để được hỗ trợ chọn cơ sở, tìm hiểu dịch vụ hoặc gửi yêu cầu đặt lịch. Đội ngũ Nha Khoa 2000 sẽ tiếp nhận và liên hệ xác nhận với bạn.
+                {hero.description}
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <AppointmentButton className="min-h-12 rounded-full px-6 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2">

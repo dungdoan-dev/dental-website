@@ -7,6 +7,7 @@ import { ImageUploadField } from "./ImageUploadField";
 
 export function TestimonialFormDialog({
   testimonial,
+  nextSortOrder = 0,
   buttonLabel = "Sửa",
   buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
 }: {
@@ -21,6 +22,7 @@ export function TestimonialFormDialog({
     sortOrder: number;
     avatar?: string | null;
   };
+  nextSortOrder?: number;
   buttonLabel?: string;
   buttonClassName?: string;
 }) {
@@ -35,7 +37,7 @@ export function TestimonialFormDialog({
     source: testimonial?.source ?? "",
     initials: testimonial?.initials ?? "KH",
     accent: testimonial?.accent ?? "blue",
-    sortOrder: testimonial?.sortOrder ?? 0,
+    sortOrder: testimonial?.sortOrder ?? nextSortOrder,
     avatar: testimonial?.avatar ?? "",
   });
 
@@ -63,7 +65,10 @@ export function TestimonialFormDialog({
           id: formData.id || `review-${crypto.randomUUID()}`,
           rating: Number(formData.rating),
         });
-        if (!result.success) throw new Error("Testimonial save failed");
+        if (!result.success) {
+          showAdminToast("error", result.error);
+          return;
+        }
         showAdminToast("success", testimonial ? "Đã cập nhật đánh giá." : "Đã thêm đánh giá.");
         setIsOpen(false);
       } catch {

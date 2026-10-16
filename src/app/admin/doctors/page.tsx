@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { getDoctorFullName } from "@/features/doctors/utils/doctor-card-name";
 import Link from "next/link";
+import { DirectoryHeroForm } from "@/features/admin/components/DirectoryHeroForm";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
-import { doctorRepository } from "@/features/doctors/repositories/doctor.repository";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { DoctorFormDialog } from "@/features/admin/components/DoctorFormDialog";
 import { DeleteDoctorButton } from "@/features/admin/components/DeleteButtons";
 import { DoctorSortOrderInput } from "@/features/admin/components/DoctorSortOrderInput";
-import type { Doctor } from "@/features/doctors/types/doctor.type";
 
 export const metadata = {
   title: "Đội Ngũ Bác Sĩ | Admin Nha Khoa 2000",
@@ -14,7 +14,16 @@ export const metadata = {
 
 export default async function AdminDoctorsPage() {
   await requireAdmin();
-  const doctors = await doctorRepository.findAll();
+  // List rows only: the profile (description, education, certificates…) loads when "Sửa" is clicked.
+  const { data, error } = await (await getSupabaseServerClient()).from("doctors")
+    .select("id,name,slug,avatar,position,degree,experience,sort_order,doctor_specialties(specialty,sort_order)")
+    .order("sort_order").order("id");
+  if (error) throw error;
+  const doctors = data.map((row) => ({
+    id: row.id, name: row.name, slug: row.slug, avatar: row.avatar, position: row.position, degree: row.degree,
+    experience: row.experience, sortOrder: row.sort_order,
+    specialties: [...row.doctor_specialties].sort((a, b) => a.sort_order - b.sort_order).map((item) => item.specialty),
+  }));
 
   return (
     <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
@@ -45,6 +54,8 @@ export default async function AdminDoctorsPage() {
         </div>
       </div>
 
+      <DirectoryHeroForm page="doctors" />
+
       {/* Doctors Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div aria-label="Danh sách bác sĩ" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
@@ -60,12 +71,6 @@ export default async function AdminDoctorsPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">
               {doctors.map((doctor, idx) => {
-      const docObj: Doctor = {
-                  ...doctor,
-                  category: doctor.category as Doctor["category"],
-                  profile: doctor.profile ?? { licenseNumber: "", quote: "", sourceUrl: "", languages: [], specialties: [], education: [], experienceHighlights: [], certificates: [] },
-                };
-
                 return (
                   <tr
                     key={doctor.id}
@@ -99,7 +104,7 @@ export default async function AdminDoctorsPage() {
 
                     <td className="px-4 py-3.5" data-label="Chức vụ & chuyên khoa">
                       <div className="font-semibold text-text-primary text-xs">{doctor.position}</div>
-                      <div className="text-[11px] text-text-secondary">{doctor.profile?.specialties.join(" · ") || "—"}</div>
+                      <div className="text-[11px] text-text-secondary">{doctor.specialties.join(" · ") || "—"}</div>
                     </td>
 
                     <td className="px-4 py-3.5 font-bold text-xs text-text-primary" data-label="Kinh nghiệm">
@@ -113,7 +118,7 @@ export default async function AdminDoctorsPage() {
                     <td className="px-4 py-3.5 text-right" data-label="Thao tác">
                       <div className="inline-flex items-center gap-2 whitespace-nowrap">
                         <DoctorFormDialog
-                          doctor={docObj}
+                          doctorId={doctor.id}
                           buttonLabel="Sửa"
                           buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                         />

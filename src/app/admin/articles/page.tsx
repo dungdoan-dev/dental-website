@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { DirectoryHeroForm } from "@/features/admin/components/DirectoryHeroForm";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ArticleFormDialog } from "@/features/admin/components/ArticleFormDialog";
@@ -81,6 +82,8 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
       <nav aria-label="Lọc trạng thái bài viết" className="flex flex-wrap gap-2">
         {[{ label: "Tất cả", value: "all" }, { label: "Bản nháp", value: "draft" }, { label: "Đã xuất bản", value: "published" }].map((filter) => <Link aria-current={query.status === filter.value ? "page" : undefined} className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold ${query.status === filter.value ? "bg-brand-blue-dark text-white" : "border border-border-subtle bg-white text-text-primary"}`} href={filter.value === "all" ? "/admin/articles" : `/admin/articles?status=${filter.value}`} key={filter.value}>{filter.label}</Link>)}
       </nav>
+
+      <DirectoryHeroForm page="articles" />
 
       {/* Articles Table */}
       <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">

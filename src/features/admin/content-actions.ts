@@ -8,6 +8,7 @@ import { contactCtaSchema } from "@/features/content/schemas/contact-cta.schema"
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
 import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
 import { serviceDetailSchema, serviceDetailContentKey } from "@/features/services/schemas/service-detail.schema";
+import { directoryHeroPages, directoryHeroSchema } from "@/features/content/schemas/directory-hero.schema";
 import { servicePriceCategoriesSchema } from "@/features/services/schemas/service-price-categories.schema";
 import type { MutationResult } from "./services/mutation";
 import { validationFailure } from "./services/mutation";
@@ -190,11 +191,35 @@ export async function updateContactCta(_previous: State, formData: FormData): Pr
       whatsappUrl: readField(formData, "whatsappUrl"),
     });
     if (!settings.success) return validationFailure(settings.error);
+    // The call button dials each clinic's own phone, so the numbers are edited here but stored on the clinic.
+    const phones = z.array(z.string().trim().min(1, "Số điện thoại không được để trống").max(100)).safeParse(clinics.map((clinic) => readField(formData, `phone-${clinic.id}`)));
+    if (!phones.success) return validationFailure(phones.error);
+    for (const [index, clinic] of clinics.entries()) {
+      const { error: phoneError } = await (await getSupabaseServerClient()).from("clinics").update({ phone: phones.data[index] }).eq("id", clinic.id);
+      if (phoneError) throw phoneError;
+    }
+    updateTag(publicDataTags.clinics);
     await saveSiteRecord("contact_cta", "CTA liên hệ", settings.data);
   } catch { return { success: false, error: "Không thể lưu CTA liên hệ. Vui lòng kiểm tra các liên kết." }; }
-  revalidatePath("/admin");
-  revalidatePath("/admin/content");
+  revalidatePath("/admin/clinics");
+  revalidatePath("/lien-he");
   revalidatePath("/");
+  return { success: true };
+}
+
+export async function updateDirectoryHero(_previous: State, formData: FormData): Promise<MutationResult> {
+  await requireAdmin();
+  const page = readField(formData, "page");
+  if (!Object.hasOwn(directoryHeroPages, page)) return { success: false, error: "Trang không hợp lệ." };
+  const { key, label, path } = directoryHeroPages[page as keyof typeof directoryHeroPages];
+  const parsed = directoryHeroSchema.safeParse({ title: readField(formData, "title"), description: readField(formData, "description") });
+  if (!parsed.success) return validationFailure(parsed.error);
+  try {
+    await saveSiteRecord(key, label, parsed.data);
+  } catch {
+    return { success: false, error: "Không thể lưu tiêu đề trang. Vui lòng thử lại." };
+  }
+  revalidatePath(path);
   return { success: true };
 }
 

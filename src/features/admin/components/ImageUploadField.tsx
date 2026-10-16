@@ -1,8 +1,12 @@
 "use client";
 
-import Cropper, { type Area } from "react-easy-crop";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
+import type { Area } from "react-easy-crop";
+
+// Loaded only when the crop dialog opens, so pages with image fields do not ship the cropper up front.
+const Cropper = dynamic(() => import("react-easy-crop"), { ssr: false });
 
 async function createCroppedImage(image: string, area: Area): Promise<Blob> {
   const source = new window.Image();

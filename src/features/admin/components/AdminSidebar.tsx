@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 type NavItem = {
@@ -10,29 +10,34 @@ type NavItem = {
   label: string;
   icon: string;
   badge?: string | number;
-  badgeColor?: string;
-  dot?: boolean;
 };
 
-const CONTENT_NAV: readonly NavItem[] = [
-  { href: "/admin", label: "Tổng quan & Danh sách trang", icon: "auto_stories", dot: true },
-  { href: "/admin/pages", label: "Cấu hình trang", icon: "web" },
-];
-
-const OPS_NAV: readonly NavItem[] = [
-  { href: "/admin/appointments", label: "Quản lý Đặt hẹn", icon: "calendar_month", badge: "Live" },
-  { href: "/admin/clinics", label: "Cơ sở Phòng khám", icon: "verified_user" },
+// Website content follows the public site menu order; one click reaches each page's editor.
+const NAV_GROUPS: readonly { title: string; items: readonly NavItem[] }[] = [
+  { title: "Tổng quan", items: [{ href: "/admin", label: "Bảng điều khiển", icon: "dashboard" }] },
+  { title: "Lịch hẹn", items: [{ href: "/admin/appointments", label: "Đặt lịch hẹn", icon: "calendar_month", badge: "Live" }] },
+  { title: "Nội dung website", items: [
+    { href: "/admin/home", label: "Trang chủ", icon: "home" },
+    { href: "/admin/content?section=about", label: "Giới thiệu", icon: "corporate_fare" },
+    { href: "/admin/services", label: "Dịch vụ", icon: "medical_services" },
+    { href: "/admin/doctors", label: "Bác sĩ", icon: "badge" },
+    { href: "/admin/articles", label: "Kiến thức", icon: "article" },
+    { href: "/admin/clinics", label: "Liên hệ & Cơ sở", icon: "call" },
+  ] },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const section = useSearchParams().get("section");
   const [isOpen, setIsOpen] = useState(false);
 
   function isItemActive(href: string): boolean {
     if (!pathname) return false;
-    if (href === "/admin") return pathname === "/admin";
-    if (href === "/admin/pages") return ["/admin/pages", "/admin/home", "/admin/content", "/admin/services", "/admin/doctors", "/admin/articles"].some((path) => pathname === path || pathname.startsWith(`${path}/`));
-    return pathname.startsWith(href);
+    const [path, query] = href.split("?");
+    if (path === "/admin") return pathname === "/admin";
+    if (query) return pathname === path && section === query.split("=")[1];
+    // "Giới thiệu" and "Liên hệ" share /admin/content; the bare path belongs to neither.
+    return pathname === path || pathname.startsWith(`${path}/`);
   }
 
   return (
@@ -88,85 +93,45 @@ export function AdminSidebar() {
             <button aria-label="Đóng menu" className="-mr-2 grid h-10 w-10 place-items-center rounded-xl text-text-secondary lg:hidden" onClick={() => setIsOpen(false)} type="button"><span className="material-symbols-outlined">close</span></button>
           </div>
 
-          {/* Group 1: Quản Trị Nội Dung */}
-          <div className="px-4 py-3">
-            <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
-              Quản Trị Nội Dung
-            </p>
-            <nav className="flex flex-col gap-1">
-              {CONTENT_NAV.map((item) => {
-                const active = isItemActive(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    aria-current={active ? "page" : undefined}
-                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition-all text-sm ${
-                      active
-                        ? "bg-brand-blue-light text-brand-blue-dark font-semibold shadow-sm"
-                        : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className={`material-symbols-outlined text-[20px] transition-colors ${
-                          active ? "text-brand-blue-dark" : "text-text-secondary group-hover:text-on-surface"
-                        }`}
-                      >
-                        {item.icon}
-                      </span>
-                      <span className="truncate">{item.label}</span>
-                    </div>
-                    {item.dot && active && (
-                      <span className="h-2 w-2 rounded-full bg-brand-green shrink-0" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* Group 2: Vận Hành & Đặt Hẹn */}
-          <div className="px-4 py-2">
-            <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
-              Vận Hành & Đặt Hẹn
-            </p>
-            <nav className="flex flex-col gap-1">
-              {OPS_NAV.map((item) => {
-                const active = isItemActive(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    aria-current={active ? "page" : undefined}
-                    className={`group flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition-all text-sm ${
-                      active
-                        ? "bg-brand-blue-light text-brand-blue-dark font-semibold shadow-sm"
-                        : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className={`material-symbols-outlined text-[20px] transition-colors ${
-                          active ? "text-brand-blue-dark" : "text-text-secondary group-hover:text-on-surface"
-                        }`}
-                      >
-                        {item.icon}
-                      </span>
-                      <span className="truncate">{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span className="px-2 py-0.5 rounded-full bg-brand-green-light text-brand-green-dark text-[11px] font-bold shrink-0">
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
+          {NAV_GROUPS.map((group) => (
+            <div className="px-4 py-2" key={group.title}>
+              <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-text-secondary">{group.title}</p>
+              <nav aria-label={group.title} className="flex flex-col gap-1">
+                {group.items.map((item) => {
+                  const active = isItemActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={`group flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition-all text-sm ${
+                        active
+                          ? "bg-brand-blue-light text-brand-blue-dark font-semibold shadow-sm"
+                          : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span
+                          className={`material-symbols-outlined text-[20px] transition-colors ${
+                            active ? "text-brand-blue-dark" : "text-text-secondary group-hover:text-on-surface"
+                          }`}
+                        >
+                          {item.icon}
+                        </span>
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className="px-2 py-0.5 rounded-full bg-brand-green-light text-brand-green-dark text-[11px] font-bold shrink-0">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          ))}
         </div>
 
         {/* User Card & Logout */}

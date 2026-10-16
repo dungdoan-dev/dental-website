@@ -16,10 +16,10 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
       </div>
       <div className="flex flex-1 flex-col justify-between p-6 text-center">
         <div className="flex-1">
-          {doctor.degree ? <p className="truncate text-sm font-semibold text-brand-blue-dark">{doctor.degree}</p> : null}
-          <h3 className="mt-0.5 truncate text-xl font-bold text-text-primary transition-colors group-hover:text-brand-blue" title={fullName}>{doctor.name}</h3>
-          {doctor.position ? <p className="mt-1.5 truncate text-[13px] text-text-secondary" title={doctor.position}>{doctor.position}</p> : null}
-          {doctor.directoryTitle ? <p className="mt-1.5 truncate text-sm font-semibold text-brand-blue" title={doctor.directoryTitle}>{doctor.directoryTitle}</p> : null}
+          <p className="h-5 truncate text-sm font-semibold leading-5 text-brand-blue-dark">{doctor.degree}</p>
+          <h3 className="mt-0.5 h-7 truncate text-xl font-bold leading-7 text-text-primary transition-colors group-hover:text-brand-blue" title={fullName}>{doctor.name}</h3>
+          <p className="mt-1.5 h-5 truncate text-[13px] leading-5 text-text-secondary" title={doctor.position}>{doctor.position}</p>
+          <p className="mt-1.5 h-5 truncate text-sm font-semibold leading-5 text-brand-blue" title={doctor.directoryTitle}>{doctor.directoryTitle}</p>
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm font-bold text-brand-blue transition-colors group-hover:text-brand-blue-dark">
           <span>Xem hồ sơ bác sĩ</span>

@@ -12,6 +12,7 @@ import { ServicePriceCategoriesEditor } from "@/features/admin/components/Servic
 import { defaultServicePriceCategories } from "@/features/services/data/service-price-categories";
 import { servicePriceCategoriesSchema } from "@/features/services/schemas/service-price-categories.schema";
 import { ServiceSortOrderControl } from "@/features/admin/components/ServiceSortOrderControl";
+import { DirectoryHeroForm } from "@/features/admin/components/DirectoryHeroForm";
 import { serviceIconByCategory } from "@/features/services/data/service-filter.data";
 
 export const metadata = {
@@ -23,16 +24,14 @@ export default async function AdminServicesPage() {
   const supabase = await getSupabaseServerClient();
   const [{ data: serviceRows, error: serviceError }, { data: pricingRecord, error: pricingError }] = await Promise.all([
     supabase.from("services")
-      .select("id,name,slug,short_description,description,image,badge,badge_variant,featured,sort_order,category")
+      .select("id,name,slug,sort_order,category")
       .order("sort_order").order("id"),
     supabase.from("site_content").select("content").eq("key", "service_price_categories").maybeSingle(),
   ]);
   if (serviceError) throw serviceError;
   const services = serviceRows.map((service) => ({
-    id: service.id, name: service.name, slug: service.slug, shortDescription: service.short_description,
-    description: service.description, image: service.image, badge: service.badge,
-    badgeVariant: service.badge_variant as "blue" | "green", featured: service.featured,
-    sortOrder: service.sort_order, category: service.category,
+    id: service.id, name: service.name, slug: service.slug, sortOrder: service.sort_order,
+    category: service.category as DentalService["category"],
   }));
   if (pricingError) throw pricingError;
   const pricingParse = servicePriceCategoriesSchema.safeParse(pricingRecord?.content);
@@ -67,6 +66,8 @@ export default async function AdminServicesPage() {
         </div>
       </div>
 
+      <DirectoryHeroForm page="services" />
+
       <section className="overflow-hidden rounded-2xl border border-border-subtle/50 bg-white shadow-sm">
         <div className="border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4"><h2 className="text-base font-bold text-text-primary">Bảng giá theo danh mục kĩ thuật</h2><p className="text-xs text-text-secondary">Cấu hình tiêu đề, ghi chú và các danh mục hiển thị tại trang /bang-gia.</p></div>
         <AdminActionForm action={updateServicePriceCategories} submitLabel="Lưu bảng giá danh mục" className="space-y-4 p-6">
@@ -90,8 +91,6 @@ export default async function AdminServicesPage() {
             </thead>
             <tbody className="divide-y divide-slate-100 text-on-surface">
               {services.map((service, idx) => {
-                const dentalService: DentalService = { ...service, category: service.category as DentalService["category"] };
-
                 return (
                   <tr
                     key={service.id}
@@ -134,11 +133,11 @@ export default async function AdminServicesPage() {
                     <td className="px-4 py-3.5 text-right" data-label="Thao tác">
                       <div className="inline-flex items-center gap-2 whitespace-nowrap">
                         <ServiceFormDialog
-                          service={dentalService}
+                          serviceId={service.id}
                           buttonLabel="Sửa"
                           buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                         />
-                        <ServiceDetailFormDialog service={dentalService} />
+                        <ServiceDetailFormDialog service={service} />
                         <DeleteServiceButton id={service.id} />
                       </div>
                     </td>

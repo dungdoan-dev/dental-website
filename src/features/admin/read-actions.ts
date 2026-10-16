@@ -6,6 +6,9 @@ import { recordIdSchema } from "./schemas/admin.schema";
 import { serviceDetailContentKey, serviceDetailSchema, type ServiceDetailData } from "@/features/services/schemas/service-detail.schema";
 import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
 import type { Article } from "@/features/articles/types/article.type";
+import type { DentalService, ServiceCategory } from "@/features/services/types/service.type";
+import type { Doctor } from "@/features/doctors/types/doctor.type";
+import { doctorRepository } from "@/features/doctors/repositories/doctor.repository";
 
 export async function getAdminArticleForEdit(id: string): Promise<Article> {
   await requireAdmin();
@@ -64,4 +67,25 @@ export async function getAdminServiceDetailForEdit(serviceId: string): Promise<S
     highlights: [],
     ...parsed.data,
   }) : null;
+}
+
+export async function getAdminServiceForEdit(id: string): Promise<DentalService> {
+  await requireAdmin();
+  const { data: s, error } = await (await getSupabaseServerClient()).from("services")
+    .select("id,name,slug,short_description,description,image,badge,badge_variant,featured,sort_order,category")
+    .eq("id", recordIdSchema.parse(id))
+    .single();
+  if (error) throw error;
+  return {
+    id: s.id, name: s.name, slug: s.slug, shortDescription: s.short_description, description: s.description,
+    image: s.image, badge: s.badge, badgeVariant: s.badge_variant as "blue" | "green", featured: s.featured,
+    sortOrder: s.sort_order, category: s.category as ServiceCategory,
+  };
+}
+
+export async function getAdminDoctorForEdit(id: string): Promise<Doctor> {
+  await requireAdmin();
+  const doctor = await doctorRepository.findById(recordIdSchema.parse(id));
+  if (!doctor) throw new Error("Doctor not found");
+  return doctor;
 }

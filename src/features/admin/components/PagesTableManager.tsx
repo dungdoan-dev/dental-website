@@ -52,7 +52,7 @@ export async function PagesTableManager() {
 
     <section aria-labelledby="admin-pages-heading" className="space-y-4">
       <div><h2 className="text-xl font-bold text-text-primary" id="admin-pages-heading">Cấu hình theo trang</h2><p className="mt-1 text-sm text-text-secondary">Đi đến form đang quản lý dữ liệu của từng trang.</p></div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{navigation.map((item) => <Link className="rounded-xl border border-border-subtle bg-white p-4 transition-colors hover:border-brand-blue" href={pageTargets[item.href] ?? "/admin/pages"} key={item.href}><h3 className="font-semibold text-text-primary">{item.label}</h3><p className="mt-1 text-xs text-text-secondary">{item.href}</p></Link>)}</div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{navigation.map((item) => <Link className="rounded-xl border border-border-subtle bg-white p-4 transition-colors hover:border-brand-blue" href={pageTargets[item.href] ?? "/admin"} key={item.href}><h3 className="font-semibold text-text-primary">{item.label}</h3><p className="mt-1 text-xs text-text-secondary">{item.href}</p></Link>)}</div>
     </section>
 
     <section aria-labelledby="admin-history-heading" className="overflow-hidden rounded-2xl border border-border-subtle bg-white">

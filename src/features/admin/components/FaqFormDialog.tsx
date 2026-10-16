@@ -6,10 +6,12 @@ import { showAdminToast } from "./AdminToast";
 
 export function FaqFormDialog({
   faq,
+  nextSortOrder = 0,
   buttonLabel = "Sửa",
   buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
 }: {
   faq?: { id: string; question: string; answer: string; sortOrder: number };
+  nextSortOrder?: number;
   buttonLabel?: string;
   buttonClassName?: string;
 }) {
@@ -20,7 +22,7 @@ export function FaqFormDialog({
     id: faq?.id,
     question: faq?.question ?? "",
     answer: faq?.answer ?? "",
-    sortOrder: faq?.sortOrder ?? 0,
+    sortOrder: faq?.sortOrder ?? nextSortOrder,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,7 +30,10 @@ export function FaqFormDialog({
     startTransition(async () => {
       try {
         const result = await upsertFaq(formData);
-        if (!result.success) throw new Error("FAQ save failed");
+        if (!result.success) {
+          showAdminToast("error", result.error);
+          return;
+        }
         showAdminToast("success", faq ? "Đã cập nhật câu hỏi." : "Đã thêm câu hỏi.");
         setIsOpen(false);
       } catch {

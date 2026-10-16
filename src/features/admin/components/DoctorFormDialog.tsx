@@ -10,7 +10,9 @@ import type {
 import { upsertDoctor } from "../actions";
 import { ImageUploadField } from "./ImageUploadField";
 import { EditableRows } from "./EditableRows";
-import { useMutationToast } from "./AdminToast";
+import { showMutationToast, useMutationToast } from "./AdminToast";
+import { LazyEditDialog } from "./LazyEditDialog";
+import { getAdminDoctorForEdit } from "../read-actions";
 
 const CATEGORIES: { label: string; value: DoctorCategory }[] = [
   { label: "Cấy Ghép Implant", value: "implant" },
@@ -20,16 +22,33 @@ const CATEGORIES: { label: string; value: DoctorCategory }[] = [
   { label: "Nha Khoa Trẻ Em & Tổng Quát", value: "pediatric" },
 ];
 
-export function DoctorFormDialog({
+const defaultButtonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm";
+
+// With doctorId the full profile is fetched on click; without it the dialog adds a new doctor.
+export function DoctorFormDialog({ doctorId, buttonLabel = "Sửa", buttonClassName = defaultButtonClassName }: { doctorId?: string; buttonLabel?: string; buttonClassName?: string }) {
+  if (!doctorId) return <DoctorEditor buttonClassName={buttonClassName} buttonLabel={buttonLabel} />;
+  return (
+    <LazyEditDialog buttonClassName={buttonClassName} buttonLabel={buttonLabel} load={() => getAdminDoctorForEdit(doctorId)}>
+      {(doctor, close) => <DoctorEditor defaultOpen doctor={doctor} onClose={close} />}
+    </LazyEditDialog>
+  );
+}
+
+function DoctorEditor({
   doctor,
+  defaultOpen = false,
+  onClose,
   buttonLabel = "Sửa",
-  buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
+  buttonClassName = defaultButtonClassName,
 }: {
   doctor?: Doctor;
+  defaultOpen?: boolean;
+  onClose?: () => void;
   buttonLabel?: string;
   buttonClassName?: string;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const close = () => { setIsOpen(false); onClose?.(); };
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
   useMutationToast(result, doctor ? "Đã cập nhật hồ sơ bác sĩ." : "Đã thêm bác sĩ.");
@@ -88,21 +107,22 @@ export function DoctorFormDialog({
         id: formData.id || `doctor-${crypto.randomUUID()}`,
         experience: Number(formData.experience),
       });
-        setResult(saved);
-        if (saved.success) setIsOpen(false);
+        // Success toasts directly: closing unmounts this editor before the result effect could run.
+        if (saved.success) { showMutationToast(saved, doctor ? "Đã cập nhật hồ sơ bác sĩ." : "Đã thêm bác sĩ."); close(); }
+        else setResult(saved);
       } catch { setResult({ success: false, error: "Không thể lưu thay đổi. Vui lòng thử lại." }); }
     });
   };
 
   return (
     <>
-      <button
+      {defaultOpen ? null : <button
         type="button"
         onClick={() => setIsOpen(true)}
         className={buttonClassName}
       >
         {buttonLabel}
-      </button>
+      </button>}
 
       {isOpen && (
         <div className="admin-dialog-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-4 backdrop-blur-sm sm:p-6 sm:pt-8">
@@ -118,7 +138,7 @@ export function DoctorFormDialog({
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => close()}
                 className="p-1.5 rounded-xl text-text-secondary hover:bg-surface-container hover:text-text-primary transition"
               >
                 ✕
@@ -158,7 +178,7 @@ export function DoctorFormDialog({
                 <EditableRows label="Chuyên môn chi tiết * (ít nhất 1 dòng)" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.specialties.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, specialties: rows.map((row) => row.value) })} />
                 <EditableRows label="Học vấn và đào tạo" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.education.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, education: rows.map((row) => row.value) })} />
                 <EditableRows label="Kinh nghiệm nổi bật" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.experienceHighlights.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, experienceHighlights: rows.map((row) => row.value) })} />
-                <EditableRows label="Chứng chỉ và bằng cấp" columns={[{ key: "title", label: "Tên chứng chỉ" }, { key: "issuer", label: "Đơn vị cấp" }, { key: "detail", label: "Chi tiết", multiline: true }, { key: "image", label: "Đường dẫn ảnh" }]} value={formData.certificates} onChange={(rows) => setFormData({ ...formData, certificates: rows.map((row) => ({ title: row.title, issuer: row.issuer, detail: row.detail, image: row.image })) })} />
+                <EditableRows label="Chứng chỉ và bằng cấp" columns={[{ key: "title", label: "Tên chứng chỉ" }, { key: "issuer", label: "Đơn vị cấp" }, { key: "detail", label: "Chi tiết", multiline: true }, { key: "image", label: "Ảnh chứng chỉ", image: true }]} value={formData.certificates} onChange={(rows) => setFormData({ ...formData, certificates: rows.map((row) => ({ title: row.title, issuer: row.issuer, detail: row.detail, image: row.image })) })} />
                 <EditableRows label="Ngôn ngữ" columns={[{ key: "value", label: "Nội dung" }]} value={formData.languages.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, languages: rows.map((row) => row.value) })} />
               </fieldset>
 
@@ -185,7 +205,7 @@ export function DoctorFormDialog({
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => close()}
                   className="rounded-xl border border-border-subtle px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-container"
                 >
                   Hủy

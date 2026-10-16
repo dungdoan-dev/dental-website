@@ -4,7 +4,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "./auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { z } from "zod";
-import { serviceFormSchema, serviceSortOrderSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
+import { serviceFormSchema, serviceSortOrderSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, faqSchema, testimonialSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
 import { runMutation, validationFailure, saveRevision, SlugConflictError } from "./services/mutation";
 import { publicDataTags } from "@/lib/public-data-cache";
 import { sanitizeArticleContent } from "@/features/articles/lib/article-content";
@@ -269,73 +269,65 @@ export async function deleteArticle(id: string) {
 // ─────────────────────────────────────────────────────────────
 // FAQ
 // ─────────────────────────────────────────────────────────────
-export async function upsertFaq(data: {
-  id?: string;
-  question: string;
-  answer: string;
-  sortOrder?: number;
-}) {
-  await requireAdmin();
-  if (data.id) {
-    const { error } = await (await getSupabaseServerClient()).from("faq_items").update({ question: data.question, answer: data.answer, sort_order: data.sortOrder ?? 0 }).eq("id", data.id);
-    if (error) throw error;
-  } else {
-    const { error } = await (await getSupabaseServerClient()).from("faq_items").insert({ question: data.question, answer: data.answer, sort_order: data.sortOrder ?? 0 });
-    if (error) throw error;
-  }
-
+function revalidateHome(tag: string) {
   revalidatePath("/admin/home");
   revalidatePath("/");
-  updateTag(publicDataTags.faqs);
-  return { success: true };
+  updateTag(tag);
+}
+
+export async function upsertFaq(input: z.infer<typeof faqSchema>) {
+  await requireAdmin();
+  const parsed = faqSchema.safeParse(input);
+  if (!parsed.success) return validationFailure(parsed.error);
+  const { id, question, answer, sortOrder } = parsed.data;
+  return runMutation(async () => {
+    const row = { question, answer, sort_order: sortOrder };
+    const supabase = await getSupabaseServerClient();
+    const { error } = id ? await supabase.from("faq_items").update(row).eq("id", id) : await supabase.from("faq_items").insert(row);
+    if (error) throw error;
+    revalidateHome(publicDataTags.faqs);
+  });
 }
 
 export async function deleteFaq(id: string) {
   await requireAdmin();
-  const { error } = await (await getSupabaseServerClient()).from("faq_items").delete().eq("id", id);
-  if (error) throw error;
-  revalidatePath("/admin/home");
-  revalidatePath("/");
-  updateTag(publicDataTags.faqs);
-  return { success: true };
+  const parsed = numericIdSchema.safeParse(id);
+  if (!parsed.success) return validationFailure(parsed.error);
+  return runMutation(async () => {
+    const { error } = await (await getSupabaseServerClient()).from("faq_items").delete().eq("id", parsed.data);
+    if (error) throw error;
+    revalidateHome(publicDataTags.faqs);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
 // TESTIMONIALS
 // ─────────────────────────────────────────────────────────────
-export async function upsertTestimonial(data: {
-  id: string;
-  customerName: string;
-  rating: number;
-  content: string;
-  source?: string;
-  initials: string;
-  accent: string;
-  sortOrder?: number;
-  avatar?: string;
-}) {
+export async function upsertTestimonial(input: z.infer<typeof testimonialSchema>) {
   await requireAdmin();
-  const { error } = await (await getSupabaseServerClient()).from("testimonials").upsert({
-    id: data.id, customer_name: data.customerName, rating: Number(data.rating), content: data.content,
-    avatar: data.avatar || null, source: data.source ?? "", initials: data.initials,
-    accent: data.accent, sort_order: data.sortOrder ?? 0,
+  const parsed = testimonialSchema.safeParse(input);
+  if (!parsed.success) return validationFailure(parsed.error);
+  const data = parsed.data;
+  return runMutation(async () => {
+    const { error } = await (await getSupabaseServerClient()).from("testimonials").upsert({
+      id: data.id, customer_name: data.customerName, rating: data.rating, content: data.content,
+      avatar: data.avatar || null, source: data.source ?? "", initials: data.initials,
+      accent: data.accent, sort_order: data.sortOrder,
+    });
+    if (error) throw error;
+    revalidateHome(publicDataTags.testimonials);
   });
-  if (error) throw error;
-
-  revalidatePath("/admin/home");
-  revalidatePath("/");
-  updateTag(publicDataTags.testimonials);
-  return { success: true };
 }
 
 export async function deleteTestimonial(id: string) {
   await requireAdmin();
-  const { error } = await (await getSupabaseServerClient()).from("testimonials").delete().eq("id", id);
-  if (error) throw error;
-  revalidatePath("/admin/home");
-  revalidatePath("/");
-  updateTag(publicDataTags.testimonials);
-  return { success: true };
+  const parsed = recordIdSchema.safeParse(id);
+  if (!parsed.success) return validationFailure(parsed.error);
+  return runMutation(async () => {
+    const { error } = await (await getSupabaseServerClient()).from("testimonials").delete().eq("id", parsed.data);
+    if (error) throw error;
+    revalidateHome(publicDataTags.testimonials);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────

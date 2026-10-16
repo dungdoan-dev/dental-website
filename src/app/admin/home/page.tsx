@@ -35,6 +35,9 @@ export default async function AdminHomePage() {
   const faqRows = faqs.data ?? [];
   const testimonialRows = testimonials.data ?? [];
   const coreValueRows = coreValues.data ?? [];
+  // New FAQ/testimonials go last instead of jumping to the top at sort_order 0.
+  const nextFaqSort = Math.max(-1, ...faqRows.map((row) => row.sort_order)) + 1;
+  const nextTestimonialSort = Math.max(-1, ...testimonialRows.map((row) => row.sort_order)) + 1;
   const heroSlideRows = (heroSlides.data ?? []).map((row) => ({
     ...row, imageAlt: row.image_alt, badgeVariant: row.badge_variant,
     objectPosition: row.object_position, sortOrder: row.sort_order,
@@ -86,7 +89,7 @@ export default async function AdminHomePage() {
         </div>
       </div>
 
-      <section className="order-10 overflow-hidden rounded-2xl border border-border-subtle/50 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-2xl border border-border-subtle/50 bg-white shadow-sm">
         <div className="border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4"><h2 className="text-base font-bold text-text-primary">Tiêu đề và ghi chú trang chủ</h2><p className="text-xs text-text-secondary">Quản lý tiêu đề cùng dòng mô tả nhỏ bên dưới từng tiêu đề section.</p></div>
         <AdminActionForm action={updateHomeSectionCopy} submitLabel="Lưu tất cả tiêu đề" className="grid gap-4 p-6 md:grid-cols-2">
           {(Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>).map((key) => {
@@ -96,14 +99,104 @@ export default async function AdminHomePage() {
         </AdminActionForm>
       </section>
 
-      {/* SECTION 1: FAQ */}
-      <section className="order-8 overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
+      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
+        <div className="flex flex-col gap-3 border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-base font-bold text-text-primary">Slider trang chủ</h2>
+            <p className="text-xs text-text-secondary">Quản lý hình ảnh, nội dung, vị trí ảnh và thứ tự trình chiếu.</p>
+          </div>
+          <HeroSlideFormDialog />
+        </div>
+
+        <div className="divide-y divide-slate-100">
+          {heroSlideRows.map((slide) => (
+            <div key={slide.id} className="flex flex-col gap-4 p-4 transition hover:bg-background-secondary sm:flex-row sm:items-center">
+              <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-surface-container-low sm:w-40">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img alt={slide.imageAlt} className="h-full w-full object-cover" src={slide.image} />
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="font-bold text-text-primary">{slide.title}</div>
+                <div className="text-xs text-text-secondary">{slide.badge || "Không có nhãn"} · Mã: <span className="font-mono">{slide.id}</span></div>
+                <div className="truncate text-[11px] text-text-secondary" title={slide.image}>{slide.image}</div>
+                <span className="inline-flex rounded-full bg-brand-blue-light px-2 py-0.5 text-[11px] font-semibold text-brand-blue-dark">Thứ tự: {slide.sortOrder}</span>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <HeroSlideFormDialog slide={{ ...slide, badgeVariant: slide.badgeVariant === "green" ? "green" : "blue", objectPosition: slide.objectPosition === "top" ? "top" : "center" }} buttonLabel="Sửa" />
+                <DeleteHeroSlideButton id={slide.id} />
+              </div>
+            </div>
+          ))}
+          {heroSlideRows.length === 0 ? <p className="p-6 text-sm text-text-secondary">Chưa có slide nào. Thêm slide để hiển thị slider ở đầu trang chủ.</p> : null}
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
+        <div className="border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
+          <h2 className="text-base font-bold text-text-primary">4 Giá Trị Tạo Dựng Niềm Tin Bền Vững</h2>
+          <p className="text-xs text-text-secondary">Chỉnh sửa tiêu đề, thông điệp, mô tả, biểu tượng và thứ tự hiển thị trên trang chủ.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          {coreValueRows.map((row) => {
+            const cv = { ...row, iconKey: row.icon_key, sortOrder: row.sort_order };
+            return (
+            <div key={cv.id} className="p-5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-blue-dark">{cv.title}</span>
+              <h3 className="mt-2 text-xs font-bold text-text-primary">{cv.slogan}</h3>
+              <p className="mt-1 text-xs text-text-secondary leading-relaxed">{cv.description}</p>
+              <details className="mt-4 rounded-xl border border-border-subtle p-3">
+                <summary className="cursor-pointer text-xs font-semibold text-brand-blue-dark">Chỉnh sửa nội dung</summary>
+                <AdminActionForm action={updateCoreValue} submitLabel="Lưu giá trị" className="mt-3 space-y-3">
+                  <input name="id" type="hidden" value={cv.id.toString()} />
+                  <label className="block text-xs font-semibold text-text-secondary">Tiêu đề<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.title} name="title" maxLength={80} required /></label>
+                  <label className="block text-xs font-semibold text-text-secondary">Thông điệp<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.slogan} name="slogan" maxLength={200} required /></label>
+                  <label className="block text-xs font-semibold text-text-secondary">Mô tả<textarea className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.description} name="description" maxLength={1200} rows={4} required /></label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block text-xs font-semibold text-text-secondary">Biểu tượng<select className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.iconKey} name="iconKey"><option value="heart">Tận thương</option><option value="care">Tận tâm</option><option value="honesty">Trung thực</option><option value="innovation">Tân tiến</option></select></label>
+                    <label className="block text-xs font-semibold text-text-secondary">Thứ tự<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.sortOrder} min={0} max={999} name="sortOrder" type="number" required /></label>
+                  </div>
+                </AdminActionForm>
+              </details>
+            </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="font-bold text-text-primary">Dịch vụ</h2><p className="text-xs text-text-secondary">Các dịch vụ đang hoạt động được hiển thị trong danh sách dịch vụ trang chủ.</p></div>
+        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/services">Quản lý dịch vụ →</Link>
+      </section>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="font-bold text-text-primary">Đội ngũ bác sĩ</h2><p className="text-xs text-text-secondary">Các hồ sơ bác sĩ đang hoạt động được hiển thị trong danh sách trang chủ.</p></div>
+        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/doctors">Quản lý bác sĩ →</Link>
+      </section>
+
+      <section className="rounded-2xl border border-border-subtle/50 bg-white p-6 shadow-sm">
+        <div className="mb-4"><h2 className="text-base font-bold text-text-primary">Lý do lựa chọn</h2><p className="text-xs text-text-secondary">Cập nhật hình ảnh hiển thị trong section này trên trang chủ.</p></div>
+        <AdminActionForm action={updateStructuredSiteContent} submitLabel="Lưu hình ảnh" className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <input name="key" type="hidden" value="home_why_choose" />
+          <div className="flex-1"><ImageUploadField aspect={16 / 9} name="image" label="Hình ảnh section" defaultValue={whyChooseImage} required /></div>
+        </AdminActionForm>
+      </section>
+
+      <section className="flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="font-bold text-text-primary">Cơ sở vật chất</h2><p className="text-xs text-text-secondary">Thông tin và hình ảnh cơ sở được quản lý cùng hồ sơ từng phòng khám.</p></div>
+        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/clinics">Quản lý cơ sở →</Link>
+      </section>
+
+      <div><InsurancePartnersManager partners={insurancePartnerRows} /></div>
+
+      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div className="flex items-center justify-between border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
           <div>
             <h2 className="text-base font-bold text-text-primary">Câu hỏi thường gặp (FAQ)</h2>
             <p className="text-xs text-text-secondary">Câu hỏi và câu trả lời hiển thị trong mục FAQ trên trang chủ; thứ tự theo số thứ tự.</p>
           </div>
           <FaqFormDialog
+            nextSortOrder={nextFaqSort}
             buttonLabel="+ Thêm Câu Hỏi"
             buttonClassName="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-brand-blue-dark hover:bg-brand-blue text-white text-xs font-bold shadow-sm transition-all"
           />
@@ -134,14 +227,14 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      {/* SECTION 2: TESTIMONIALS */}
-      <section className="order-9 overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
+      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div className="flex items-center justify-between border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
           <div>
             <h2 className="text-base font-bold text-text-primary">Đánh giá của Khách hàng</h2>
             <p className="text-xs text-text-secondary">Các lời chia sẻ từ bệnh nhân sau khi điều trị thành công</p>
           </div>
           <TestimonialFormDialog
+            nextSortOrder={nextTestimonialSort}
             buttonLabel="+ Thêm Đánh Giá"
             buttonClassName="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-brand-blue-dark hover:bg-brand-blue text-white text-xs font-bold shadow-sm transition-all"
           />
@@ -183,98 +276,6 @@ export default async function AdminHomePage() {
           })}
         </div>
       </section>
-
-      {/* SECTION 3: CORE VALUES */}
-      <section className="order-2 overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
-          <h2 className="text-base font-bold text-text-primary">4 Giá Trị Tạo Dựng Niềm Tin Bền Vững</h2>
-          <p className="text-xs text-text-secondary">Chỉnh sửa tiêu đề, thông điệp, mô tả, biểu tượng và thứ tự hiển thị trên trang chủ.</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          {coreValueRows.map((row) => {
-            const cv = { ...row, iconKey: row.icon_key, sortOrder: row.sort_order };
-            return (
-            <div key={cv.id} className="p-5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-blue-dark">{cv.title}</span>
-              <h3 className="mt-2 text-xs font-bold text-text-primary">{cv.slogan}</h3>
-              <p className="mt-1 text-xs text-text-secondary leading-relaxed">{cv.description}</p>
-              <details className="mt-4 rounded-xl border border-border-subtle p-3">
-                <summary className="cursor-pointer text-xs font-semibold text-brand-blue-dark">Chỉnh sửa nội dung</summary>
-                <AdminActionForm action={updateCoreValue} submitLabel="Lưu giá trị" className="mt-3 space-y-3">
-                  <input name="id" type="hidden" value={cv.id.toString()} />
-                  <label className="block text-xs font-semibold text-text-secondary">Tiêu đề<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.title} name="title" maxLength={80} required /></label>
-                  <label className="block text-xs font-semibold text-text-secondary">Thông điệp<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.slogan} name="slogan" maxLength={200} required /></label>
-                  <label className="block text-xs font-semibold text-text-secondary">Mô tả<textarea className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.description} name="description" maxLength={1200} rows={4} required /></label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="block text-xs font-semibold text-text-secondary">Biểu tượng<select className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.iconKey} name="iconKey"><option value="heart">Tận thương</option><option value="care">Tận tâm</option><option value="honesty">Trung thực</option><option value="innovation">Tân tiến</option></select></label>
-                    <label className="block text-xs font-semibold text-text-secondary">Thứ tự<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={cv.sortOrder} min={0} max={999} name="sortOrder" type="number" required /></label>
-                  </div>
-                </AdminActionForm>
-              </details>
-            </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* SECTION 4: HERO SLIDES */}
-      <section className="order-1 overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="flex flex-col gap-3 border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-bold text-text-primary">Slider trang chủ</h2>
-            <p className="text-xs text-text-secondary">Quản lý hình ảnh, nội dung, vị trí ảnh và thứ tự trình chiếu.</p>
-          </div>
-          <HeroSlideFormDialog />
-        </div>
-
-        <div className="divide-y divide-slate-100">
-          {heroSlideRows.map((slide) => (
-            <div key={slide.id} className="flex flex-col gap-4 p-4 transition hover:bg-background-secondary sm:flex-row sm:items-center">
-              <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-surface-container-low sm:w-40">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img alt={slide.imageAlt} className="h-full w-full object-cover" src={slide.image} />
-              </div>
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="font-bold text-text-primary">{slide.title}</div>
-                <div className="text-xs text-text-secondary">{slide.badge || "Không có nhãn"} · Mã: <span className="font-mono">{slide.id}</span></div>
-                <div className="truncate text-[11px] text-text-secondary" title={slide.image}>{slide.image}</div>
-                <span className="inline-flex rounded-full bg-brand-blue-light px-2 py-0.5 text-[11px] font-semibold text-brand-blue-dark">Thứ tự: {slide.sortOrder}</span>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <HeroSlideFormDialog slide={{ ...slide, badgeVariant: slide.badgeVariant === "green" ? "green" : "blue", objectPosition: slide.objectPosition === "top" ? "top" : "center" }} buttonLabel="Sửa" />
-                <DeleteHeroSlideButton id={slide.id} />
-              </div>
-            </div>
-          ))}
-          {heroSlideRows.length === 0 ? <p className="p-6 text-sm text-text-secondary">Chưa có slide nào. Thêm slide để hiển thị slider ở đầu trang chủ.</p> : null}
-        </div>
-      </section>
-
-      <section className="order-5 rounded-2xl border border-border-subtle/50 bg-white p-6 shadow-sm">
-        <div className="mb-4"><h2 className="text-base font-bold text-text-primary">Lý do lựa chọn</h2><p className="text-xs text-text-secondary">Cập nhật hình ảnh hiển thị trong section này trên trang chủ.</p></div>
-        <AdminActionForm action={updateStructuredSiteContent} submitLabel="Lưu hình ảnh" className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <input name="key" type="hidden" value="home_why_choose" />
-          <div className="flex-1"><ImageUploadField aspect={16 / 9} name="image" label="Hình ảnh section" defaultValue={whyChooseImage} required /></div>
-        </AdminActionForm>
-      </section>
-
-      <section className="order-3 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div><h2 className="font-bold text-text-primary">Dịch vụ</h2><p className="text-xs text-text-secondary">Các dịch vụ đang hoạt động được hiển thị trong danh sách dịch vụ trang chủ.</p></div>
-        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/services">Quản lý dịch vụ →</Link>
-      </section>
-
-      <section className="order-4 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div><h2 className="font-bold text-text-primary">Đội ngũ bác sĩ</h2><p className="text-xs text-text-secondary">Các hồ sơ bác sĩ đang hoạt động được hiển thị trong danh sách trang chủ.</p></div>
-        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/doctors">Quản lý bác sĩ →</Link>
-      </section>
-
-      <section className="order-6 flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div><h2 className="font-bold text-text-primary">Cơ sở vật chất</h2><p className="text-xs text-text-secondary">Thông tin và hình ảnh cơ sở được quản lý cùng hồ sơ từng phòng khám.</p></div>
-        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/clinics">Quản lý cơ sở →</Link>
-      </section>
-
-      <div className="order-7"><InsurancePartnersManager partners={insurancePartnerRows} /></div>
     </div>
   );
 }

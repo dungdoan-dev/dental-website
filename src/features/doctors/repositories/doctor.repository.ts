@@ -82,6 +82,19 @@ export const doctorRepository = {
     }));
   },
 
+  async findById(id: string): Promise<Doctor | null> {
+    const { data: doctor, error } = await getPublicSupabaseClient().from("doctors").select(DOCTOR_SELECT).eq("id", id).maybeSingle();
+    if (error) throw error;
+
+    return doctor ? mapDoctor({
+      ...doctor,
+      doctor_specialties: doctor.doctor_specialties?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_education: doctor.doctor_education?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_experience_highlights: doctor.doctor_experience_highlights?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+      doctor_certificates: doctor.doctor_certificates?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+    }) : null;
+  },
+
   async findBySlug(slug: string): Promise<Doctor | null> {
     const { data: doctor, error } = await getPublicSupabaseClient().from("doctors").select(DOCTOR_SELECT).eq("slug", slug).maybeSingle();
     if (error) throw error;

@@ -1,9 +1,7 @@
 import { ContentDatabaseManager, type SiteContentRecord } from "@/features/admin/components/ContentDatabaseManager";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { getContactCtaSettings } from "@/features/content/services/contact-cta.service";
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
-import { getClinics } from "@/features/clinics/services/clinic.service";
 
 export const metadata = { title: "Nội dung website | Admin Nha Khoa 2000" };
 
@@ -11,11 +9,7 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
   await requireAdmin();
   const { section = "all" } = await searchParams;
   const supabase = await getSupabaseServerClient();
-  const [contentRecords, contactCtaSettings, clinics] = await Promise.all([
-    supabase.from("site_content").select("key,content").order("key"),
-    getContactCtaSettings(),
-    getClinics(),
-  ]);
+  const contentRecords = await supabase.from("site_content").select("key,content").order("key");
   if (contentRecords.error) throw contentRecords.error;
 
   const editableContent: SiteContentRecord[] = [];
@@ -40,8 +34,6 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
     <ContentDatabaseManager
       contentRecords={editableContent}
       contentWarning={aboutContentWarning}
-      contactCtaSettings={contactCtaSettings}
-      clinics={clinics.map(({ id, name }) => ({ id, name }))}
       section={section}
     />
   );

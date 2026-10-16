@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { AdminHeader } from "./AdminHeader";
 import { AdminSidebar } from "./AdminSidebar";
-import { AdminPageConfigNavigation } from "./AdminPageConfigNavigation";
 import { AdminToastViewport } from "./AdminToast";
 
 export function AdminLayoutShell({ children }: { children: ReactNode }) {
@@ -14,11 +13,10 @@ export function AdminLayoutShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh min-w-0 bg-[#f4f8fb] font-body-md text-body-md text-on-surface antialiased">
-      <AdminSidebar />
+      <Suspense fallback={null}><AdminSidebar /></Suspense>
       <div className="min-w-0 lg:pl-72">
         <AdminHeader />
         <main className="relative min-h-dvh min-w-0 w-full bg-background pt-20">
-          <Suspense fallback={null}><AdminPageConfigNavigation /></Suspense>
           {children}
         </main>
       </div>

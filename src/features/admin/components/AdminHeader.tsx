@@ -6,7 +6,6 @@ import { logoutAdmin } from "../auth/actions";
 
 const SECTION_LABELS: Record<string, string> = {
   "/admin": "Tổng quan",
-  "/admin/pages": "Cấu hình trang",
   "/admin/home": "Trang chủ",
   "/admin/content": "Nội dung website",
   "/admin/services": "Dịch vụ",

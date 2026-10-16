@@ -8,16 +8,18 @@ import type { ServiceDetailData } from "@/features/services/schemas/service-deta
 import { ImageUploadField } from "./ImageUploadField";
 import { FormFeedback } from "./FormFeedback";
 import { updateServiceDetail } from "../content-actions";
-import { getAdminServiceDetailForEdit } from "../read-actions";
+import { getAdminServiceDetailForEdit, getAdminServiceForEdit } from "../read-actions";
 import { useMutationToast } from "./AdminToast";
 
-type Props = { service: DentalService };
+// The list passes a summary row; description and image are fetched together with the detail on open.
+type Props = { service: Pick<DentalService, "id" | "name" | "category"> };
 
 export function ServiceDetailFormDialog({ service }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [detail, setDetail] = useState<ServiceDetailData | null>(null);
+  const [base, setBase] = useState<DentalService | null>(null);
   const [result, formAction, pending] = useActionState(updateServiceDetail, null);
   useMutationToast(result, "Đã cập nhật chi tiết dịch vụ.");
 
@@ -26,7 +28,9 @@ export function ServiceDetailFormDialog({ service }: Props) {
     setLoading(true);
     setLoadError("");
     try {
-      setDetail(await getAdminServiceDetailForEdit(service.id));
+      const [loadedDetail, loadedBase] = await Promise.all([getAdminServiceDetailForEdit(service.id), getAdminServiceForEdit(service.id)]);
+      setDetail(loadedDetail);
+      setBase(loadedBase);
     } catch {
       setLoadError("Không thể tải chi tiết dịch vụ. Vui lòng thử lại.");
     } finally {
@@ -38,7 +42,7 @@ export function ServiceDetailFormDialog({ service }: Props) {
   const initial: ServiceDetailData = detail ?? {
     eyebrow: service.category,
     title: service.name,
-    introduction: service.description,
+    introduction: base?.description ?? "",
     highlights: [],
     priceSourceUrl: "",
     prices: [],
@@ -70,7 +74,7 @@ export function ServiceDetailFormDialog({ service }: Props) {
             {!loading && !loadError ? <form action={formAction} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
               <input name="serviceId" type="hidden" value={service.id} />
-              <ImageUploadField aspect={16 / 9} label="Ảnh trang chi tiết dịch vụ" defaultValue={service.image} name="image" required />
+              <ImageUploadField aspect={16 / 9} label="Ảnh trang chi tiết dịch vụ" defaultValue={base?.image} name="image" required />
               <div className="grid gap-4 sm:grid-cols-2">
                 <label>Dòng giới thiệu nhỏ<input defaultValue={initial.eyebrow} maxLength={120} name="eyebrow" placeholder="Ví dụ: Nha khoa thẩm mỹ" /></label>
                 <label>Tiêu đề chính *<input defaultValue={initial.title} maxLength={240} name="title" required /></label>

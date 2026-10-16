@@ -1,5 +1,4 @@
-import { updateContactCta, updateStructuredSiteContent } from "../content-actions";
-import type { ContactCtaSettings } from "@/features/content/schemas/contact-cta.schema";
+import { updateStructuredSiteContent } from "../content-actions";
 import type { AboutPageData } from "@/features/about/schemas/about.schema";
 import type { ImplantDetailData } from "@/features/services/schemas/implant-detail.schema";
 import { EditableRows } from "./EditableRows";
@@ -90,43 +89,26 @@ function ContentEditor({ record }: { record: SiteContentRecord }) {
 export function ContentDatabaseManager({
   contentRecords,
   contentWarning,
-  contactCtaSettings,
-  clinics,
   section,
 }: {
   contentRecords: readonly SiteContentRecord[];
   contentWarning?: string;
-  contactCtaSettings: ContactCtaSettings;
-  clinics: readonly { id: string; name: string }[];
   section: string;
 }) {
   const visibleContent = contentRecords.filter((record) => section === "all" || (section === "about" && record.key === "about_page"));
-  const showContact = section === "all" || section === "contact";
-  const showContent = section !== "contact";
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-8">
       <header>
         <p className="text-sm font-bold uppercase tracking-wider text-brand-blue">Quản trị dữ liệu</p>
         <h1 className="mt-2 text-3xl font-extrabold text-text-primary">Nội dung website &amp; bảo hiểm</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">Quản lý nội dung trang, liên kết liên hệ và logo bảo hiểm bằng các trường nhập liệu.</p>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">Quản lý nội dung trang bằng các trường nhập liệu.</p>
       </header>
 
-      {showContact ? <section aria-labelledby="contact-cta-heading" className="space-y-4">
-          <div><h2 className="text-xl font-bold text-text-primary" id="contact-cta-heading">Liên hệ nhanh &amp; khách nước ngoài</h2><p className="mt-1 text-sm text-text-secondary">Cấu hình Zalo riêng cho từng cơ sở và một liên kết Viber, WhatsApp dùng chung cho khách nước ngoài.</p></div>
-        <AdminActionForm action={updateContactCta} className="grid gap-5 rounded-2xl border border-border-subtle bg-white p-5 shadow-sm" submitLabel="Lưu CTA liên hệ">
-          <label className="flex items-center gap-3 text-sm font-semibold text-text-primary"><input className="h-4 w-4 accent-brand-blue" defaultChecked={contactCtaSettings.showPhone} name="showPhone" type="checkbox" />Hiển thị nút gọi điện nhanh</label>
-          <label className="block text-sm font-semibold text-text-primary">Liên kết Facebook<input className="mt-1 w-full rounded-xl border border-border-subtle bg-surface px-4 py-3 font-normal outline-none focus:border-brand-blue" defaultValue={contactCtaSettings.facebookUrl} name="facebookUrl" placeholder="https://facebook.com/..." type="url" /></label>
-          {clinics.map((clinic) => <label className="block text-sm font-semibold text-text-primary" key={clinic.id}>Liên kết Zalo — {clinic.name}<input className="mt-1 w-full rounded-xl border border-border-subtle bg-surface px-4 py-3 font-normal outline-none focus:border-brand-blue" defaultValue={contactCtaSettings.zaloLinks[clinic.id] ?? ""} name={`zaloUrl-${clinic.id}`} placeholder="https://zalo.me/..." type="url" /></label>)}
-          <fieldset className="grid gap-4 rounded-xl border border-border-subtle p-4 md:grid-cols-2"><legend className="px-1 text-sm font-bold text-text-primary">Liên hệ cho khách nước ngoài</legend><label className="block text-sm font-semibold text-text-primary">Viber<input className="mt-1 w-full rounded-xl border border-border-subtle bg-surface px-4 py-3 font-normal outline-none focus:border-brand-blue" defaultValue={contactCtaSettings.viberUrl} name="viberUrl" placeholder="https://..." type="url" /></label><label className="block text-sm font-semibold text-text-primary">WhatsApp<input className="mt-1 w-full rounded-xl border border-border-subtle bg-surface px-4 py-3 font-normal outline-none focus:border-brand-blue" defaultValue={contactCtaSettings.whatsappUrl} name="whatsappUrl" placeholder="https://wa.me/..." type="url" /></label></fieldset>
-          <p className="text-xs text-text-secondary">Để trống kênh không muốn hiển thị. Liên kết phải bắt đầu bằng https:// (ví dụ WhatsApp: https://wa.me/...).</p>
-        </AdminActionForm>
-      </section> : null}
-
-      {showContent ? <section aria-labelledby="site-content-heading" className="space-y-4">
+      <section aria-labelledby="site-content-heading" className="space-y-4">
         <div><h2 className="text-xl font-bold text-text-primary" id="site-content-heading">Nội dung website</h2><p className="mt-1 text-sm text-text-secondary">Chỉnh nội dung theo từng trang bằng form; các danh sách được nhập mỗi mục trên một dòng theo hướng dẫn.</p></div>
         {section === "about" && contentWarning ? <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950" role="alert">{contentWarning}</p> : null}
         {visibleContent.length ? visibleContent.map((record) => <ContentEditor key={record.key} record={record} />) : <p className="rounded-2xl border border-border-subtle bg-white p-5 text-sm text-text-secondary">Chưa có nội dung cấu hình cho mục này.</p>}
-      </section> : null}
+      </section>
 
     </div>
   );
