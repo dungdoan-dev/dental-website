@@ -15,10 +15,10 @@ export function DoctorRosterCard({ doctor }: DoctorRosterCardProps) {
         <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rotate-45 rounded-xl bg-[#0ea5e9] opacity-90" /><div className="pointer-events-none absolute right-1/4 top-0 h-32 w-32 -rotate-12 rounded-xl bg-[#0284c7] opacity-60" /><div className="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-[#0369a1]/30 blur-xl" />
         <div className="relative z-10 mt-2 aspect-square w-full max-w-48 shrink-0 overflow-hidden rounded-full bg-white/10 shadow-xl ring-4 ring-white/90 sm:mt-4 sm:max-w-52"><Image alt={fullName} className="object-cover object-top" fill sizes="208px" src={doctor.avatar} /></div>
         <div className="relative z-10 mb-1 mt-auto flex w-full min-w-0 flex-col items-center pt-5 text-center">
-          {doctor.degree ? <p className="w-full truncate text-sm font-semibold tracking-wide text-white/85">{doctor.degree}</p> : null}
-          <h3 className="mt-0.5 w-full truncate text-xl font-bold tracking-tight text-white" title={fullName}>{doctor.name}</h3>
-          {doctor.position ? <p className="mt-1.5 w-full truncate text-[13px] text-white/70" title={doctor.position}>{doctor.position}</p> : null}
-          {doctor.directoryTitle ? <p className="mt-1.5 w-full truncate text-sm font-semibold text-cyan-200" title={doctor.directoryTitle}>{doctor.directoryTitle}</p> : null}
+          <p className="h-5 w-full truncate text-sm font-semibold leading-5 tracking-wide text-white/85">{doctor.degree}</p>
+          <h3 className="mt-0.5 h-7 w-full truncate text-xl font-bold leading-7 tracking-tight text-white" title={fullName}>{doctor.name}</h3>
+          <p className="mt-1.5 h-5 w-full truncate text-[13px] leading-5 text-white/70" title={doctor.position}>{doctor.position}</p>
+          <p className="mt-1.5 h-5 w-full truncate text-sm font-semibold leading-5 text-cyan-200" title={doctor.directoryTitle}>{doctor.directoryTitle}</p>
         </div>
       </div>
     </Link>

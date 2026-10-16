@@ -22,7 +22,7 @@ export async function CoreValuesSection() {
                 <h3 className="mb-3 text-2xl font-extrabold uppercase tracking-wide text-brand-blue-dark">
                   {value.title}
                 </h3>
-                <p className="mb-3 text-[15px] font-bold leading-snug text-text-primary">
+                <p className="mb-3 text-[15px] font-bold leading-snug text-text-primary sm:min-h-[2.75em]">
                   {value.slogan}
                 </p>
                 <p className="text-sm leading-relaxed text-text-secondary">
