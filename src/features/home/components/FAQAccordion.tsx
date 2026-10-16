@@ -11,7 +11,7 @@ export function FAQAccordion({ items, title, note }: { items: readonly FAQItem[]
     <section className="bg-white py-5 lg:py-6">
       <div className="mx-auto max-w-4xl px-margin-mobile md:px-margin">
         <div className="mx-auto mb-4 max-w-2xl space-y-1 text-center">
-          <h2 className="whitespace-nowrap text-[clamp(0.7rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">
+          <h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">
             {title}
           </h2>
           <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
@@ -28,12 +28,12 @@ export function FAQAccordion({ items, title, note }: { items: readonly FAQItem[]
                   <button
                     aria-controls={answerId}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between gap-4 p-6 text-left text-xl font-bold text-text-primary transition hover:text-brand-blue"
+                    className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left text-base font-bold sm:text-lg text-text-primary transition hover:text-brand-blue"
                     onClick={() => setOpenIndex(isOpen ? null : index)}
                     type="button"
                   >
                     <span>{item.question}</span>
-                    <Icon className={`h-6 w-6 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} name="chevron-down" />
+                    <Icon className={`h-5 w-5 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} name="chevron-down" />
                   </button>
                 </h3>
                 <div
@@ -41,7 +41,7 @@ export function FAQAccordion({ items, title, note }: { items: readonly FAQItem[]
                   id={answerId}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-6 pb-6 leading-relaxed text-text-secondary">{item.answer}</p>
+                    <p className="px-6 pb-5 text-sm leading-relaxed text-text-secondary sm:text-base">{item.answer}</p>
                   </div>
                 </div>
               </article>

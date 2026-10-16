@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { doctorFilters, type DoctorFilter } from "../data/doctor-filter.data";
 import type { Doctor } from "../types/doctor.type";
 import { DoctorRosterCard } from "./DoctorRosterCard";
+import { getDoctorFullName } from "@/features/doctors/utils/doctor-card-name";
 
 type DoctorFilterGridProps = { doctors: readonly Doctor[] };
 
@@ -26,7 +27,7 @@ export function DoctorFilterGrid({ doctors }: DoctorFilterGridProps) {
 
     return doctors.filter((doctor) => {
       const matchesCategory = activeFilter === "all" || doctor.category === activeFilter;
-      const matchesName = !query || normalizeSearch(doctor.name).includes(query);
+      const matchesName = !query || normalizeSearch(getDoctorFullName(doctor)).includes(query);
       return matchesCategory && matchesName;
     });
   }, [activeFilter, doctors, searchTerm]);
@@ -37,19 +38,8 @@ export function DoctorFilterGrid({ doctors }: DoctorFilterGridProps) {
   };
 
   return (
-    <section aria-labelledby="doctor-directory-title" className="bg-surface py-12 md:py-16">
+    <section aria-label="Danh sách bác sĩ" className="bg-surface py-8 md:py-10">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-brand-blue">
-            <span aria-hidden="true" className="inline-block h-0.5 w-6 bg-brand-blue" />
-            Danh sách chuyên khoa
-            <span aria-hidden="true" className="inline-block h-0.5 w-6 bg-brand-blue" />
-          </div>
-          <h2 className="mt-2 text-3xl font-bold text-text-primary sm:text-[2.5rem]" id="doctor-directory-title">
-            Gặp gỡ chuyên gia điều trị
-          </h2>
-        </div>
-
         <div className="mx-auto mb-6 max-w-xl">
           <label className="sr-only" htmlFor="doctor-name-search">Tìm bác sĩ theo tên</label>
           <div className="relative">

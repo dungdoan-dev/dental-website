@@ -26,7 +26,16 @@ export function generateSeoMetadata({ title, description = siteConfig.descriptio
       description,
       type: "website",
       url: canonicalUrl,
-      images: image ? [{ url: image }] : undefined,
+      siteName: siteConfig.name,
+      locale: "vi_VN",
+      // Pages without their own image share the team photo so Facebook/Zalo previews are never blank.
+      images: [image ? { url: image } : { url: "/og-default.jpg", width: 1200, height: 630, alt: siteConfig.name }],
     },
+    twitter: { card: "summary_large_image" },
   };
+}
+
+/** Absolute URL for JSON-LD, which (unlike <meta>) does not resolve paths against metadataBase. */
+export function absoluteUrl(path: string): string {
+  return new URL(path, getSiteUrl()).toString();
 }

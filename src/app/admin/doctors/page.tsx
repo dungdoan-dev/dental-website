@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getDoctorFullName } from "@/features/doctors/utils/doctor-card-name";
 import Link from "next/link";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { doctorRepository } from "@/features/doctors/repositories/doctor.repository";
@@ -61,8 +62,6 @@ export default async function AdminDoctorsPage() {
               {doctors.map((doctor, idx) => {
       const docObj: Doctor = {
                   ...doctor,
-                  nameLines: doctor.nameLines === 2 ? 2 : 1,
-                  nameLine2: doctor.nameLine2 ?? "",
                   category: doctor.category as Doctor["category"],
                   profile: doctor.profile ?? { licenseNumber: "", quote: "", sourceUrl: "", languages: [], specialties: [], education: [], experienceHighlights: [], certificates: [] },
                 };
@@ -88,7 +87,7 @@ export default async function AdminDoctorsPage() {
                         <div className="min-w-0">
                           <div className="font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors">
                             <Link href={`/bac-si/${doctor.slug}`} target="_blank">
-                              {doctor.name}
+                              {getDoctorFullName(doctor)}
                             </Link>
                           </div>
                           <div className="truncate text-[11px] text-text-secondary font-mono">

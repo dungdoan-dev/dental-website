@@ -41,7 +41,7 @@ function clinicDisplay(clinic: Clinic, index: number) {
 export function Footer({ clinics }: { clinics: readonly Clinic[] }) {
   return (
     <footer className="w-full border-t border-border-subtle bg-surface-container-high">
-      <div className="mx-auto max-w-[1440px] px-5 py-12 text-black sm:px-8 md:py-14 xl:px-12">
+      <div className="mx-auto max-w-7xl px-margin-mobile py-12 text-black md:px-margin md:py-14">
         <div className="grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 xl:grid-cols-[1.2fr_1.15fr_1.15fr_0.9fr] xl:gap-x-12">
           <div className="space-y-4"><div className="flex flex-col items-start gap-0"><Link className="inline-block" href="/"><Image alt="Nha Khoa 2000" className="h-11 w-auto object-contain" height={42} src="/images/logo/nha-khoa-2000.png" width={126} /></Link><p className="-mt-1 text-lg font-bold italic leading-tight text-brand-blue">You Smile, We Smile</p></div><p className="text-sm leading-relaxed text-black">Hơn 25 năm kiến tạo hàng ngàn nụ cười hạnh phúc, tiên phong cấy ghép kỹ thuật số và nha khoa chuyên sâu chuẩn quốc tế tại TP.HCM.</p><div className="space-y-1 pt-1 text-xs leading-relaxed text-black"><p className="font-semibold">CÔNG TY TNHH NHA KHOA 2000</p><p>GPĐKKD: 0302396828 do Sở KH&amp;ĐT TP.HCM cấp</p><p>GPHĐ: 00128/SYT-GPHĐ &amp; 05037/HCM-GPHĐ</p></div><p className="text-xs leading-relaxed text-black"><span className="font-semibold">Thời gian hoạt động:</span> {clinics[0]?.workingHours ?? "08:00–12:00 | 13:30–20:00 (T2 - T7)"}</p></div>
           {clinics.map((clinic, index) => {

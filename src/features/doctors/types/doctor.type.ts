@@ -26,8 +26,7 @@ export type Doctor = {
   position: string;
   experience: number;
   sortOrder: number;
-  nameLines: 1 | 2;
-  nameLine2: string;
+  degree: string;
   description: string;
   badge: string;
   highlight: string;

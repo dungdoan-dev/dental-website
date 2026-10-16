@@ -2,25 +2,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import type { Doctor } from "../types/doctor.type";
-import { getDoctorCardNameLines } from "../utils/doctor-card-name";
+import { getDoctorFullName } from "../utils/doctor-card-name";
 
 type DoctorCardProps = { doctor: Doctor };
 
 export function DoctorCard({ doctor }: DoctorCardProps) {
-  const nameLines = getDoctorCardNameLines(doctor);
+  const fullName = getDoctorFullName(doctor);
 
   return (
     <Link className="group flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl" href={`/bac-si/${doctor.slug}`}>
       <div className="relative h-80 w-full shrink-0 overflow-hidden bg-slate-100">
-        <Image alt={doctor.name} className="object-cover object-top transition-transform duration-500 group-hover:scale-105" fill sizes="(max-width: 768px) 100vw, 33vw" src={doctor.avatar} />
+        <Image alt={fullName} className="object-cover object-top transition-transform duration-500 group-hover:scale-105" fill sizes="(max-width: 768px) 100vw, 33vw" src={doctor.avatar} />
       </div>
       <div className="flex flex-1 flex-col justify-between p-6 text-center">
         <div className="flex-1">
-          <h3 className={`text-xl font-bold text-text-primary transition-colors group-hover:text-brand-blue ${doctor.nameLines === 2 ? "min-h-14" : "line-clamp-1"}`} title={doctor.name}>
-            <span className={doctor.nameLines === 2 ? "block truncate" : undefined}>{nameLines.firstLine}</span>
-            {nameLines.secondLine ? <span className="block truncate">{nameLines.secondLine}</span> : null}
-          </h3>
-          <p className="mt-2 line-clamp-1 text-sm font-medium text-text-secondary" title={doctor.directoryTitle}>{doctor.directoryTitle}</p>
+          {doctor.degree ? <p className="truncate text-sm font-semibold text-brand-blue-dark">{doctor.degree}</p> : null}
+          <h3 className="mt-0.5 truncate text-xl font-bold text-text-primary transition-colors group-hover:text-brand-blue" title={fullName}>{doctor.name}</h3>
+          {doctor.position ? <p className="mt-1.5 truncate text-[13px] text-text-secondary" title={doctor.position}>{doctor.position}</p> : null}
+          {doctor.directoryTitle ? <p className="mt-1.5 truncate text-sm font-semibold text-brand-blue" title={doctor.directoryTitle}>{doctor.directoryTitle}</p> : null}
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-sm font-bold text-brand-blue transition-colors group-hover:text-brand-blue-dark">
           <span>Xem hồ sơ bác sĩ</span>

@@ -9,6 +9,8 @@ import { AppointmentDialogProvider } from "@/features/appointments/components/Ap
 import { getServices } from "@/features/services/services/service.service";
 import { getClinics } from "@/features/clinics/services/clinic.service";
 import { getContactCtaSettings } from "@/features/content/services/contact-cta.service";
+import { JsonLd } from "@/components/common/JsonLd";
+import { clinicsJsonLd } from "@/lib/structured-data";
 import "react-phone-input-2/lib/style.css";
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
@@ -21,6 +23,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
 
   return (
     <AppointmentDialogProvider clinics={appointmentClinics} services={services}>
+      <JsonLd data={clinicsJsonLd(clinics)} />
       <AppShell
         topBar={<TopBar clinics={clinics} />}
         header={<Header />}

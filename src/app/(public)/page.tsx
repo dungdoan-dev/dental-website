@@ -20,6 +20,7 @@ export const metadata: Metadata = generateSeoMetadata({
 export default function HomePage() {
   return (
     <>
+      <h1 className="sr-only">Nha Khoa 2000 – Nha khoa chuyên sâu, cấy ghép Implant tại TP. Hồ Chí Minh</h1>
       <HeroCarousel />
       <VisionMissionSection />
       <CoreValuesSection />

@@ -16,17 +16,17 @@ export default async function ContactPage() {
 
   return (
     <main className="bg-surface">
-      <section className="relative overflow-hidden border-b border-border-subtle bg-gradient-to-br from-brand-blue-light/70 via-white to-brand-green-light/40 py-8 sm:py-12 lg:py-16">
+      <section className="relative overflow-hidden border-b border-border-subtle bg-gradient-to-br from-brand-blue-light/70 via-white to-brand-green-light/40 py-6 md:py-8">
         <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-brand-blue/10 blur-3xl" />
         <Container className="relative">
           <Breadcrumb items={[{ label: "Liên hệ" }]} />
-          <div className="grid items-center gap-8 lg:grid-cols-[1fr_0.72fr] lg:gap-14">
+          <div className="grid items-center gap-8 lg:grid-cols-[1fr_0.72fr] lg:gap-10">
             <div className="max-w-3xl">
               <p className="inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-white/80 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.14em] text-brand-blue-dark">
                 <span aria-hidden="true" className="h-2 w-2 rounded-full bg-brand-green" />
                 Nha Khoa 2000 · TP. Hồ Chí Minh
               </p>
-              <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-text-primary sm:text-5xl lg:text-6xl">
+              <h1 className="mt-5 text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold leading-tight tracking-tight text-text-primary">
                 Chúng tôi luôn sẵn sàng <span className="text-brand-blue-dark">lắng nghe bạn.</span>
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-text-secondary sm:text-lg sm:leading-8">
@@ -71,12 +71,12 @@ export default async function ContactPage() {
         </Container>
       </section>
 
-      <section aria-labelledby="clinic-contact-title" className="py-12 sm:py-16 lg:py-20">
+      <section aria-labelledby="clinic-contact-title" className="py-8 md:py-10">
         <Container className="max-w-5xl">
           <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue">Hệ thống phòng khám</p>
-              <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-text-primary sm:text-4xl" id="clinic-contact-title">Chọn cơ sở thuận tiện cho bạn</h2>
+              <h2 className="mt-2 text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary" id="clinic-contact-title">Chọn cơ sở thuận tiện cho bạn</h2>
             </div>
             <p className="max-w-md text-sm leading-6 text-text-secondary">Xem địa chỉ, giờ làm việc và gọi trực tiếp cho từng cơ sở trước khi đến thăm khám.</p>
           </div>

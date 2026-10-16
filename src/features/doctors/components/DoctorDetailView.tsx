@@ -1,5 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { ImageLightbox } from "@/components/common/ImageLightbox";
+import { getDoctorFullName } from "../utils/doctor-card-name";
 import { AppointmentButton } from "@/components/common/AppointmentButton";
 import { Icon } from "@/components/ui/Icon";
 import type { Doctor } from "../types/doctor.type";
@@ -31,21 +33,15 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
     <>
       <div className="border-b border-border-subtle bg-white">
         <div className="mx-auto max-w-7xl px-margin-mobile py-3.5 md:px-margin">
-          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-text-secondary">
-            <Link className="hover:text-brand-blue-dark" href="/">Trang chủ</Link>
-            <Icon className="h-4 w-4 opacity-40" name="chevron-right" />
-            <Link className="hover:text-brand-blue-dark" href="/bac-si">Đội ngũ bác sĩ</Link>
-            <Icon className="h-4 w-4 opacity-40" name="chevron-right" />
-            <span aria-current="page" className="font-bold text-brand-blue-dark">{doctor.name}</span>
-          </nav>
+          <Breadcrumb className="" items={[{ label: "Đội ngũ bác sĩ", href: "/bac-si" }, { label: getDoctorFullName(doctor) }]} />
         </div>
       </div>
-      <article className="bg-white py-12 md:py-16">
-        <div className="mx-auto grid max-w-7xl items-start gap-8 px-margin-mobile md:px-margin lg:grid-cols-12 lg:gap-12">
+      <article className="bg-white py-8 md:py-10">
+        <div className="mx-auto grid max-w-7xl items-start gap-8 px-margin-mobile md:px-margin lg:grid-cols-12 lg:gap-10">
           <div className="flex flex-col gap-6 lg:col-span-5 xl:col-span-4">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-sm">
-              <Image alt={`Chân dung ${doctor.name}`} className="object-cover object-top" fill priority sizes="(max-width: 1024px) 100vw, 400px" src={doctor.avatar} />
-            </div>
+            <ImageLightbox alt={`Chân dung ${getDoctorFullName(doctor)}`} caption={getDoctorFullName(doctor)} className="relative block aspect-[3/4] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-sm" src={doctor.avatar}>
+              <Image alt={`Chân dung ${getDoctorFullName(doctor)}`} className="object-cover object-top" fill priority sizes="(max-width: 1024px) 100vw, 400px" src={doctor.avatar} />
+            </ImageLightbox>
             <div className="space-y-3">
               {profile?.licenseNumber ? (
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
@@ -73,8 +69,8 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
           </div>
           <div className="flex flex-col gap-8 lg:col-span-7 xl:col-span-8">
             <header>
-              <h1 className="text-3xl font-extrabold uppercase tracking-tight text-text-primary md:text-[2.5rem]">{doctor.name}</h1>
-              <p className="mt-2 text-lg font-semibold leading-relaxed text-brand-blue-dark">{doctor.position}</p>
+              <h1 className="text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold uppercase tracking-tight text-text-primary">{getDoctorFullName(doctor)}</h1>
+              {doctor.position ? <p className="mt-2 text-lg font-semibold leading-relaxed text-brand-blue-dark">{doctor.position}</p> : null}
               <p className="mt-5 max-w-3xl leading-relaxed text-text-secondary">{doctor.description}</p>
             </header>
             {profile?.quote ? <blockquote className="border-l-4 border-brand-blue bg-brand-blue-light/50 p-6 text-lg italic leading-relaxed text-text-primary">“{profile.quote}”</blockquote> : null}
@@ -87,7 +83,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
               </>
             ) : (
               <div className="space-y-4">
-                <DetailList items={[`${doctor.experience} năm kinh nghiệm`, ...specialties]} markerColor="bg-brand-green-dark" title="Chuyên môn & Kinh nghiệm" />
+                <DetailList items={[...(doctor.experience > 0 ? [`${doctor.experience} năm kinh nghiệm`] : []), ...specialties]} markerColor="bg-brand-green-dark" title="Chuyên môn & Kinh nghiệm" />
               </div>
             )}
             <div className="pt-2">

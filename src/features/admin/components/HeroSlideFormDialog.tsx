@@ -38,7 +38,7 @@ export function HeroSlideFormDialog({
     setError("");
     startTransition(async () => {
       try {
-        const result = await upsertHeroSlide({ ...formData, id: formData.id.trim(), sortOrder: Number(formData.sortOrder) });
+        const result = await upsertHeroSlide({ ...formData, id: slide?.id ?? `slide-${crypto.randomUUID()}`, sortOrder: Number(formData.sortOrder) });
         if (!result.success) {
           setError(result.error);
           showAdminToast("error", result.error);
@@ -47,7 +47,7 @@ export function HeroSlideFormDialog({
         showAdminToast("success", slide ? "Đã cập nhật slide." : "Đã thêm slide.");
         setIsOpen(false);
       } catch {
-        const message = "Không thể lưu slide. Hãy kiểm tra mã slide có bị trùng hoặc thông tin chưa hợp lệ.";
+        const message = "Không thể lưu slide. Hãy kiểm tra lại thông tin và thử lại.";
         setError(message);
         showAdminToast("error", message);
       }
@@ -70,31 +70,34 @@ export function HeroSlideFormDialog({
               <h2 className="text-lg font-bold text-text-primary" id="hero-slide-dialog-title">{slide ? "Chỉnh sửa slide" : "Thêm slide trang chủ"}</h2>
               <button aria-label="Đóng" className="rounded-lg px-2 py-1 text-text-secondary hover:bg-surface-container-low" onClick={() => setIsOpen(false)} type="button">✕</button>
             </div>
-            <form className="admin-dialog-form grid min-h-0 flex-1 gap-5 overflow-y-auto px-5 py-5 text-sm sm:grid-cols-2 sm:px-7" onSubmit={handleSubmit}>
-              <label className="grid gap-1 font-medium text-text-primary">Mã slide *
-                <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2 disabled:opacity-70" disabled={Boolean(slide)} maxLength={80} onChange={(event) => updateField("id", event.target.value)} placeholder="clinic" required value={formData.id} />
-              </label>
-              <label className="grid gap-1 font-medium text-text-primary">Thứ tự hiển thị *
-                <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" min={0} onChange={(event) => updateField("sortOrder", Number(event.target.value))} required type="number" value={formData.sortOrder} />
-              </label>
-              <div className="sm:col-span-2"><ImageUploadField aspect={16 / 9} label="Ảnh slide *" onChange={(image) => updateField("image", image)} required value={formData.image} /></div>
-              <label className="grid gap-1 font-medium text-text-primary sm:col-span-2">Văn bản thay thế ảnh *
-                <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("imageAlt", event.target.value)} required value={formData.imageAlt} />
-              </label>
-              <label className="grid gap-1 font-medium text-text-primary sm:col-span-2">Tiêu đề *
-                <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("title", event.target.value)} required value={formData.title} />
-              </label>
-              <label className="grid gap-1 font-medium text-text-primary">Nhãn nhỏ
-                <input className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("badge", event.target.value)} value={formData.badge} />
-              </label>
-              <label className="grid gap-1 font-medium text-text-primary">Màu nhãn
-                <select className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("badgeVariant", event.target.value as HeroSlideData["badgeVariant"])} value={formData.badgeVariant}><option value="blue">Xanh dương</option><option value="green">Xanh lá</option></select>
-              </label>
-              <label className="grid gap-1 font-medium text-text-primary">Vị trí ảnh
-                <select className="rounded-lg border border-border-subtle bg-background-secondary px-3 py-2" onChange={(event) => updateField("objectPosition", event.target.value as HeroSlideData["objectPosition"])} value={formData.objectPosition}><option value="center">Căn giữa</option><option value="top">Căn phía trên</option></select>
-              </label>
-              {error ? <p className="text-xs text-red-600 sm:col-span-2" role="alert">{error}</p> : null}
-              <div className="flex justify-end gap-2 border-t border-border-subtle pt-4 sm:col-span-2">
+            <form className="admin-dialog-form flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7" onSubmit={handleSubmit}>
+              <fieldset className="admin-form-section">
+                <legend>Ảnh slide</legend>
+                <ImageUploadField aspect={16 / 9} label="Ảnh slide (tỉ lệ 16:9, rộng từ 1920px) *" onChange={(image) => updateField("image", image)} required value={formData.image} />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label>Mô tả ảnh (cho người khiếm thị và Google) *<input onChange={(event) => updateField("imageAlt", event.target.value)} required value={formData.imageAlt} /></label>
+                  <label>Phần giữ lại khi ảnh bị cắt
+                    <select onChange={(event) => updateField("objectPosition", event.target.value as HeroSlideData["objectPosition"])} value={formData.objectPosition}><option value="center">Giữa ảnh</option><option value="top">Phía trên ảnh</option></select>
+                  </label>
+                </div>
+              </fieldset>
+              <fieldset className="admin-form-section">
+                <legend>Nội dung</legend>
+                <label>Tiêu đề *<input onChange={(event) => updateField("title", event.target.value)} required value={formData.title} /></label>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label>Nhãn nhỏ<input onChange={(event) => updateField("badge", event.target.value)} value={formData.badge} /></label>
+                  <label>Màu nhãn
+                    <select onChange={(event) => updateField("badgeVariant", event.target.value as HeroSlideData["badgeVariant"])} value={formData.badgeVariant}><option value="blue">Xanh dương</option><option value="green">Xanh lá</option></select>
+                  </label>
+                </div>
+              </fieldset>
+              <fieldset className="admin-form-section">
+                <legend>Sắp xếp</legend>
+                <label>Thứ tự hiển thị *<input min={0} onChange={(event) => updateField("sortOrder", Number(event.target.value))} required type="number" value={formData.sortOrder} /></label>
+                <p className="admin-form-hint">Số nhỏ hiển thị trước.{slide ? ` Mã slide: ${slide.id}` : ""}</p>
+              </fieldset>
+              {error ? <p className="text-xs text-red-600" role="alert">{error}</p> : null}
+              <div className="flex justify-end gap-2 border-t border-border-subtle pt-4">
                 <button className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-semibold" onClick={() => setIsOpen(false)} type="button">Hủy</button>
                 <button className="rounded-lg bg-brand-blue-dark px-4 py-2 text-xs font-bold text-white disabled:opacity-60" disabled={isPending} type="submit">{isPending ? "Đang lưu..." : "Lưu slide"}</button>
               </div>

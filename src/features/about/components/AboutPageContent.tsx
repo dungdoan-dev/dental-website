@@ -19,10 +19,10 @@ export function AboutPageContent({ content, clinics }: AboutPageContentProps) {
       <section aria-labelledby="about-title" className="pt-6 sm:pt-8">
         <Container>
           <Breadcrumb items={[{ label: "Giới thiệu" }]} />
-          <div className="grid items-center gap-8 pb-10 pt-3 sm:pb-12 lg:grid-cols-12 lg:gap-12 lg:pt-6">
+          <div className="grid items-center gap-8 pb-8 pt-3 sm:pb-8 lg:grid-cols-12 lg:gap-12 lg:pt-6">
             <div className="lg:col-span-6">
               <p className={eyebrowClassName}>{content.hero.eyebrow}</p>
-              <h1 className="mt-5 max-w-xl text-4xl font-bold leading-[1.12] tracking-tight text-text-primary sm:text-5xl lg:text-[3.4rem]" id="about-title">{content.hero.title}</h1>
+              <h1 className="mt-5 text-[clamp(1.5rem,5vw,2.25rem)] max-w-xl font-extrabold leading-[1.12] tracking-tight text-text-primary" id="about-title">{content.hero.title}</h1>
               <p className="mt-6 max-w-lg text-base leading-8 text-text-secondary">{content.hero.description}</p>
               <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <Link className="inline-flex min-h-12 items-center justify-center gap-3 rounded-lg bg-brand-blue-dark px-6 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-brand-blue-hover motion-reduce:transition-none" href="/bac-si">
@@ -60,8 +60,8 @@ export function AboutPageContent({ content, clinics }: AboutPageContentProps) {
         </Container>
       </section>
 
-      <section aria-labelledby="story-title" className="py-12 sm:py-16 lg:py-20" id="hanh-trinh">
-        <Container className="grid items-center gap-8 lg:grid-cols-12 lg:gap-16">
+      <section aria-labelledby="story-title" className="py-8 md:py-10" id="hanh-trinh">
+        <Container className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
           <figure className="mx-auto w-full max-w-md lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-background-secondary">
               <Image alt={content.story.founderName} className="object-cover object-top" fill sizes="(max-width: 1024px) 448px, 40vw" src={content.story.image} />
@@ -82,12 +82,12 @@ export function AboutPageContent({ content, clinics }: AboutPageContentProps) {
         </Container>
       </section>
 
-      <section aria-labelledby="direction-title" className="bg-brand-blue-dark py-12 text-white sm:py-16" id="dinh-huong">
+      <section aria-labelledby="direction-title" className="bg-brand-blue-dark py-8 text-white md:py-10" id="dinh-huong">
         <Container>
           <div className="grid gap-6 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-5">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/90 sm:text-sm">{content.visionMission.eyebrow}</p>
-              <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl" id="direction-title">{content.visionMission.title}</h2>
+              <h2 className="mt-4 text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold leading-tight tracking-tight" id="direction-title">{content.visionMission.title}</h2>
             </div>
             <p className="max-w-2xl leading-8 text-white/90 lg:col-span-7 lg:pt-1">{content.visionMission.introduction}</p>
           </div>
@@ -104,9 +104,9 @@ export function AboutPageContent({ content, clinics }: AboutPageContentProps) {
         </Container>
       </section>
 
-      <section aria-labelledby="principles-title" className="py-12 sm:py-16 lg:py-20" id="nguyen-tac">
+      <section aria-labelledby="principles-title" className="py-8 md:py-10" id="nguyen-tac">
         <Container>
-          <div className="grid gap-5 lg:grid-cols-2 lg:gap-16">
+          <div className="grid gap-5 lg:grid-cols-2 lg:gap-10">
             <div>
               <p className={eyebrowClassName}>{content.principles.eyebrow}</p>
               <h2 className={`mt-4 ${headingClassName}`} id="principles-title">{content.principles.title}</h2>
@@ -146,9 +146,9 @@ export function AboutPageContent({ content, clinics }: AboutPageContentProps) {
         </Container>
       </section>
 
-      <section aria-labelledby="clinics-title" className="py-12 sm:py-16 lg:py-20" id="he-thong-phong-kham">
+      <section aria-labelledby="clinics-title" className="py-8 md:py-10" id="he-thong-phong-kham">
         <Container>
-          <div className="grid gap-5 lg:grid-cols-2 lg:gap-16">
+          <div className="grid gap-5 lg:grid-cols-2 lg:gap-10">
             <div>
               <p className={eyebrowClassName}>{content.clinics.eyebrow}</p>
               <h2 className={`mt-4 ${headingClassName}`} id="clinics-title">{content.clinics.title}</h2>

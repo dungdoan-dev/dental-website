@@ -159,131 +159,42 @@ export function ArticleFormDialog({
             {loadError ? <p className="p-7 text-sm text-error" role="alert">{loadError}</p> : null}
             {!isLoading && !loadError ? <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">
-                  Tiêu đề bài viết *
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={formData.title}
-                  onChange={handleTitleChange}
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  placeholder="Tiêu đề chuẩn SEO y khoa..."
-                />
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <fieldset className="admin-form-section">
+                <legend>Nội dung bài viết</legend>
+                <label>Tiêu đề *<input onChange={handleTitleChange} placeholder="Tiêu đề chuẩn SEO y khoa..." required type="text" value={formData.title} /></label>
+                <label>Tóm tắt ngắn *<textarea onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} placeholder="Mô tả tóm tắt nội dung bài viết..." required rows={2} value={formData.excerpt} /></label>
+                <p className="admin-form-hint">Hiện dưới tiêu đề ở danh sách bài viết và khi chia sẻ lên mạng xã hội.</p>
                 <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Slug URL *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.slug}
-                    onChange={(e) =>
-                      setFormData({ ...formData, slug: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary font-mono focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  />
+                  <p className="mb-2 text-[0.8125rem] font-semibold text-text-primary">Nội dung *</p>
+                  <TinyMceEditor value={editorContent} onChange={(content) => { setEditorContent(content); setFormData((current) => ({ ...current, content })); }} />
+                  <p className="admin-form-hint mt-2">Có thể định dạng tiêu đề, danh sách, liên kết và bảng. Bài Markdown cũ được tự chuyển sang định dạng editor khi mở.</p>
                 </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Chuyên mục *
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        category: e.target.value as ArticleCategory,
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none cursor-pointer"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+              </fieldset>
 
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">
-                  Tóm tắt ngắn (Excerpt) *
-                </label>
-                <textarea
-                  required
-                  rows={2}
-                  value={formData.excerpt}
-                  onChange={(e) =>
-                    setFormData({ ...formData, excerpt: e.target.value })
-                  }
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  placeholder="Mô tả tóm tắt nội dung bài viết..."
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block font-semibold text-text-primary">Nội dung bài viết / Kiến thức nha khoa *</label>
-                <TinyMceEditor value={editorContent} onChange={(content) => { setEditorContent(content); setFormData((current) => ({ ...current, content })); }} />
-              </div>
-
-              <p className="text-xs leading-relaxed text-text-secondary">Có thể định dạng tiêu đề, danh sách, liên kết và bảng. Nội dung bài Markdown cũ sẽ được chuyển sang định dạng editor khi mở.</p>
-              <label className="block text-sm font-semibold">Trạng thái bài viết<select className="mt-1 min-h-11 w-full rounded-lg border border-border-subtle px-3" onChange={(event) => setFormData({ ...formData, status: event.target.value as "draft" | "published" })} value={formData.status}><option value="draft">Bản nháp — chưa hiển thị công khai</option><option value="published">Xuất bản — hiển thị trên website</option></select></label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="sm:col-span-2"><ImageUploadField aspect={16 / 9} label="Ảnh thu nhỏ (Thumbnail) *" onChange={(thumbnail) => setFormData({ ...formData, thumbnail })} required value={formData.thumbnail} /></div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Thời gian đọc (phút)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={formData.readingMinutes}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        readingMinutes: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Tác giả / Bác sĩ kiểm duyệt
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.author}
-                    onChange={(e) =>
-                      setFormData({ ...formData, author: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="BS.CKII Võ Văn Tự Hiến"
-                  />
-                </div>
-                <div className="flex items-center pt-6">
-                  <label className="flex items-center gap-2 cursor-pointer text-text-primary font-medium">
-                    <input
-                      type="checkbox"
-                      checked={formData.featured}
-                      onChange={(e) =>
-                        setFormData({ ...formData, featured: e.target.checked })
-                      }
-                      className="h-4 w-4 rounded border-border-subtle text-brand-blue-dark accent-brand-blue-dark cursor-pointer"
-                    />
-                    <span>Bài viết nổi bật (Hero trang tin tức)</span>
+              <fieldset className="admin-form-section">
+                <legend>Xuất bản và hiển thị</legend>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label>Trạng thái<select onChange={(event) => setFormData({ ...formData, status: event.target.value as "draft" | "published" })} value={formData.status}><option value="draft">Bản nháp (chưa hiển thị)</option><option value="published">Xuất bản (hiển thị trên website)</option></select></label>
+                  <label>Chuyên mục *
+                    <select onChange={(e) => setFormData({ ...formData, category: e.target.value as ArticleCategory })} value={formData.category}>
+                      {CATEGORIES.map((cat) => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                    </select>
                   </label>
                 </div>
-              </div>
+                <ImageUploadField aspect={16 / 9} label="Ảnh đại diện bài viết (16:9) *" onChange={(thumbnail) => setFormData({ ...formData, thumbnail })} required value={formData.thumbnail} />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,10rem)]">
+                  <label>Tác giả / Bác sĩ kiểm duyệt<input onChange={(e) => setFormData({ ...formData, author: e.target.value })} placeholder="Bác sĩ Võ Văn Tự Hiến" type="text" value={formData.author} /></label>
+                  <label>Thời gian đọc (phút)<input min="1" onChange={(e) => setFormData({ ...formData, readingMinutes: Number(e.target.value) })} type="number" value={formData.readingMinutes} /></label>
+                </div>
+                <label><input checked={formData.featured} className="h-4 w-4 accent-brand-blue-dark" onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} type="checkbox" />Bài nổi bật (hiển thị lớn ở đầu trang Kiến thức)</label>
+              </fieldset>
+
+              <details className="admin-form-section">
+                <summary>Cài đặt nâng cao</summary>
+                <label>Đường dẫn bài viết (slug) *<input className="font-mono" onChange={(e) => setFormData({ ...formData, slug: e.target.value })} required type="text" value={formData.slug} /></label>
+                <p className="admin-form-hint">Tự tạo từ tiêu đề khi thêm mới. Đổi slug sẽ làm đường dẫn cũ /tin-tuc/… không còn hoạt động.</p>
+              </details>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button

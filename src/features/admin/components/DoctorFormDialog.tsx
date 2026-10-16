@@ -38,12 +38,11 @@ export function DoctorFormDialog({
     id: doctor?.id ?? "",
     name: doctor?.name ?? "",
     slug: doctor?.slug ?? "",
-    avatar: doctor?.avatar ?? "/images/doctors/vo-van-tu-hien.jpg",
-    position: doctor?.position ?? "Bác Sĩ Chuyên Khoa",
+    avatar: doctor?.avatar ?? "",
+    position: doctor?.position ?? "",
     experience: doctor?.experience ?? 10,
     sortOrder: doctor?.sortOrder ?? 0,
-    nameLines: doctor?.nameLines ?? 1,
-    nameLine2: doctor?.nameLine2 ?? "",
+    degree: doctor?.degree ?? "",
     description: doctor?.description ?? "",
     badge: doctor?.badge ?? "Bác sĩ",
     highlight: doctor?.highlight ?? "Hơn 10 năm kinh nghiệm",
@@ -128,236 +127,60 @@ export function DoctorFormDialog({
 
             <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Họ và tên bác sĩ (kèm học vị) *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.name}
-                    onChange={handleNameChange}
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="BS.CKII Võ Văn Tự Hiến"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Slug URL *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.slug}
-                    onChange={(e) =>
-                      setFormData({ ...formData, slug: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary font-mono focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="vo-van-tu-hien"
-                  />
-                </div>
-              </div>
 
-              <div className="max-w-xs">
-                <label className="mb-1 block font-semibold text-text-primary" htmlFor={`doctor-name-lines-${doctor?.id ?? "new"}`}>Số dòng hiển thị tên trên thẻ</label>
-                <select
-                  id={`doctor-name-lines-${doctor?.id ?? "new"}`}
-                  value={formData.nameLines}
-                  onChange={(e) => setFormData({ ...formData, nameLines: Number(e.target.value) as 1 | 2 })}
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                >
-                  <option value={1}>1 dòng (tên dài có thể bị rút gọn)</option>
-                  <option value={2}>2 dòng (hiển thị tên đầy đủ hơn)</option>
-                </select>
-                <p className="mt-1 text-xs text-text-secondary">Dùng 2 dòng cho tên dài như học vị kèm họ tên.</p>
-                {formData.nameLines === 2 ? (
-                  <div className="mt-3">
-                    <label className="mb-1 block font-semibold text-text-primary" htmlFor={`doctor-name-line-2-${doctor?.id ?? "new"}`}>Tên hiển thị — dòng 2 *</label>
-                    <input
-                      id={`doctor-name-line-2-${doctor?.id ?? "new"}`}
-                      required
-                      maxLength={160}
-                      type="text"
-                      value={formData.nameLine2}
-                      onChange={(e) => setFormData({ ...formData, nameLine2: e.target.value })}
-                      className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                      placeholder="Ví dụ: Thân Trọng Nguyên"
-                    />
-                    <p className="mt-1 text-xs text-text-secondary">Dòng đầu sẽ tự bỏ phần này khỏi tên hồ sơ nếu nó nằm ở cuối tên.</p>
+              <fieldset className="admin-form-section">
+                <legend>Hiển thị trên thẻ bác sĩ</legend>
+                <p className="admin-form-hint">Thẻ hiển thị theo thứ tự: Học vị, Họ và tên, Chức vị (nếu có), Chuyên môn.</p>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
+                  <ImageUploadField aspect={1} label="Ảnh chân dung *" onChange={(avatar) => setFormData({ ...formData, avatar })} required value={formData.avatar} />
+                  <div className="flex flex-col gap-4">
+                    <label>Học vị<input maxLength={60} onChange={(e) => setFormData({ ...formData, degree: e.target.value })} placeholder="THẠC SĨ, BÁC SĨ CKII" type="text" value={formData.degree} /></label>
+                    <label>Họ và tên *<input onChange={handleNameChange} placeholder="Võ Văn Tự Hiến" required type="text" value={formData.name} /></label>
+                    <label>Chức vị (nếu có)<input onChange={(e) => setFormData({ ...formData, position: e.target.value })} placeholder="Giám đốc chuyên môn Cơ sở 1" type="text" value={formData.position} /></label>
+                    <label>Chuyên môn<input onChange={(e) => setFormData({ ...formData, directoryTitle: e.target.value })} placeholder="Implant & Phẫu thuật miệng" type="text" value={formData.directoryTitle} /></label>
                   </div>
-                ) : null}
-              </div>
+                </div>
+              </fieldset>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Chức vụ *
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.position}
-                    onChange={(e) =>
-                      setFormData({ ...formData, position: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="Trưởng khoa Chỉnh nha"
-                  />
+              <fieldset className="admin-form-section">
+                <legend>Giới thiệu trên trang hồ sơ</legend>
+                <label>Mô tả kinh nghiệm *<textarea onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Hơn 15 năm kinh nghiệm phục hình dán sứ vi phẫu..." required rows={3} value={formData.description} /></label>
+                <label>Trích dẫn y đức (không bắt buộc)<textarea onChange={(e) => setFormData({ ...formData, quote: e.target.value })} rows={2} value={formData.quote} /></label>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <label>Số năm kinh nghiệm *<input min="0" onChange={(e) => setFormData({ ...formData, experience: Number(e.target.value) })} required type="number" value={formData.experience} /></label>
+                  <label>Điểm nổi bật<input onChange={(e) => setFormData({ ...formData, highlight: e.target.value })} placeholder="Hơn 35 năm kinh nghiệm" type="text" value={formData.highlight} /></label>
+                  <label>Số chứng chỉ hành nghề<input onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })} placeholder="010749/HCM-CCHN" type="text" value={formData.licenseNumber} /></label>
                 </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Số năm kinh nghiệm *
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    value={formData.experience}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        experience: Number(e.target.value),
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1" htmlFor="doctor-sort-order">
-                    Thứ tự hiển thị
-                  </label>
-                  <input
-                    id="doctor-sort-order"
-                    type="number"
-                    min="0"
-                    max="99999"
-                    step="1"
-                    value={formData.sortOrder}
-                    onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })}
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    aria-describedby="doctor-sort-order-help"
-                  />
-                  <p id="doctor-sort-order-help" className="mt-1 text-xs text-text-secondary">
-                    Số nhỏ hiển thị trước; nếu trùng, hệ thống sắp theo mã bác sĩ.
-                  </p>
-                </div>
-              </div>
+              </fieldset>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Nhóm chuyên môn *
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        category: e.target.value as DoctorCategory,
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none cursor-pointer"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Tiêu đề danh bạ
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.directoryTitle}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        directoryTitle: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="Chuyên Gia Cấy Ghép Implant"
-                  />
-                </div>
-              </div>
+              <fieldset className="admin-form-section">
+                <legend>Hồ sơ chuyên môn</legend>
+                <EditableRows label="Chuyên môn chi tiết * (ít nhất 1 dòng)" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.specialties.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, specialties: rows.map((row) => row.value) })} />
+                <EditableRows label="Học vấn và đào tạo" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.education.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, education: rows.map((row) => row.value) })} />
+                <EditableRows label="Kinh nghiệm nổi bật" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.experienceHighlights.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, experienceHighlights: rows.map((row) => row.value) })} />
+                <EditableRows label="Chứng chỉ và bằng cấp" columns={[{ key: "title", label: "Tên chứng chỉ" }, { key: "issuer", label: "Đơn vị cấp" }, { key: "detail", label: "Chi tiết", multiline: true }, { key: "image", label: "Đường dẫn ảnh" }]} value={formData.certificates} onChange={(rows) => setFormData({ ...formData, certificates: rows.map((row) => ({ title: row.title, issuer: row.issuer, detail: row.detail, image: row.image })) })} />
+                <EditableRows label="Ngôn ngữ" columns={[{ key: "value", label: "Nội dung" }]} value={formData.languages.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, languages: rows.map((row) => row.value) })} />
+              </fieldset>
 
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">
-                  Mô tả giới thiệu kinh nghiệm *
-                </label>
-                <textarea
-                  required
-                  rows={2}
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  placeholder="Hơn 15 năm kinh nghiệm phục hình dán sứ vi phẫu..."
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <ImageUploadField aspect={1} label="Ảnh chân dung *" onChange={(avatar) => setFormData({ ...formData, avatar })} required value={formData.avatar} />
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Điểm nổi bật
+              <fieldset className="admin-form-section">
+                <legend>Lọc và sắp xếp trên trang Bác sĩ</legend>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label>Nhóm chuyên môn (bộ lọc) *
+                    <select onChange={(e) => setFormData({ ...formData, category: e.target.value as DoctorCategory })} value={formData.category}>
+                      {CATEGORIES.map((cat) => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                    </select>
                   </label>
-                  <input
-                    type="text"
-                    value={formData.highlight}
-                    onChange={(e) =>
-                      setFormData({ ...formData, highlight: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="Hơn 35 năm kinh nghiệm"
-                  />
+                  <label>Thứ tự hiển thị<input max="99999" min="0" onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })} step="1" type="number" value={formData.sortOrder} /></label>
                 </div>
-              </div>
+                <p className="admin-form-hint">Số nhỏ hiển thị trước.</p>
+              </fieldset>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Số CCHN
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.licenseNumber}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        licenseNumber: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="010749/HCM-CCHN"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">
-                    Trích dẫn y đức (Quote)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.quote}
-                    onChange={(e) =>
-                      setFormData({ ...formData, quote: e.target.value })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <EditableRows label="Học vấn và đào tạo" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.education.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, education: rows.map((row) => row.value) })} />
-              <EditableRows label="Chuyên môn chi tiết" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.specialties.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, specialties: rows.map((row) => row.value) })} />
-              <EditableRows label="Kinh nghiệm nổi bật" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.experienceHighlights.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, experienceHighlights: rows.map((row) => row.value) })} />
-              <EditableRows label="Ngôn ngữ" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.languages.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, languages: rows.map((row) => row.value) })} />
-              <EditableRows label="Chứng chỉ và bằng cấp" columns={[{ key: "title", label: "Tên chứng chỉ" }, { key: "issuer", label: "Đơn vị cấp" }, { key: "detail", label: "Chi tiết", multiline: true }, { key: "image", label: "Đường dẫn ảnh" }]} value={formData.certificates} onChange={(rows) => setFormData({ ...formData, certificates: rows.map((row) => ({ title: row.title, issuer: row.issuer, detail: row.detail, image: row.image })) })} />
-              <label className="block text-xs font-semibold">URL nguồn hồ sơ<input className="mt-1 min-h-11 w-full rounded-lg border border-border-subtle px-3" type="url" value={formData.sourceUrl} onChange={(event) => setFormData({ ...formData, sourceUrl: event.target.value })} /></label>
+              <details className="admin-form-section">
+                <summary>Cài đặt nâng cao</summary>
+                <label>Đường dẫn trang (slug) *<input className="font-mono" onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="vo-van-tu-hien" required type="text" value={formData.slug} /></label>
+                <p className="admin-form-hint">Tự tạo từ họ tên khi thêm mới. Đổi slug sẽ làm đường dẫn cũ /bac-si/… không còn hoạt động.</p>
+                <label>URL nguồn hồ sơ<input onChange={(event) => setFormData({ ...formData, sourceUrl: event.target.value })} type="url" value={formData.sourceUrl} /></label>
+              </details>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button

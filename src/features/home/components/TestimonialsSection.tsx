@@ -6,26 +6,11 @@ const accentClass = { blue: "bg-brand-blue", green: "bg-brand-green", "blue-dark
 
 export async function TestimonialsSection() {
   const [testimonials, copy] = await Promise.all([getTestimonials(), getHomeSectionCopy()]);
-  const averageRating = testimonials.length > 0
-    ? testimonials.reduce((sum, item) => sum + item.rating, 0) / testimonials.length
-    : null;
 
   return (
     <section className="bg-brand-blue-light/50 py-5 lg:py-6">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mb-4 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <div className="max-w-2xl space-y-1">
-            <h2 className="whitespace-nowrap text-[clamp(1.25rem,3.2vw,2.5rem)] font-extrabold tracking-tight text-text-primary">{copy.testimonials.title}</h2>
-            <p className="text-sm leading-relaxed text-text-secondary sm:text-base">{copy.testimonials.note}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-4 rounded-2xl bg-white px-6 py-3.5 shadow-sm">
-            <div className="text-3xl font-extrabold text-brand-blue-dark">{averageRating?.toFixed(1) ?? "—"}</div>
-            <div>
-              <StarRating rating={5} />
-              <span className="text-xs font-medium text-text-secondary">{testimonials.length} đánh giá</span>
-            </div>
-          </div>
-        </div>
+        <div className="mb-4 text-center"><h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.testimonials.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.testimonials.note}</p></div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {testimonials.map((testimonial) => (
             <article className="flex flex-col justify-between rounded-2xl bg-white p-7 shadow-sm" key={testimonial.id}>

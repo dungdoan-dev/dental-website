@@ -1,7 +1,7 @@
 import { getPublicSupabaseClient } from "@/lib/supabase/public";
 import type { Doctor, DoctorCategory } from "../types/doctor.type";
 
-const DOCTOR_SELECT = "id,name,slug,avatar,position,experience,sort_order,name_lines,name_line_2,description,badge,highlight,category,directory_title,license_number,quote,languages,source_url,doctor_specialties(specialty,sort_order),doctor_education(content,sort_order),doctor_experience_highlights(content,sort_order),doctor_certificates(title,issuer,detail,image,sort_order)";
+const DOCTOR_SELECT = "id,name,slug,avatar,position,experience,sort_order,degree,description,badge,highlight,category,directory_title,license_number,quote,languages,source_url,doctor_specialties(specialty,sort_order),doctor_education(content,sort_order),doctor_experience_highlights(content,sort_order),doctor_certificates(title,issuer,detail,image,sort_order)";
 
 function mapDoctor(d: {
   id: string;
@@ -11,8 +11,7 @@ function mapDoctor(d: {
   position: string;
   experience: number;
   sort_order: number;
-  name_lines: number;
-  name_line_2: string | null;
+  degree: string;
   description: string;
   badge: string;
   highlight: string;
@@ -42,8 +41,7 @@ function mapDoctor(d: {
     position: d.position,
     experience: d.experience,
     sortOrder: d.sort_order,
-    nameLines: (d.name_lines === 2 ? 2 : 1),
-    nameLine2: d.name_line_2 ?? "",
+    degree: d.degree,
     description: d.description,
     badge: d.badge,
     highlight: d.highlight,
@@ -51,7 +49,7 @@ function mapDoctor(d: {
     directoryTitle: d.directory_title,
     profile: hasProfile
       ? {
-          licenseNumber: d.license_number!,
+          licenseNumber: d.license_number ?? "",
           quote: d.quote ?? "",
           specialties: d.doctor_specialties?.map((s) => s.specialty) ?? [],
           languages,

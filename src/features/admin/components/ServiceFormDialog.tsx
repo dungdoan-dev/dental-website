@@ -112,89 +112,29 @@ export function ServiceFormDialog({
 
             <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
               <FormFeedback result={result} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">Tên dịch vụ *</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.name}
-                    onChange={handleNameChange}
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                    placeholder="Ví dụ: Cấy Ghép Implant Kỹ Thuật Số"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">Slug URL *</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none font-mono"
-                    placeholder="trong-rang-implant"
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">Mã ID dịch vụ *</label>
-                  <input
-                    required
-                    disabled={!!service}
-                    type="text"
-                    value={formData.id}
-                    onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none font-mono disabled:opacity-60"
-                  />
+              <fieldset className="admin-form-section">
+                <legend>Nội dung dịch vụ</legend>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,16rem)]">
+                  <label>Tên dịch vụ *<input onChange={handleNameChange} placeholder="Ví dụ: Cấy Ghép Implant Kỹ Thuật Số" required type="text" value={formData.name} /></label>
+                  <label>Chuyên mục *
+                    <select onChange={(e) => setFormData({ ...formData, category: e.target.value as ServiceCategory })} value={formData.category}>
+                      {CATEGORIES.map((cat) => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                    </select>
+                  </label>
                 </div>
-                <div>
-                  <label className="block font-semibold text-text-primary mb-1">Chuyên mục kỹ thuật *</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        category: e.target.value as ServiceCategory,
-                      })
-                    }
-                    className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none cursor-pointer"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                <label>Mô tả ngắn *<textarea onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })} placeholder="Mô tả tóm tắt nổi bật dịch vụ..." required rows={2} value={formData.shortDescription} /></label>
+                <p className="admin-form-hint">Hiện trên thẻ dịch vụ ở trang chủ và trang Dịch vụ (khoảng 3 dòng).</p>
+                <label>Mô tả chi tiết *<textarea onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Mô tả chuyên môn đầy đủ..." required rows={4} value={formData.description} /></label>
+                {!service ? <ImageUploadField label="Ảnh trang chi tiết *" onChange={(image) => setFormData({ ...formData, image })} required value={formData.image} /> : <p className="admin-form-hint">Ảnh, bảng giá, quy trình và câu hỏi thường gặp được sửa ở nút “Chi tiết”.</p>}
+              </fieldset>
 
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">Mô tả ngắn (Trang chủ / Danh sách) *</label>
-                <textarea
-                  required
-                  rows={2}
-                  value={formData.shortDescription}
-                  onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  placeholder="Mô tả tóm tắt nổi bật dịch vụ..."
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">Mô tả chi tiết *</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                  placeholder="Mô tả chuyên môn đầy đủ..."
-                />
-              </div>
-
-              {!service ? <ImageUploadField label="Ảnh trang chi tiết *" onChange={(image) => setFormData({ ...formData, image })} required value={formData.image} /> : null}
+              <details className="admin-form-section">
+                <summary>Cài đặt nâng cao</summary>
+                <label>Đường dẫn trang (slug) *<input className="font-mono" onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="trong-rang-implant" required type="text" value={formData.slug} /></label>
+                <p className="admin-form-hint">Tự tạo từ tên khi thêm mới. Đổi slug sẽ làm đường dẫn cũ /dich-vu/… không còn hoạt động.</p>
+                <p className="admin-form-hint">Mã dịch vụ (tự tạo, không sửa được): <span className="font-mono">{formData.id || "—"}</span></p>
+              </details>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
                 <button

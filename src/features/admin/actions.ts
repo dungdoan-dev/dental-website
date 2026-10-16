@@ -178,7 +178,7 @@ export async function upsertDoctor(input: DoctorFormData) {
   const parsed = doctorFormSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   const { education, specialties, experienceHighlights, certificates, ...data } = parsed.data;
-  const base = { ...data, nameLine2: data.nameLine2 || null, licenseNumber: data.licenseNumber || null, quote: data.quote || null, sourceUrl: data.sourceUrl || null };
+  const base = { ...data, licenseNumber: data.licenseNumber || null, quote: data.quote || null, sourceUrl: data.sourceUrl || null };
   return runMutation(async () => {
     const supabase = await getSupabaseServerClient();
     const { data: duplicate, error: duplicateError } = await supabase.from("doctors").select("id").eq("slug", data.slug).maybeSingle();
@@ -187,7 +187,7 @@ export async function upsertDoctor(input: DoctorFormData) {
     const { error } = await supabase.from("doctors").upsert({
       id: base.id, name: base.name, slug: base.slug, avatar: base.avatar, position: base.position,
       experience: base.experience, sort_order: base.sortOrder,
-      name_lines: base.nameLines, name_line_2: base.nameLine2, description: base.description,
+      degree: base.degree, description: base.description,
       badge: base.badge, highlight: base.highlight, category: base.category, directory_title: base.directoryTitle,
       license_number: base.licenseNumber, quote: base.quote, languages: base.languages, source_url: base.sourceUrl,
       updated_at: new Date().toISOString(),

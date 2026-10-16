@@ -9,9 +9,9 @@ export async function SearchPageContent({ query }: SearchPageContentProps) {
   const results = await searchWebsite(searchQuery);
 
   return (
-    <section className="bg-surface py-14 md:py-20">
-      <div className="mx-auto max-w-5xl px-margin-mobile md:px-margin">
-        <h1 className="text-3xl font-extrabold text-text-primary md:text-4xl">Tìm kiếm</h1>
+    <section className="bg-surface py-8 md:py-10">
+      <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
+        <h1 className="text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold text-text-primary">Tìm kiếm</h1>
         <p className="mt-3 text-text-secondary">Tìm dịch vụ, bác sĩ và bài viết tại Nha Khoa 2000.</p>
         <form action="/tim-kiem" className="mt-8 flex max-w-2xl gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-border-subtle" method="get" role="search">
           <label className="sr-only" htmlFor="site-search-input">Từ khóa tìm kiếm</label>
@@ -20,11 +20,11 @@ export async function SearchPageContent({ query }: SearchPageContentProps) {
         </form>
 
         {!searchQuery ? (
-          <p className="mt-10 rounded-2xl bg-white p-6 text-text-secondary">Nhập từ khóa để bắt đầu tìm kiếm.</p>
+          <p className="mt-8 rounded-2xl bg-white p-6 text-text-secondary">Nhập từ khóa để bắt đầu tìm kiếm.</p>
         ) : results.length === 0 ? (
-          <p className="mt-10 rounded-2xl bg-white p-6 text-text-secondary">Không tìm thấy kết quả cho “{searchQuery}”. Hãy thử từ khóa khác.</p>
+          <p className="mt-8 rounded-2xl bg-white p-6 text-text-secondary">Không tìm thấy kết quả cho “{searchQuery}”. Hãy thử từ khóa khác.</p>
         ) : (
-          <div className="mt-10">
+          <div className="mt-8">
             <p aria-live="polite" className="text-sm font-semibold text-text-secondary">Tìm thấy {results.length} kết quả cho “{searchQuery}”</p>
             <ul className="mt-5 grid gap-4">
               {results.map((result) => (

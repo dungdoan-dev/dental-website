@@ -41,7 +41,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
     <Container className="py-12">
       <Breadcrumb items={[{ label: "Dịch vụ", href: "/dich-vu" }, { label: service.name }]} />
       <article className="rounded-2xl bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-bold">{service.name}</h1>
+        <h1 className="text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold">{service.name}</h1>
         <p className="mt-5 max-w-3xl leading-8 text-slate-600">{service.description}</p>
         <ButtonLink className="mt-8" href="/lien-he">Đặt lịch tư vấn</ButtonLink>
       </article>

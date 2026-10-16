@@ -1,6 +1,7 @@
 import { getArticles } from "@/features/articles/services/article.service";
 import { getDoctors } from "@/features/doctors/services/doctor.service";
 import { getServices } from "@/features/services/services/service.service";
+import { getDoctorFullName } from "@/features/doctors/utils/doctor-card-name";
 
 export type WebsiteSearchResult = {
   id: string;
@@ -30,7 +31,7 @@ export async function searchWebsite(rawQuery: string): Promise<readonly WebsiteS
     ...doctors.map((doctor) => ({
       id: doctor.id,
       type: "Bác sĩ" as const,
-      title: doctor.name,
+      title: getDoctorFullName(doctor),
       description: [doctor.position, ...(doctor.profile?.specialties ?? [])].filter(Boolean).join(" · "),
       href: `/bac-si/${doctor.slug}`,
     })),

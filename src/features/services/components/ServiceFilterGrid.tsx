@@ -39,12 +39,12 @@ export function ServiceFilterGrid({ services }: ServiceFilterGridProps) {
     : services.filter((service) => service.category === activeFilter);
 
   return (
-    <section aria-label="Danh sách dịch vụ" className="bg-surface py-10 md:py-14">
+    <section aria-label="Danh sách dịch vụ" className="bg-surface py-6 md:py-8">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
         <div className="rounded-3xl border border-border-subtle bg-white p-5 shadow-[0_12px_40px_rgba(23,49,58,0.05)] sm:p-7 lg:p-8">
           <div className="flex flex-col gap-5 border-b border-border-subtle pb-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-xl font-extrabold tracking-tight text-text-primary sm:text-2xl">Khám phá theo nhóm dịch vụ</h2>
+              <h2 className="text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">Khám phá theo nhóm dịch vụ</h2>
               <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">Chọn chuyên khoa phù hợp với nhu cầu chăm sóc răng miệng của bạn.</p>
             </div>
             <Link className="inline-flex w-full items-center justify-between gap-3 rounded-xl border border-brand-green/40 bg-brand-green-light px-4 py-3 text-sm font-bold text-brand-green-dark transition-colors hover:border-brand-green hover:bg-brand-green/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green sm:w-fit" href={servicePriceLink.href}>
@@ -70,11 +70,11 @@ export function ServiceFilterGrid({ services }: ServiceFilterGridProps) {
             })}
           </nav>
         </div>
-        <div className="mb-6 mt-10 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-xl font-bold text-text-primary sm:text-2xl">Dịch vụ của chúng tôi</h2>
+        <div className="mb-5 mt-8 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold text-text-primary tracking-tight">Dịch vụ của chúng tôi</h2>
           <p className="text-sm text-text-secondary">{filteredServices.length} dịch vụ</p>
         </div>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">{filteredServices.map((service) => <ServiceCard key={service.id} service={service} />)}</div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">{filteredServices.map((service) => <ServiceCard key={service.id} service={service} />)}</div>
         {filteredServices.length === 0 ? <p className="rounded-2xl border border-border-subtle bg-white px-6 py-12 text-center text-text-secondary">Chưa có dịch vụ trong danh mục này.</p> : null}
       </div>
     </section>

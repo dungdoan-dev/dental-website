@@ -29,7 +29,7 @@ export function ArticleDetail({ article, articles }: ArticleDetailProps) {
   const relatedArticles = related.length ? related : recentArticles.slice(0, 2);
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-16 pt-4 sm:px-6 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10 lg:px-8 lg:pb-24">
+    <div className="mx-auto grid w-full max-w-7xl gap-8 px-margin-mobile pb-10 pt-4 md:px-margin lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10 lg:pb-12">
       <aside className="order-2 space-y-5 lg:order-1">
         <form action="/tin-tuc" className="rounded-2xl border border-border-subtle bg-white p-4 shadow-sm" role="search">
           <label className="text-sm font-bold text-text-primary" htmlFor="article-sidebar-search">Tìm trong kiến thức nha khoa</label>
@@ -64,7 +64,7 @@ export function ArticleDetail({ article, articles }: ArticleDetailProps) {
         <article className="overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-[0_16px_48px_rgba(23,49,58,0.07)]">
           <header className="px-5 pb-6 pt-6 sm:px-8 sm:pb-8 sm:pt-8 lg:px-10">
             <div className="flex flex-wrap items-center gap-2"><Link className="rounded-full bg-brand-blue-light px-3 py-1.5 text-xs font-bold text-brand-blue-dark transition hover:bg-brand-blue-dark hover:text-white" href={`/tin-tuc?category=${article.category}#article-list`}>{getArticleCategoryLabel(article.category)}</Link><span className="text-xs text-text-secondary">Kiến thức nha khoa</span></div>
-            <h1 className="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-text-primary sm:text-4xl lg:text-[2.65rem]">{article.title}</h1>
+            <h1 className="mt-5 text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold leading-tight tracking-tight text-text-primary">{article.title}</h1>
             <p className="mt-4 text-base leading-7 text-text-secondary sm:text-lg sm:leading-8">{article.excerpt}</p>
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-border-subtle pt-5 text-sm text-text-secondary">
               <span className="inline-flex items-center gap-2"><span className="grid h-9 w-9 place-items-center rounded-full bg-brand-blue-light text-brand-blue-dark"><Icon className="h-4 w-4" name="person" /></span><span><span className="block text-[11px] text-text-secondary">Tác giả</span><span className="font-bold text-text-primary">{article.author}</span></span></span>
