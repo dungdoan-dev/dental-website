@@ -19,9 +19,12 @@ type State = MutationResult | null;
 type ListRow = Record<string, string>;
 
 function readRowList(formData: FormData, name: string, keys: readonly string[]): ListRow[] {
-  const raw = String(formData.get(name) ?? "[]");
+  const raw = formData.get(name);
+  // A missing field must not be read as an empty list, or saving would wipe the stored rows.
+  if (typeof raw !== "string") throw new Error(`Thiếu danh sách ${name}.`);
   const parsed: unknown = JSON.parse(raw);
-  if (!Array.isArray(parsed) || parsed.length > 50) throw new Error(`Danh sách ${name} không hợp lệ.`);
+  // Per-list limits (e.g. 100 price rows) are enforced by each content schema; this only stops runaway input.
+  if (!Array.isArray(parsed) || parsed.length > 500) throw new Error(`Danh sách ${name} không hợp lệ.`);
   return parsed.map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`Mục trong ${name} không hợp lệ.`);
     return Object.fromEntries(keys.map((key) => [key, typeof (item as Record<string, unknown>)[key] === "string" ? (item as Record<string, string>)[key].trim() : ""]));

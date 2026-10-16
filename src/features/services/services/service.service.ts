@@ -4,6 +4,7 @@ import { implantDetailSchema, type ImplantDetailData } from "../schemas/implant-
 import { serviceDetailContentKey, serviceDetailSchema, type ServiceDetailData } from "../schemas/service-detail.schema";
 import { serviceSchema } from "../schemas/service.schema";
 import type { DentalService } from "../types/service.type";
+import { parseValidItems } from "@/lib/parse-list";
 import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
 
 const getCachedServices = cachePublicData("services:list", [publicDataTags.services], () => serviceRepository.findAll());
@@ -11,8 +12,7 @@ const getCachedServiceBySlug = cachePublicData("services:by-slug", [publicDataTa
 
 export async function getServices(): Promise<readonly DentalService[]> {
   try {
-    const services = await getCachedServices();
-    return serviceSchema.array().parse(services);
+    return parseValidItems(serviceSchema, await getCachedServices(), "service.service");
   } catch (error) {
     console.error("[service.service] public data load failed", error);
     return [];

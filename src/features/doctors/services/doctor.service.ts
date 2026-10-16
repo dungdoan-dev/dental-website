@@ -1,6 +1,7 @@
 import { doctorRepository } from "../repositories/doctor.repository";
 import { doctorSchema } from "../schemas/doctor.schema";
 import type { Doctor } from "../types/doctor.type";
+import { parseValidItems } from "@/lib/parse-list";
 import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
 
 const getCachedDoctors = cachePublicData("doctors:list", [publicDataTags.doctors], () => doctorRepository.findAll());
@@ -8,7 +9,7 @@ const getCachedDoctorBySlug = cachePublicData("doctors:by-slug", [publicDataTags
 
 export async function getDoctors(): Promise<readonly Doctor[]> {
   try {
-    return doctorSchema.array().parse(await getCachedDoctors());
+    return parseValidItems(doctorSchema, await getCachedDoctors(), "doctor.service");
   } catch (error) {
     console.error("[doctor.service] public data load failed", error);
     return [];

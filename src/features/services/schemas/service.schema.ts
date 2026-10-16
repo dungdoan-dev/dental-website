@@ -7,7 +7,7 @@ export const serviceSchema = z.object({
   shortDescription: z.string().min(1),
   description: z.string().min(1),
   image: z.string().min(1),
-  badge: z.string().min(1),
+  badge: z.string(),
   badgeVariant: z.enum(["blue", "green"]),
   featured: z.boolean(),
   sortOrder: z.number().int().min(0).max(99999),
