@@ -10,6 +10,7 @@ import { updateHomeSectionCopy, updateStructuredSiteContent } from "@/features/a
 import { updateCoreValue } from "@/features/admin/actions";
 import { AdminActionForm } from "@/features/admin/components/AdminActionForm";
 import { ImageUploadField } from "@/features/admin/components/ImageUploadField";
+import { CoreValueIcon } from "@/features/home/components/CoreValueIcon";
 import { HOME_SECTION_COPY, type HomeSectionCopyMap } from "@/features/home/home-section-copy";
 
 export const metadata = {
@@ -123,7 +124,7 @@ export default async function AdminHomePage() {
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <HeroSlideFormDialog slide={{ ...slide, badgeVariant: slide.badgeVariant === "green" ? "green" : "blue", objectPosition: slide.objectPosition === "top" ? "top" : "center" }} buttonLabel="Sửa" />
-                <DeleteHeroSlideButton id={slide.id} />
+                <DeleteHeroSlideButton id={slide.id} name={slide.title} />
               </div>
             </div>
           ))}
@@ -133,7 +134,7 @@ export default async function AdminHomePage() {
 
       <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
         <div className="border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
-          <h2 className="text-base font-bold text-text-primary">4 Giá Trị Tạo Dựng Niềm Tin Bền Vững</h2>
+          <h2 className="text-base font-bold text-text-primary">{sectionCopy.values.title}</h2>
           <p className="text-xs text-text-secondary">Chỉnh sửa tiêu đề, thông điệp, mô tả, biểu tượng và thứ tự hiển thị trên trang chủ.</p>
         </div>
 
@@ -141,11 +142,13 @@ export default async function AdminHomePage() {
           {coreValueRows.map((row) => {
             const cv = { ...row, iconKey: row.icon_key, sortOrder: row.sort_order };
             return (
-            <div key={cv.id} className="p-5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-blue-dark">{cv.title}</span>
-              <h3 className="mt-2 text-xs font-bold text-text-primary">{cv.slogan}</h3>
-              <p className="mt-1 text-xs text-text-secondary leading-relaxed">{cv.description}</p>
-              <details className="mt-4 rounded-xl border border-border-subtle p-3">
+            <div key={cv.id} className="p-5 text-center">
+              {/* Preview mirrors the public card: icon, title, slogan, description with its line breaks. */}
+              <div className="mx-auto mb-3 h-12 w-12"><CoreValueIcon iconKey={cv.iconKey as "heart" | "care" | "honesty" | "innovation"} /></div>
+              <span className="text-lg font-extrabold uppercase tracking-wide text-brand-blue-dark">{cv.title}</span>
+              <h3 className="mt-2 text-sm font-bold text-text-primary">{cv.slogan}</h3>
+              <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-text-secondary">{cv.description}</p>
+              <details className="mt-4 rounded-xl border border-border-subtle p-3 text-left">
                 <summary className="cursor-pointer text-xs font-semibold text-brand-blue-dark">Chỉnh sửa nội dung</summary>
                 <AdminActionForm action={updateCoreValue} submitLabel="Lưu giá trị" className="mt-3 space-y-3">
                   <input name="id" type="hidden" value={cv.id.toString()} />
@@ -220,7 +223,7 @@ export default async function AdminHomePage() {
                   buttonLabel="Sửa"
                   buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                 />
-                <DeleteFaqButton id={faq.id.toString()} />
+                <DeleteFaqButton id={faq.id.toString()} name={faq.question} />
               </div>
             </div>
           ))}
@@ -269,7 +272,7 @@ export default async function AdminHomePage() {
                   buttonLabel="Sửa"
                   buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                 />
-                <DeleteTestimonialButton id={item.id} />
+                <DeleteTestimonialButton id={item.id} name={`Đánh giá của ${item.customerName}`} />
               </div>
             </div>
             );

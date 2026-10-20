@@ -250,7 +250,7 @@ export default async function AdminAppointmentsPage({
                       <StatusBadge status={app.status} />
                     </td>
                     <td className="px-3 py-4 text-right" data-label="Thao tác">
-                      <AppointmentActions id={app.id.toString()} currentStatus={app.status} />
+                      <AppointmentActions id={app.id.toString()} currentStatus={app.status} name={app.name} />
                     </td>
                   </tr>
                 ))}

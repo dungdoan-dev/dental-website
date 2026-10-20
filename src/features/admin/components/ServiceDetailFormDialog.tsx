@@ -1,6 +1,9 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { AdminDialog } from "./AdminDialog";
+import { FormSectionNav } from "./FormSectionNav";
+import { DialogFooter } from "./DialogFooter";
 import { EditableRows } from "./EditableRows";
 import { PriceTableEditor } from "./PriceTableEditor";
 import type { DentalService } from "@/features/services/types/service.type";
@@ -56,22 +59,11 @@ export function ServiceDetailFormDialog({ service }: Props) {
         <span aria-hidden="true" className="material-symbols-outlined text-base">edit_note</span>
         Chi tiết
       </button>
-      {open ? (
-        <div className="admin-dialog-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-4 backdrop-blur-sm sm:p-6 sm:pt-8" onClick={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-          <section aria-labelledby="service-detail-title" aria-modal="true" className="admin-dialog-panel flex max-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-2xl sm:max-h-[calc(100dvh-4rem)]" role="dialog">
-            <header className="admin-dialog-header flex shrink-0 items-center justify-between border-b border-border-subtle px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
-              <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-wider text-brand-blue-dark">Quản lý nội dung trang chi tiết</p>
-                <h2 className="mt-1 truncate text-lg font-bold text-text-primary" id="service-detail-title">{service.name}</h2>
-              </div>
-              <button aria-label="Đóng" className="ml-4 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-container-low text-text-secondary transition hover:bg-surface-container hover:text-text-primary" onClick={() => setOpen(false)} type="button">
-                <span aria-hidden="true" className="material-symbols-outlined">close</span>
-              </button>
-            </header>
-
+      <AdminDialog eyebrow="Quản lý nội dung trang chi tiết" icon="edit_note" onOpenChange={(next) => { if (!next) setOpen(false); }} open={open} size="xl" title={service.name}>
             {loading ? <p className="p-7 text-sm text-text-secondary" role="status">Đang tải chi tiết dịch vụ…</p> : null}
             {loadError ? <p className="p-7 text-sm text-error" role="alert">{loadError}</p> : null}
             {!loading && !loadError ? <form action={formAction} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+              <FormSectionNav />
               <FormFeedback result={result} />
               <input name="serviceId" type="hidden" value={service.id} />
               <ImageUploadField aspect={16 / 9} label="Ảnh trang chi tiết dịch vụ" defaultValue={base?.image} name="image" required />
@@ -89,14 +81,9 @@ export function ServiceDetailFormDialog({ service }: Props) {
               </section>
               <EditableRows label="Quy trình thực hiện" name="steps" columns={[{ key: "number", label: "Số thứ tự" }, { key: "title", label: "Tên bước" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={initial.steps} />
               <EditableRows label="Câu hỏi thường gặp" name="faqs" columns={[{ key: "question", label: "Câu hỏi", multiline: true }, { key: "answer", label: "Câu trả lời", multiline: true }]} initialRows={initial.faqs} />
-              <div className="flex justify-end gap-3 border-t border-border-subtle pt-4">
-                <button className="min-h-11 rounded-xl border border-border-subtle px-4 text-sm font-semibold text-text-secondary hover:bg-surface-container-low" onClick={() => setOpen(false)} type="button">Đóng</button>
-                <button className="min-h-11 rounded-xl bg-brand-blue-dark px-5 text-sm font-bold text-white transition hover:bg-brand-blue-hover disabled:cursor-wait disabled:opacity-60" disabled={pending} type="submit">{pending ? "Đang lưu…" : "Lưu chi tiết dịch vụ"}</button>
-              </div>
+              <DialogFooter cancelLabel="Đóng" isPending={pending} onCancel={() => setOpen(false)} submitLabel="Lưu chi tiết dịch vụ" />
             </form> : null}
-          </section>
-        </div>
-      ) : null}
+      </AdminDialog>
     </>
   );
 }

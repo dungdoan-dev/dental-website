@@ -179,7 +179,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                           buttonLabel="Sửa"
                           buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                         />
-                        <DeleteArticleButton id={article.id} />
+                        <DeleteArticleButton id={article.id} name={article.title} />
                       </div>
                     </td>
                   </tr>

@@ -13,6 +13,8 @@ export function TinyMceEditor({ value, onChange }: { value: string; onChange: (v
         height: 480,
         min_height: 320,
         max_height: 760,
+        // Render menus/dialogs inside the modal so its focus trap does not block them.
+        ui_container: ".admin-dialog-panel",
         menubar: false,
         plugins: ["lists", "link", "table", "image", "code", "autoresize", "wordcount"],
         toolbar: "undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | blockquote | link image table | removeformat | code",

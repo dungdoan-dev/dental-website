@@ -6,16 +6,20 @@ import { FormFeedback } from "./FormFeedback";
 import type { AppointmentStatus } from "@/features/appointments/types/appointment.type";
 import { deleteAppointment, updateAppointmentStatus } from "../actions";
 import { showMutationToast } from "./AdminToast";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export function AppointmentActions({
   id,
   currentStatus,
+  name,
 }: {
   id: string;
   currentStatus: AppointmentStatus;
+  name?: string;
 }) {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<MutationResult | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const handleStatusChange = (status: AppointmentStatus) => {
     startTransition(async () => {
@@ -33,20 +37,18 @@ export function AppointmentActions({
   };
 
   const handleDelete = () => {
-    if (confirm("Bạn có chắc chắn muốn xóa lịch hẹn này khỏi hệ thống?")) {
-      startTransition(async () => {
-        setResult(null);
-        try {
-          const response = await deleteAppointment(id);
-          showMutationToast(response, "Đã xóa lịch hẹn.");
-          setResult(response);
-        } catch {
-          const errorResult = { success: false as const, error: "Không thể xóa lịch hẹn. Vui lòng thử lại." };
-          showMutationToast(errorResult, "Đã xóa lịch hẹn.");
-          setResult(errorResult);
-        }
-      });
-    }
+    startTransition(async () => {
+      setResult(null);
+      try {
+        const response = await deleteAppointment(id);
+        showMutationToast(response, "Đã xóa lịch hẹn.");
+        setResult(response);
+      } catch {
+        const errorResult = { success: false as const, error: "Không thể xóa lịch hẹn. Vui lòng thử lại." };
+        showMutationToast(errorResult, "Đã xóa lịch hẹn.");
+        setResult(errorResult);
+      }
+    });
   };
 
   return (
@@ -69,12 +71,14 @@ export function AppointmentActions({
       <button
         type="button"
         disabled={isPending}
-        onClick={handleDelete}
+        onClick={() => setConfirmingDelete(true)}
         className="p-1.5 rounded-xl text-text-secondary hover:text-error hover:bg-error-container transition-colors disabled:opacity-50"
         title="Xóa lịch hẹn"
       >
         <span className="material-symbols-outlined text-[18px]">delete</span>
       </button>
-    </div><div className="mt-2 text-left"><FormFeedback result={result} /></div></div>
+    </div><div className="mt-2 text-left"><FormFeedback result={result} /></div>
+      <ConfirmDialog confirmLabel="Xóa lịch hẹn" description="Lịch hẹn sẽ bị xóa khỏi hệ thống và không thể khôi phục." onConfirm={handleDelete} onOpenChange={setConfirmingDelete} open={confirmingDelete} title={name ? `Xóa lịch hẹn của "${name}"?` : "Xóa lịch hẹn này?"} />
+    </div>
   );
 }

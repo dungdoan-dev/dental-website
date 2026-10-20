@@ -1,6 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { AdminDialog } from "./AdminDialog";
+import { FormSectionNav } from "./FormSectionNav";
+import { DialogFooter } from "./DialogFooter";
 import { useState, useTransition } from "react";
 import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
@@ -134,33 +137,14 @@ export function ArticleFormDialog({
         {buttonLabel}
       </button>
 
-      {isOpen && (
-        <div className="admin-dialog-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-4 backdrop-blur-sm sm:p-6 sm:pt-8">
-          <div className="admin-dialog-panel relative flex max-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-border-subtle bg-white shadow-2xl sm:max-h-[calc(100dvh-4rem)]">
-            <div className="admin-dialog-header flex shrink-0 items-center justify-between border-b border-border-subtle/60 px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-brand-blue-light text-brand-blue-dark flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[20px]">article</span>
-                </div>
-                <h3 className="text-lg font-bold text-text-primary">
-                  {article ? "Chỉnh sửa Bài Viết" : "Thêm Bài Viết Mới"}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-xl text-text-secondary hover:bg-surface-container hover:text-text-primary transition"
-              >
-                ✕
-              </button>
-            </div>
-
+      <AdminDialog icon="article" onOpenChange={(open) => { if (!open) (() => setIsOpen(false))(); }} open={isOpen} size="xl" title={article ? "Chỉnh sửa Bài Viết" : "Thêm Bài Viết Mới"}>
             {isLoading ? <p className="p-7 text-sm text-text-secondary" role="status">Đang tải nội dung bài viết…</p> : null}
             {loadError ? <p className="p-7 text-sm text-error" role="alert">{loadError}</p> : null}
             {!isLoading && !loadError ? <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
+              <FormSectionNav />
               <FormFeedback result={result} />
 
-              <fieldset className="admin-form-section">
+              <fieldset className="admin-form-section" data-nav="Nội dung">
                 <legend>Nội dung bài viết</legend>
                 <label>Tiêu đề *<input onChange={handleTitleChange} placeholder="Tiêu đề chuẩn SEO y khoa..." required type="text" value={formData.title} /></label>
                 <label>Tóm tắt ngắn *<textarea onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} placeholder="Mô tả tóm tắt nội dung bài viết..." required rows={2} value={formData.excerpt} /></label>
@@ -172,7 +156,7 @@ export function ArticleFormDialog({
                 </div>
               </fieldset>
 
-              <fieldset className="admin-form-section">
+              <fieldset className="admin-form-section" data-nav="Xuất bản">
                 <legend>Xuất bản và hiển thị</legend>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label>Trạng thái<select onChange={(event) => setFormData({ ...formData, status: event.target.value as "draft" | "published" })} value={formData.status}><option value="draft">Bản nháp (chưa hiển thị)</option><option value="published">Xuất bản (hiển thị trên website)</option></select></label>
@@ -190,32 +174,15 @@ export function ArticleFormDialog({
                 <label><input checked={formData.featured} className="h-4 w-4 accent-brand-blue-dark" onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} type="checkbox" />Bài nổi bật (hiển thị lớn ở đầu trang Kiến thức)</label>
               </fieldset>
 
-              <details className="admin-form-section">
+              <details className="admin-form-section" data-nav="Nâng cao">
                 <summary>Cài đặt nâng cao</summary>
                 <label>Đường dẫn bài viết (slug) *<input className="font-mono" onChange={(e) => setFormData({ ...formData, slug: e.target.value })} required type="text" value={formData.slug} /></label>
                 <p className="admin-form-hint">Tự tạo từ tiêu đề khi thêm mới. Đổi slug sẽ làm đường dẫn cũ /tin-tuc/… không còn hoạt động.</p>
               </details>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-subtle/60">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="rounded-xl border border-border-subtle px-4 py-2 text-xs font-semibold text-text-secondary hover:bg-surface-container"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="rounded-xl bg-brand-blue-dark px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-brand-blue disabled:opacity-50 transition-all"
-                >
-                  {isPending ? "Đang lưu..." : "Lưu Bài Viết"}
-                </button>
-              </div>
+              <DialogFooter isPending={isPending} onCancel={() => setIsOpen(false)} submitLabel="Lưu Bài Viết" />
             </form> : null}
-          </div>
-        </div>
-      )}
+      </AdminDialog>
     </>
   );
 }

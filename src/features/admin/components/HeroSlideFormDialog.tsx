@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { AdminDialog } from "./AdminDialog";
+import { DialogFooter } from "./DialogFooter";
 import { upsertHeroSlide } from "../actions";
 import { ImageUploadField } from "./ImageUploadField";
 import { showAdminToast } from "./AdminToast";
@@ -63,13 +65,7 @@ export function HeroSlideFormDialog({
       <button className="inline-flex items-center gap-1.5 rounded-2xl bg-brand-blue-dark px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-brand-blue" onClick={() => setIsOpen(true)} type="button">
         {buttonLabel}
       </button>
-      {isOpen ? (
-        <div className="admin-dialog-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-4 backdrop-blur-sm sm:p-6 sm:pt-8" onClick={(event) => { if (event.target === event.currentTarget) setIsOpen(false); }}>
-          <div aria-labelledby="hero-slide-dialog-title" aria-modal="true" className="admin-dialog-panel flex max-h-[calc(100dvh-2rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-2xl sm:max-h-[calc(100dvh-4rem)]" role="dialog">
-            <div className="admin-dialog-header flex shrink-0 items-center justify-between border-b border-border-subtle px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
-              <h2 className="text-lg font-bold text-text-primary" id="hero-slide-dialog-title">{slide ? "Chỉnh sửa slide" : "Thêm slide trang chủ"}</h2>
-              <button aria-label="Đóng" className="rounded-lg px-2 py-1 text-text-secondary hover:bg-surface-container-low" onClick={() => setIsOpen(false)} type="button">✕</button>
-            </div>
+      <AdminDialog icon="home" onOpenChange={(open) => { if (!open) setIsOpen(false); }} open={isOpen} size="lg" title={slide ? "Chỉnh sửa slide" : "Thêm slide trang chủ"}>
             <form className="admin-dialog-form flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7" onSubmit={handleSubmit}>
               <fieldset className="admin-form-section">
                 <legend>Ảnh slide</legend>
@@ -97,14 +93,9 @@ export function HeroSlideFormDialog({
                 <p className="admin-form-hint">Số nhỏ hiển thị trước.{slide ? ` Mã slide: ${slide.id}` : ""}</p>
               </fieldset>
               {error ? <p className="text-xs text-red-600" role="alert">{error}</p> : null}
-              <div className="flex justify-end gap-2 border-t border-border-subtle pt-4">
-                <button className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-semibold" onClick={() => setIsOpen(false)} type="button">Hủy</button>
-                <button className="rounded-lg bg-brand-blue-dark px-4 py-2 text-xs font-bold text-white disabled:opacity-60" disabled={isPending} type="submit">{isPending ? "Đang lưu..." : "Lưu slide"}</button>
-              </div>
+              <DialogFooter isPending={isPending} onCancel={() => setIsOpen(false)} submitLabel="Lưu slide" />
             </form>
-          </div>
-        </div>
-      ) : null}
+      </AdminDialog>
     </>
   );
 }

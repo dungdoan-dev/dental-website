@@ -25,8 +25,9 @@ export async function CoreValuesSection() {
                 <p className="mb-3 text-[15px] font-bold leading-snug text-text-primary sm:min-h-[2.75em]">
                   {value.slogan}
                 </p>
-                <p className="text-sm leading-relaxed text-text-secondary">
-                  {value.description}
+                <p className="whitespace-pre-line text-sm leading-relaxed text-text-secondary">
+                  {/* a blank line typed in the admin would show as an empty row */}
+                  {value.description.replace(/(\r?\n)+/g, "\n")}
                 </p>
               </article>
             ))}

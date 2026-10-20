@@ -138,7 +138,7 @@ export default async function AdminServicesPage() {
                           buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
                         />
                         <ServiceDetailFormDialog service={service} />
-                        <DeleteServiceButton id={service.id} />
+                        <DeleteServiceButton id={service.id} name={service.name} />
                       </div>
                     </td>
                   </tr>
