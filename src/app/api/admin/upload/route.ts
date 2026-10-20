@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { hasAdminSession } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { optimizeUploadedImage } from "@/features/admin/services/optimize-image";
 
 export const runtime = "nodejs";
 
@@ -36,10 +37,14 @@ export async function POST(request: Request) {
   const isWebp = buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP";
   if (!(isJpeg || isPng || isWebp)) return NextResponse.json({ error: "Định dạng nội dung ảnh không hợp lệ." }, { status: 415 });
 
+  let optimized: Buffer;
+  try { optimized = await optimizeUploadedImage(buffer); }
+  catch { return NextResponse.json({ error: "Không thể đọc ảnh hoặc ảnh vượt quá giới hạn 40 megapixel." }, { status: 415 }); }
+  if (optimized.length > maxBytes) return NextResponse.json({ error: "Ảnh sau xử lý vượt quá giới hạn 8 MB." }, { status: 413 });
   const supabase = await getSupabaseServerClient();
-  const path = `admin/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${extension}`;
-  const { error } = await supabase.storage.from("site-media").upload(path, buffer, {
-    contentType: file.type,
+  const path = `admin/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.webp`;
+  const { error } = await supabase.storage.from("site-media").upload(path, optimized, {
+    contentType: "image/webp",
     cacheControl: "31536000",
     upsert: false,
   });

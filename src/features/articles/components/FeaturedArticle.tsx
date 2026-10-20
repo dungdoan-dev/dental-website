@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import { getArticleCategoryLabel } from "../data/article-categories.data";
-import type { Article } from "../types/article.type";
+import type { ArticleSummary } from "../types/article.type";
 
-type FeaturedArticleProps = { article: Article };
+type FeaturedArticleProps = { article: ArticleSummary };
 
 export function FeaturedArticle({ article }: FeaturedArticleProps) {
   const publishedDate = new Intl.DateTimeFormat("vi-VN", { timeZone: "UTC" }).format(new Date(article.publishedAt));

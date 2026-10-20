@@ -14,3 +14,5 @@ export type Article = {
   featured: boolean;
   status?: "draft" | "published";
 };
+
+export type ArticleSummary = Omit<Article, "content">;

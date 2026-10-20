@@ -1,15 +1,15 @@
 import { articleRepository } from "../repositories/article.repository";
-import { articleSchema } from "../schemas/article.schema";
-import type { Article } from "../types/article.type";
+import { articleSchema, articleSummarySchema } from "../schemas/article.schema";
+import type { Article, ArticleSummary } from "../types/article.type";
 import { parseValidItems } from "@/lib/parse-list";
 import { cachePublicData, publicDataTags } from "@/lib/public-data-cache";
 
-const getCachedArticles = cachePublicData("articles:list", [publicDataTags.articles], () => articleRepository.findAll());
+const getCachedArticles = cachePublicData("articles:summary-list", [publicDataTags.articles], () => articleRepository.findAll());
 const getCachedArticleBySlug = cachePublicData("articles:by-slug", [publicDataTags.articles], (slug: string) => articleRepository.findBySlug(slug));
 
-export async function getArticles(): Promise<readonly Article[]> {
+export async function getArticles(): Promise<readonly ArticleSummary[]> {
   try {
-    return parseValidItems(articleSchema, await getCachedArticles(), "article.service");
+    return parseValidItems(articleSummarySchema, await getCachedArticles(), "article.service");
   } catch (error) {
     console.error("[article.service] public data load failed", error);
     return [];

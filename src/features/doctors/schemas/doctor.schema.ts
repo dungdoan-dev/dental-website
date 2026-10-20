@@ -30,3 +30,5 @@ export const doctorSchema = z.object({
     sourceUrl: z.union([z.literal(""), z.url()]),
   }).optional(),
 });
+
+export const doctorSummarySchema = doctorSchema.pick({ id: true, name: true, slug: true, avatar: true, position: true, degree: true, category: true, directoryTitle: true, sortOrder: true }).extend({ specialties: z.array(z.string().min(1)) });

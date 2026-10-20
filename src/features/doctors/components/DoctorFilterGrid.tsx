@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { doctorFilters, type DoctorFilter } from "../data/doctor-filter.data";
-import type { Doctor } from "../types/doctor.type";
+import type { DoctorSummary } from "../types/doctor.type";
 import { DoctorRosterCard } from "./DoctorRosterCard";
 import { getDoctorFullName } from "@/features/doctors/utils/doctor-card-name";
 
-type DoctorFilterGridProps = { doctors: readonly Doctor[] };
+type DoctorFilterGridProps = { doctors: readonly DoctorSummary[] };
 
 function normalizeSearch(value: string) {
   return value

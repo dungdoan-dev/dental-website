@@ -48,6 +48,7 @@ export function AppointmentForm({
   const [message, setMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const errorSummaryRef = useRef<HTMLDivElement>(null);
+  const submission = useRef<{ payload: string; requestId: string } | null>(null);
   const errorEntries = Object.entries(fieldErrors).filter(
     (entry): entry is [keyof AppointmentSchemaInput, string] =>
       Boolean(entry[1]),
@@ -92,10 +93,12 @@ export function AppointmentForm({
     setMessage("");
     setFieldErrors({});
     try {
+      const payload = JSON.stringify(input);
+      if (submission.current?.payload !== payload) submission.current = { payload, requestId: crypto.randomUUID() };
       const response = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        body: JSON.stringify({ ...input, requestId: submission.current.requestId, website: String(data.get("website") ?? "") }),
       });
       const result = (await response.json()) as {
         message?: string;
@@ -150,6 +153,7 @@ export function AppointmentForm({
         noValidate
         onSubmit={handleSubmit}
       >
+        <div aria-hidden="true" className="sr-only"><label htmlFor={fieldId("website")}>Website</label><input autoComplete="off" id={fieldId("website")} name="website" tabIndex={-1} type="text" /></div>
         {status === "error" && message ? (
           <div
             className="rounded-xl bg-red-50 p-3 text-sm text-red-700"

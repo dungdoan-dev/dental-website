@@ -2,7 +2,7 @@ import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { StatusBadge } from "@/features/admin/components/StatusBadge";
 import { AppointmentActions } from "@/features/admin/components/AppointmentActions";
-import { appointmentQuerySchema } from "@/features/admin/schemas/admin.schema";
+import { normalizeAppointmentFilters, applyAppointmentFilters, appointmentCountArgs } from "@/features/admin/services/appointment-filters";
 import Link from "next/link";
 import { CalendarX2, ChevronLeft, ChevronRight, Download, ExternalLink, Search } from "lucide-react";
 import { Badge } from "@/components/admin-ui/badge";
@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/admin-ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin-ui/table";
 import { PageHeader } from "@/features/admin/components/PageHeader";
 import type { AppointmentStatus } from "@/features/appointments/types/appointment.type";
+import { NotificationRetryButton } from "@/features/admin/components/NotificationRetryButton";
 
 type AppointmentRow = {
   id: string | number;
@@ -37,39 +38,23 @@ export default async function AdminAppointmentsPage({
 }) {
   await requireAdmin();
   const raw = await searchParams;
-  const filters = appointmentQuerySchema.parse(Object.fromEntries(Object.entries(raw).filter((entry): entry is [string, string] => typeof entry[1] === "string")));
+  const filters = normalizeAppointmentFilters(raw);
   const supabase = await getSupabaseServerClient();
   // clinicId is not checked against the clinic list so the counts can load in parallel; an unknown id just matches nothing.
   const clinicId = filters.clinicId;
   const status = filters.status;
   const statuses = ["pending", "confirmed", "completed", "cancelled"] as const;
-  const safeName = (filters.q ?? "").replace(/[,%()\\"\\\\]/g, " ").trim();
-  // Phones are stored as +84…, so a local "09…" search must drop its leading 0 to match.
-  const digits = (filters.q ?? "").replace(/[^0-9]/g, "").replace(/^0/, "");
   const pageSize = 25;
   // Fresh builder per call (a Postgrest builder mutates itself) so a second page can be fetched when needed.
   const loadRows = (pageNumber: number) => {
-    let appointmentsQuery = supabase.from("appointments").select("id,name,phone,email,appointment_date,created_at,note,status,clinic_id,service:services(name),clinic:clinics(name,label)");
-    if (clinicId) appointmentsQuery = appointmentsQuery.eq("clinic_id", clinicId);
-    if (filters.q) {
-      appointmentsQuery = appointmentsQuery.or([`name.ilike.%${safeName}%`, ...(digits ? [`phone.ilike.%${digits}%`] : [])].join(","));
-    }
-    if (filters.date) {
-      const from = new Date(`${filters.date}T00:00:00+07:00`);
-      appointmentsQuery = appointmentsQuery.gte("appointment_date", from.toISOString()).lt("appointment_date", new Date(from.getTime() + 86400000).toISOString());
-    }
-    if (status) appointmentsQuery = appointmentsQuery.eq("status", status);
+    const appointmentsQuery = supabase.from("appointments").select("id,name,phone,email,appointment_date,created_at,note,status,clinic_id,service:services(name),clinic:clinics(name,label)");
+    applyAppointmentFilters(appointmentsQuery, filters);
     return appointmentsQuery.order("created_at", { ascending: false }).order("id", { ascending: false })
       .range((pageNumber - 1) * pageSize, pageNumber * pageSize - 1);
   };
   const [{ data: clinics, error: clinicsError }, { data: statusCounts, error: countsError }, firstRows] = await Promise.all([
     supabase.from("clinics").select("id,label").order("id"),
-    supabase.rpc("admin_appointment_status_counts", {
-      p_clinic_id: clinicId ?? null,
-      p_name_query: filters.q ? safeName : null,
-      p_phone_query: digits || null,
-      p_day: filters.date || null,
-    }),
+    supabase.rpc("admin_appointment_status_counts", appointmentCountArgs(filters)),
     loadRows(filters.page),
   ]);
   if (clinicsError) throw clinicsError;
@@ -111,6 +96,7 @@ export default async function AdminAppointmentsPage({
     <div className="mx-auto flex w-full max-w-[1800px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <PageHeader
         actions={<>
+          <NotificationRetryButton />
           <Button asChild size="sm" variant="outline"><Link href={`/admin/appointments/export?${exportQuery}`}><Download /> Xuất CSV</Link></Button>
           <Button asChild size="sm" variant="soft"><Link prefetch={false} href="/lien-he" rel="noreferrer" target="_blank"><ExternalLink /> Mở form đặt hẹn</Link></Button>
         </>}

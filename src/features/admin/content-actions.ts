@@ -7,14 +7,14 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { contactCtaSchema } from "@/features/content/schemas/contact-cta.schema";
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
 import { implantDetailSchema } from "@/features/services/schemas/implant-detail.schema";
-import { serviceDetailSchema, serviceDetailContentKey } from "@/features/services/schemas/service-detail.schema";
+import { serviceDetailSchema } from "@/features/services/schemas/service-detail.schema";
 import { directoryHeroPages, directoryHeroSchema } from "@/features/content/schemas/directory-hero.schema";
 import { servicePriceCategoriesSchema } from "@/features/services/schemas/service-price-categories.schema";
 import type { MutationResult } from "./services/mutation";
 import { validationFailure } from "./services/mutation";
 import { imagePathSchema } from "./schemas/admin.schema";
 import { publicDataTags } from "@/lib/public-data-cache";
-import { saveRevision } from "./services/mutation";
+import { saveContent } from "./services/mutation";
 
 type State = MutationResult | null;
 type ListRow = Record<string, string>;
@@ -41,10 +41,7 @@ function readField(formData: FormData, name: string) {
 }
 
 async function saveSiteRecord(key: string, title: string, content: unknown) {
-  const supabase = await getSupabaseServerClient();
-  const { error } = await supabase.from("site_content").upsert({ key, content });
-  if (error) throw error;
-  await saveRevision("site-content", key, title, content);
+  await saveContent("site-content", { key, content }, title, content);
   updateTag(publicDataTags.siteContent);
 }
 
@@ -117,11 +114,6 @@ export async function updateServiceDetail(_previous: State, formData: FormData):
   await requireAdmin();
   try {
     const serviceId = readField(formData, "serviceId");
-    const supabase = await getSupabaseServerClient();
-    const { data: service, error: serviceError } = await supabase.from("services").select("id,name,slug").eq("id", serviceId).maybeSingle();
-    if (serviceError) throw serviceError;
-    if (!service) return { success: false, error: "Không tìm thấy dịch vụ cần cập nhật." };
-
     const parsed = serviceDetailSchema.safeParse({
       eyebrow: readField(formData, "eyebrow"),
       title: readField(formData, "title"),
@@ -137,12 +129,11 @@ export async function updateServiceDetail(_previous: State, formData: FormData):
     const image = imagePathSchema.safeParse(formData.get("image"));
     if (!image.success) return validationFailure(image.error);
 
-    const key = serviceDetailContentKey(service.id);
-    await saveSiteRecord(key, `Chi tiết dịch vụ: ${service.name}`, parsed.data);
-    const { error: updateError } = await supabase.from("services").update({ image: image.data, updated_at: new Date().toISOString() }).eq("id", service.id);
-    if (updateError) throw updateError;
+    const saved = await saveContent("service-detail", { serviceId, image: image.data, content: parsed.data }, "Chi tiết dịch vụ", parsed.data);
+    updateTag(publicDataTags.siteContent);
+    updateTag(publicDataTags.services);
     revalidatePath("/admin/services");
-    revalidatePath(`/dich-vu/${service.slug}`);
+    revalidatePath(`/dich-vu/${saved.slug}`);
     revalidatePath("/dich-vu");
     revalidatePath("/");
     return { success: true };
@@ -154,7 +145,7 @@ export async function updateServiceDetail(_previous: State, formData: FormData):
 const insuranceSchema = z.object({
   code: z.string().trim().min(1).max(40), name: z.string().trim().min(1).max(200),
   description: z.string().trim().min(1).max(2000), accent: z.enum(["blue", "green"]),
-  logoSrc: z.union([z.literal(""), z.string().trim().startsWith("/images/").max(500)]),
+  logoSrc: z.union([z.literal(""), imagePathSchema]),
   sortOrder: z.number().int().min(0).max(9999),
 });
 
@@ -194,12 +185,12 @@ export async function updateContactCta(_previous: State, formData: FormData): Pr
     // The call button dials each clinic's own phone, so the numbers are edited here but stored on the clinic.
     const phones = z.array(z.string().trim().min(1, "Số điện thoại không được để trống").max(100)).safeParse(clinics.map((clinic) => readField(formData, `phone-${clinic.id}`)));
     if (!phones.success) return validationFailure(phones.error);
-    for (const [index, clinic] of clinics.entries()) {
-      const { error: phoneError } = await (await getSupabaseServerClient()).from("clinics").update({ phone: phones.data[index] }).eq("id", clinic.id);
-      if (phoneError) throw phoneError;
-    }
+    await saveContent("contact-cta", {
+      key: "contact_cta", content: settings.data,
+      phones: clinics.map((clinic, index) => ({ id: clinic.id, phone: phones.data[index] })),
+    }, "CTA liên hệ", settings.data);
     updateTag(publicDataTags.clinics);
-    await saveSiteRecord("contact_cta", "CTA liên hệ", settings.data);
+    updateTag(publicDataTags.siteContent);
   } catch { return { success: false, error: "Không thể lưu CTA liên hệ. Vui lòng kiểm tra các liên kết." }; }
   revalidatePath("/admin/clinics");
   revalidatePath("/lien-he");

@@ -34,3 +34,5 @@ export type Doctor = {
   directoryTitle: string;
   profile?: DoctorProfile;
 };
+
+export type DoctorSummary = Pick<Doctor, "id" | "name" | "slug" | "avatar" | "position" | "degree" | "category" | "directoryTitle" | "sortOrder"> & { specialties: readonly string[] };

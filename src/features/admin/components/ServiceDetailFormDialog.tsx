@@ -68,7 +68,7 @@ export function ServiceDetailFormDialog({ service }: Props) {
               <input name="serviceId" type="hidden" value={service.id} />
               <ImageUploadField aspect={16 / 9} label="Ảnh trang chi tiết dịch vụ" defaultValue={base?.image} name="image" required />
               <div className="grid gap-4 sm:grid-cols-2">
-                <label>Dòng giới thiệu nhỏ<input defaultValue={initial.eyebrow} maxLength={120} name="eyebrow" placeholder="Ví dụ: Nha khoa thẩm mỹ" /></label>
+                <label>Nhãn đầu trang chi tiết<input defaultValue={initial.eyebrow} maxLength={120} name="eyebrow" placeholder="Ví dụ: Nha khoa thẩm mỹ" /></label>
                 <label>Tiêu đề chính *<input defaultValue={initial.title} maxLength={240} name="title" required /></label>
               </div>
               <label>Mô tả mở đầu *<textarea defaultValue={initial.introduction} maxLength={10000} name="introduction" required rows={4} /></label>

@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { articleCategories } from "../data/article-categories.data";
-import type { Article, ArticleCategory } from "../types/article.type";
+import type { ArticleSummary, ArticleCategory } from "../types/article.type";
 import { ArticleCard } from "./ArticleCard";
 import { FeaturedArticle } from "./FeaturedArticle";
 
 type CategoryFilter = "all" | ArticleCategory;
-type ArticleExplorerProps = { articles: readonly Article[]; featuredArticle?: Article; initialCategory?: CategoryFilter; initialQuery?: string };
+type ArticleExplorerProps = { articles: readonly ArticleSummary[]; featuredArticle?: ArticleSummary; initialCategory?: CategoryFilter; initialQuery?: string };
 
 const pageSize = 6;
 

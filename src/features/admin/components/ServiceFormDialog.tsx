@@ -54,7 +54,7 @@ function ServiceEditor({
   const [result, setResult] = useState<MutationResult | null>(null);
   useMutationToast(result, service ? "Đã cập nhật dịch vụ." : "Đã thêm dịch vụ.");
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     id: service?.id ?? "",
     name: service?.name ?? "",
     slug: service?.slug ?? "",
@@ -65,7 +65,8 @@ function ServiceEditor({
     badgeVariant: service?.badgeVariant ?? ("blue" as const),
     featured: service?.featured ?? false,
     category: service?.category ?? ("general" as ServiceCategory),
-  });
+  };
+  const [formData, setFormData] = useState(initialFormData);
 
   const generateSlug = (name: string) => {
     return name
@@ -93,7 +94,11 @@ function ServiceEditor({
       try {
         const saved = await upsertService(formData);
         // Success toasts directly: closing unmounts this editor before the result effect could run.
-        if (saved.success) { showMutationToast(saved, service ? "Đã cập nhật dịch vụ." : "Đã thêm dịch vụ."); close(); }
+        if (saved.success) {
+          showMutationToast(saved, service ? "Đã cập nhật dịch vụ." : "Đã thêm dịch vụ.");
+          if (!service) setFormData(initialFormData);
+          close();
+        }
         else setResult(saved);
       } catch { setResult({ success: false, error: "Không thể lưu thay đổi. Vui lòng thử lại." }); }
     });
@@ -127,8 +132,9 @@ function ServiceEditor({
                   </label>
                 </div>
                 <label>Mô tả ngắn *<textarea onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })} placeholder="Mô tả tóm tắt nổi bật dịch vụ..." required rows={2} value={formData.shortDescription} /></label>
-                <p className="admin-form-hint">Hiện trên thẻ dịch vụ ở trang chủ và trang Dịch vụ (khoảng 3 dòng).</p>
-                <label>Mô tả chi tiết *<textarea onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Mô tả chuyên môn đầy đủ..." required rows={4} value={formData.description} /></label>
+                <p className="admin-form-hint">Hiện trên thẻ dịch vụ ở trang chủ và trang Dịch vụ, tối đa 4 dòng. Icon trên thẻ được chọn tự động theo chuyên mục.</p>
+                <label>Mô tả cơ bản *<textarea onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Giới thiệu dịch vụ khi chưa có trang chi tiết riêng..." required rows={4} value={formData.description} /></label>
+                <p className="admin-form-hint">Dùng khi chưa cấu hình nội dung riêng. Khi đã lưu ở nút “Chi tiết”, tiêu đề và mô tả mở đầu của trang dịch vụ được lấy từ form đó.</p>
                 {!service ? <ImageUploadField label="Ảnh trang chi tiết *" onChange={(image) => setFormData({ ...formData, image })} required value={formData.image} /> : <p className="admin-form-hint">Ảnh, bảng giá, quy trình và câu hỏi thường gặp được sửa ở nút “Chi tiết”.</p>}
               </fieldset>
 

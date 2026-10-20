@@ -15,18 +15,20 @@ export function InsurancePartnersManager({ partners }: { partners: readonly Insu
   return <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
     <div className="border-b border-border-subtle bg-surface-container-low/50 px-6 py-4">
       <h2 className="text-base font-bold text-text-primary">Đối tác bảo hiểm &amp; bảo lãnh viện phí</h2>
-      <p className="mt-1 text-xs text-text-secondary">Cấu hình logo, tên hiển thị và thứ tự ở khu vực bảo hiểm trang chủ.</p>
+      <p className="mt-1 text-xs text-text-secondary">Trang chủ hiển thị hai hàng logo chuyển động. Đối tác chưa có logo sẽ không xuất hiện.</p>
     </div>
     <div className="divide-y divide-slate-100">
-      {partners.map((partner) => <AdminActionForm action={updateInsurancePartner} className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-6 xl:items-end" key={partner.code} submitClassName="min-h-11 rounded-lg bg-brand-blue-dark px-4 text-sm font-bold text-white disabled:opacity-50" submitLabel="Lưu">
+      {partners.map((partner) => <AdminActionForm action={updateInsurancePartner} className="space-y-5 p-5 sm:p-6" key={partner.code} submitLabel="Lưu đối tác">
         <input name="code" type="hidden" value={partner.code} />
-        <div className="text-xs"><p className="font-bold text-text-primary">{partner.name}</p><p className="mt-1 font-mono text-text-secondary">{partner.code}</p></div>
-        <label className="text-xs font-semibold text-text-secondary">Tên hiển thị<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.name} name="name" required /></label>
-        <label className="text-xs font-semibold text-text-secondary">Mô tả<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.description} name="description" required /></label>
-        <div><ImageUploadField aspect={2 / 1} label="Logo đối tác" name="logoSrc" defaultValue={partner.logoSrc ?? ""} /></div>
-        <div className="grid grid-cols-2 gap-2">
-          <label className="text-xs font-semibold text-text-secondary">Màu nhấn<select className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-2 py-2 text-sm font-normal text-text-primary" defaultValue={partner.accent} name="accent"><option value="blue">Xanh dương</option><option value="green">Xanh lá</option></select></label>
-          <label className="text-xs font-semibold text-text-secondary">Thứ tự<input className="mt-1 w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm font-normal text-text-primary" defaultValue={partner.sortOrder} min={0} name="sortOrder" required type="number" /></label>
+        <input name="description" type="hidden" value={partner.description} />
+        <input name="accent" type="hidden" value={partner.accent} />
+        <div className="flex flex-wrap items-center gap-3"><h3 className="text-sm font-semibold text-text-primary">{partner.name}</h3><span className="rounded-md border border-border-subtle bg-background-secondary px-2 py-1 font-mono text-[11px] text-text-secondary">{partner.code}</span></div>
+        <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+          <div className="min-w-0"><ImageUploadField aspect={2 / 1} fit="contain" label="Logo đối tác" name="logoSrc" defaultValue={partner.logoSrc ?? ""} /></div>
+          <div className="grid min-w-0 gap-5 sm:grid-cols-2">
+            <label>Tên đối tác *<input defaultValue={partner.name} maxLength={200} name="name" required /><span className="text-xs font-normal text-text-secondary">Dùng làm mô tả logo cho trình đọc màn hình, không hiện thành dòng chữ trên trang chủ.</span></label>
+            <label>Thứ tự hiển thị *<input defaultValue={partner.sortOrder} max={9999} min={0} name="sortOrder" required type="number" /><span className="text-xs font-normal text-text-secondary">Số nhỏ hiển thị trước.</span></label>
+          </div>
         </div>
       </AdminActionForm>)}
       {partners.length === 0 ? <p className="p-5 text-sm text-text-secondary">Chưa có đối tác bảo hiểm trong database.</p> : null}

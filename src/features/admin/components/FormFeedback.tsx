@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { MutationResult } from "../services/mutation";
+import { CircleAlert, CircleCheck } from "lucide-react";
 
 // Field keys come from the zod schemas (path joined by "."); show the first segment as a Vietnamese label.
 const FIELD_LABELS: Record<string, string> = {
@@ -26,9 +27,9 @@ export function FormFeedback({ result }: { result: MutationResult | null }) {
   useEffect(() => { if (result && !result.success) ref.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [result]);
 
   if (!result) return null;
-  if (result.success) return <p aria-live="polite" className="rounded-xl bg-brand-green-light p-3 text-sm font-medium text-text-primary">Đã lưu thay đổi.</p>;
-  return <div className="rounded-xl border border-error/25 bg-error-container/30 p-4 text-sm text-error" ref={ref} role="alert">
-    <p className="font-semibold">{result.error}</p>
+  if (result.success) return <p aria-live="polite" className="flex items-center gap-2 rounded-lg border border-brand-green-dark/20 bg-brand-green-light px-4 py-3 text-sm font-medium text-brand-green-hover"><CircleCheck aria-hidden="true" className="size-4 shrink-0" />Đã lưu thay đổi.</p>;
+  return <div className="rounded-lg border border-error/20 bg-error-container/20 p-4 text-sm text-error" ref={ref} role="alert">
+    <p className="flex items-start gap-2 font-semibold"><CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />{result.error}</p>
     {result.fieldErrors && <ul className="mt-2 list-inside list-disc space-y-0.5">{Object.entries(result.fieldErrors).map(([field, message]) => <li key={field}><strong className="font-semibold">{fieldLabel(field)}:</strong> {message}</li>)}</ul>}
   </div>;
 }

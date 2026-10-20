@@ -29,7 +29,7 @@ function ContentEditor({ record }: { record: SiteContentRecord }) {
     const { hero, highlights, story, visionMission, principles, expertise, clinics } = record.content;
     return <AdminActionForm action={updateStructuredSiteContent} className="space-y-5 rounded-2xl border border-border-subtle bg-background-secondary p-4 sm:p-6" submitLabel="Lưu trang giới thiệu">
       <input name="key" type="hidden" value={record.key} />
-      <div><h3 className="text-lg font-bold text-text-primary">Nội dung trang Giới thiệu</h3><p className="mt-1 text-sm text-text-secondary">Các trường được nhóm theo đúng thứ tự nội dung trên /gioi-thieu. Ảnh có thể tải lên Supabase Storage (có cắt ảnh) hoặc nhập URL.</p></div>
+      <div><h3 className="text-lg font-bold text-text-primary">Nội dung trang Giới thiệu</h3><p className="mt-1 text-sm text-text-secondary">Các trường được nhóm theo đúng thứ tự nội dung trên /gioi-thieu. Chọn và cắt ảnh trước khi tải lên.</p></div>
       <EditorSection columns="sm:grid-cols-2" title="Banner giới thiệu">
         <TextField label="Dòng giới thiệu" name="heroEyebrow" value={hero.eyebrow} required />
         <TextField label="Tiêu đề" name="heroTitle" value={hero.title} required />

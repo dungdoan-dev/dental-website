@@ -1,5 +1,5 @@
 import { getPublicSupabaseClient } from "@/lib/supabase/public";
-import type { Doctor, DoctorCategory } from "../types/doctor.type";
+import type { Doctor, DoctorSummary, DoctorCategory } from "../types/doctor.type";
 
 const DOCTOR_SELECT = "id,name,slug,avatar,position,experience,sort_order,degree,description,badge,highlight,category,directory_title,license_number,quote,languages,source_url,doctor_specialties(specialty,sort_order),doctor_education(content,sort_order),doctor_experience_highlights(content,sort_order),doctor_certificates(title,issuer,detail,image,sort_order)";
 
@@ -69,16 +69,16 @@ function mapDoctor(d: {
 }
 
 export const doctorRepository = {
-  async findAll(): Promise<readonly Doctor[]> {
-    const { data: doctors, error } = await getPublicSupabaseClient().from("doctors").select(DOCTOR_SELECT).order("sort_order").order("id");
+  async findAll(): Promise<readonly DoctorSummary[]> {
+    const { data, error } = await getPublicSupabaseClient().from("doctors")
+      .select("id,name,slug,avatar,position,degree,category,directory_title,sort_order,doctor_specialties(specialty,sort_order)")
+      .order("sort_order").order("id");
     if (error) throw error;
-
-    return doctors.map((doctor) => mapDoctor({
-      ...doctor,
-      doctor_specialties: doctor.doctor_specialties?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
-      doctor_education: doctor.doctor_education?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
-      doctor_experience_highlights: doctor.doctor_experience_highlights?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
-      doctor_certificates: doctor.doctor_certificates?.sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),
+    return data.map((doctor) => ({
+      id: doctor.id, name: doctor.name, slug: doctor.slug, avatar: doctor.avatar,
+      position: doctor.position, degree: doctor.degree, category: doctor.category as DoctorCategory,
+      directoryTitle: doctor.directory_title, sortOrder: doctor.sort_order,
+      specialties: doctor.doctor_specialties.sort((a, b) => a.sort_order - b.sort_order).map((item) => item.specialty),
     }));
   },
 

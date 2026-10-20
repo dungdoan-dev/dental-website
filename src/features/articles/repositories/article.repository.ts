@@ -1,9 +1,9 @@
 import { getPublicSupabaseClient } from "@/lib/supabase/public";
-import type { Article, ArticleCategory } from "../types/article.type";
+import type { Article, ArticleSummary, ArticleCategory } from "../types/article.type";
 
 export const articleRepository = {
-  async findAll(): Promise<readonly Article[]> {
-    const { data: articles, error } = await getPublicSupabaseClient().from("articles").select("*")
+  async findAll(): Promise<readonly ArticleSummary[]> {
+    const { data: articles, error } = await getPublicSupabaseClient().from("articles").select("id,title,slug,excerpt,thumbnail,published_at,author,category,reading_minutes,featured,status")
       .eq("status", "published").lte("published_at", new Date().toISOString()).order("published_at", { ascending: false });
     if (error) throw error;
 
@@ -12,7 +12,6 @@ export const articleRepository = {
       title: a.title,
       slug: a.slug,
       excerpt: a.excerpt,
-      content: a.content,
       thumbnail: a.thumbnail,
       publishedAt: a.published_at,
       author: a.author,

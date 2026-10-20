@@ -14,3 +14,5 @@ export const articleSchema = z.object({
   featured: z.boolean(),
   status: z.enum(["draft", "published"]).default("published"),
 });
+
+export const articleSummarySchema = articleSchema.omit({ content: true });

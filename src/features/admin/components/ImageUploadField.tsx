@@ -2,8 +2,10 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState, type ComponentType } from "react";
+import { useId, useRef, useState, type ComponentType } from "react";
 import type { Area } from "react-easy-crop";
+import { ImagePlus, Upload } from "lucide-react";
+import { Button } from "@/components/admin-ui/button";
 
 // Loaded only when the crop dialog opens, so pages with image fields do not ship the cropper up front.
 type Point = { x: number; y: number };
@@ -19,14 +21,15 @@ async function createCroppedImage(image: string, area: Area): Promise<Blob> {
     source.onerror = () => reject(new Error("Không thể đọc ảnh đã chọn."));
   });
   const canvas = document.createElement("canvas");
-  canvas.width = area.width;
-  canvas.height = area.height;
+  const scale = Math.min(1, 2560 / Math.max(area.width, area.height));
+  canvas.width = Math.max(1, Math.round(area.width * scale));
+  canvas.height = Math.max(1, Math.round(area.height * scale));
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Trình duyệt không hỗ trợ xử lý ảnh.");
   context.fillStyle = "#fff";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(source, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
-  return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Không thể tạo ảnh đã cắt.")), "image/jpeg", 0.9));
+  context.drawImage(source, area.x, area.y, area.width, area.height, 0, 0, canvas.width, canvas.height);
+  return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Không thể tạo ảnh đã cắt.")), "image/webp", 0.9));
 }
 
 export function ImageUploadField({
@@ -35,6 +38,7 @@ export function ImageUploadField({
   onChange,
   label = "Ảnh",
   aspect = 4 / 3,
+  fit = "cover",
   name,
   required = false,
 }: {
@@ -43,6 +47,7 @@ export function ImageUploadField({
   onChange?: (path: string) => void;
   label?: string;
   aspect?: number;
+  fit?: "cover" | "contain";
   name?: string;
   required?: boolean;
 }) {
@@ -54,6 +59,8 @@ export function ImageUploadField({
   const [area, setArea] = useState<Area | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const id = useId();
+  const fileInput = useRef<HTMLInputElement>(null);
 
   function updateValue(path: string) {
     setLocalValue(path);
@@ -82,7 +89,7 @@ export function ImageUploadField({
     try {
       const blob = await createCroppedImage(source, area);
       const body = new FormData();
-      body.append("file", blob, "cropped-image.jpg");
+      body.append("file", blob, "cropped-image.webp");
       const response = await fetch("/api/admin/upload", { method: "POST", body });
       const result = await response.json() as { path?: string; error?: string };
       if (!response.ok || !result.path) throw new Error(result.error || "Tải ảnh lên thất bại.");
@@ -97,17 +104,19 @@ export function ImageUploadField({
   }
 
   return (
-    <div className="space-y-2">
-      <label className="block font-semibold text-text-primary">{label}</label>
-      <div className="flex flex-wrap items-center gap-3">
-        {value ? <Image alt="Ảnh hiện tại" className="h-16 w-24 rounded-lg border border-border-subtle object-cover" height={64} src={value} unoptimized width={96} /> : null}
-        <label className="inline-flex min-h-10 cursor-pointer items-center rounded-lg border border-border-subtle px-3 text-xs font-semibold text-brand-blue-dark hover:bg-brand-blue-light">
-          Chọn và cắt ảnh
-          <input accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => { chooseFile(event.target.files?.[0]); event.currentTarget.value = ""; }} type="file" />
-        </label>
+    <div className="space-y-2.5">
+      <label htmlFor={`${id}-file`}>{label}{required && !label.includes("*") ? " *" : ""}</label>
+      <div className="flex flex-wrap items-center gap-4 rounded-xl border border-dashed border-border-subtle bg-background-secondary p-4">
+        {value ? <Image alt={label.replace(/\s*\*$/, "")} className={`h-20 w-28 shrink-0 rounded-lg border border-border-subtle bg-white ${fit === "contain" ? "object-contain p-2" : "object-cover"}`} height={80} src={value} unoptimized width={112} /> : <span className="grid h-20 w-28 shrink-0 place-items-center rounded-lg border border-border-subtle bg-white text-text-secondary"><ImagePlus aria-hidden="true" className="size-7" strokeWidth={1.5} /></span>}
+        <div className="min-w-[9rem] flex-1 space-y-2">
+          <Button className="min-h-11" onClick={() => fileInput.current?.click()} type="button" variant="outline"><Upload aria-hidden="true" />{value ? "Thay ảnh" : "Chọn ảnh"}</Button>
+          {value && !required ? <Button aria-label={`Gỡ ${label}`} className="ml-2 min-h-11 text-error" onClick={() => updateValue("")} type="button" variant="ghost">Gỡ ảnh</Button> : null}
+          <p className="text-xs font-normal leading-relaxed text-text-secondary">JPG, PNG hoặc WebP · Tối đa 12 MB<br />Cắt ảnh theo tỉ lệ trước khi tải lên.</p>
+        </div>
+        <input accept="image/jpeg,image/png,image/webp" aria-describedby={error ? `${id}-error` : undefined} aria-label={`Chọn tệp ${label}`} className="sr-only" id={`${id}-file`} onChange={(event) => { chooseFile(event.target.files?.[0]); event.currentTarget.value = ""; }} ref={fileInput} tabIndex={-1} type="file" />
       </div>
-      <input aria-label={`${label} URL hoặc đường dẫn`} className="w-full rounded-lg border border-border-subtle bg-background-secondary px-3 py-2 font-mono text-xs text-text-primary" name={name} onChange={(event) => updateValue(event.target.value)} placeholder="Hoặc dán URL/đường dẫn ảnh" required={required} value={value} />
-      {error ? <p className="text-xs text-red-600" role="alert">{error}</p> : null}
+      {name ? <input name={name} type="hidden" value={value} /> : null}
+      {error ? <p className="text-xs text-error" id={`${id}-error`} role="alert">{error}</p> : null}
       {source ? (
         <div aria-label="Cắt ảnh" aria-modal="true" className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4" role="dialog">
           <div className="w-full max-w-2xl rounded-2xl bg-white p-4">

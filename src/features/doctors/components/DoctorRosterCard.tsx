@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Doctor } from "../types/doctor.type";
+import type { DoctorSummary } from "../types/doctor.type";
 import { getDoctorFullName } from "../utils/doctor-card-name";
 
-type DoctorRosterCardProps = { doctor: Doctor };
+type DoctorRosterCardProps = { doctor: DoctorSummary };
 
 export function DoctorRosterCard({ doctor }: DoctorRosterCardProps) {
   const fullName = getDoctorFullName(doctor);

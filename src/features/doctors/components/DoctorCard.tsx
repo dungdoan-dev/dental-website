@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
-import type { Doctor } from "../types/doctor.type";
+import type { DoctorSummary } from "../types/doctor.type";
 import { getDoctorFullName } from "../utils/doctor-card-name";
 
-type DoctorCardProps = { doctor: Doctor };
+type DoctorCardProps = { doctor: DoctorSummary };
 
 export function DoctorCard({ doctor }: DoctorCardProps) {
   const fullName = getDoctorFullName(doctor);

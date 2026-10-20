@@ -13,6 +13,16 @@ export const imagePathSchema = z.union([
   z.string().trim().max(2000).regex(/^\/(?!\/)(?!.*(?:\.\.|[\s\\?#])).+$/, "Đường dẫn ảnh nội bộ phải bắt đầu bằng / và không chứa .. hoặc khoảng trắng."),
   webUrlSchema,
 ]);
+export const clinicFormSchema = z.object({
+  id: recordIdSchema,
+  name: text(200),
+  address: text(500),
+  phone: text(100),
+  workingHours: text(200),
+  description: optionalText(2000),
+  image: imagePathSchema,
+  googleMapsUrl: z.union([z.literal(""), webUrlSchema]).optional(),
+});
 export const appointmentStatusSchema = z.enum(["pending", "confirmed", "completed", "cancelled"]);
 export const serviceFormSchema = z.object({
   id: recordIdSchema, name: text(200), slug: slugSchema,

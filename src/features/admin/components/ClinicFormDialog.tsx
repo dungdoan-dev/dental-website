@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { AdminDialog } from "./AdminDialog";
 import { DialogFooter } from "./DialogFooter";
 import type { Clinic } from "@/features/clinics/types/clinic.type";
@@ -11,6 +11,7 @@ import { ImageUploadField } from "./ImageUploadField";
 export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const fieldId = useId();
 
   const [formData, setFormData] = useState({
     id: clinic.id,
@@ -20,6 +21,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
     workingHours: clinic.workingHours,
     description: clinic.description,
     image: clinic.image,
+    googleMapsUrl: clinic.googleMapsUrl ?? "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -54,7 +56,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
             <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm text-left sm:px-7">
               <div>
                 <ImageUploadField
-                  aspect={16 / 9}
+                  aspect={16 / 10}
                   label="Ảnh cơ sở *"
                   onChange={(image) => setFormData((current) => ({ ...current, image }))}
                   required
@@ -63,8 +65,9 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
               </div>
 
               <div>
-                <label className="block font-semibold text-text-primary mb-1">Tên cơ sở *</label>
+                <label className="block font-semibold text-text-primary mb-1" htmlFor={`${fieldId}-name`}>Tên cơ sở *</label>
                 <input
+                  id={`${fieldId}-name`}
                   required
                   type="text"
                   value={formData.name}
@@ -74,8 +77,9 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
               </div>
 
               <div>
-                <label className="block font-semibold text-text-primary mb-1">Địa chỉ đầy đủ *</label>
+                <label className="block font-semibold text-text-primary mb-1" htmlFor={`${fieldId}-address`}>Địa chỉ đầy đủ *</label>
                 <input
+                  id={`${fieldId}-address`}
                   required
                   type="text"
                   value={formData.address}
@@ -86,18 +90,20 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-semibold text-text-primary mb-1">Số điện thoại / Hotline *</label>
+                  <label className="block font-semibold text-text-primary mb-1" htmlFor={`${fieldId}-phone`}>Số điện thoại / Hotline *</label>
                   <input
+                    id={`${fieldId}-phone`}
                     required
-                    type="text"
+                    type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary font-mono focus:border-brand-blue-dark focus:bg-white focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-text-primary mb-1">Giờ làm việc *</label>
+                  <label className="block font-semibold text-text-primary mb-1" htmlFor={`${fieldId}-hours`}>Giờ làm việc *</label>
                   <input
+                    id={`${fieldId}-hours`}
                     required
                     type="text"
                     value={formData.workingHours}
@@ -107,15 +113,10 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-semibold text-text-primary mb-1">Mô tả giới thiệu cơ sở</label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none"
-                />
-              </div>
+              <label>Liên kết chỉ đường
+                <input maxLength={2000} onChange={(event) => setFormData({ ...formData, googleMapsUrl: event.target.value })} placeholder="https://maps.google.com/..." type="url" value={formData.googleMapsUrl} />
+                <span className="text-xs font-normal text-text-secondary">Dùng cho nút “Chỉ đường” ở thẻ cơ sở trên trang chủ, Giới thiệu và Liên hệ. Để trống để ẩn nút.</span>
+              </label>
 
               <DialogFooter isPending={isPending} onCancel={() => setIsOpen(false)} submitLabel="Lưu Cơ Sở" />
             </form>

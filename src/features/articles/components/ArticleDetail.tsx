@@ -3,12 +3,12 @@ import Link from "next/link";
 import { AppointmentButton } from "@/components/common/AppointmentButton";
 import { Icon } from "@/components/ui/Icon";
 import { articleCategories, getArticleCategoryLabel } from "../data/article-categories.data";
-import type { Article } from "../types/article.type";
+import type { Article, ArticleSummary } from "../types/article.type";
 import { ArticleBody, getArticleHeadings } from "./ArticleBody";
 
-type ArticleDetailProps = { article: Article; articles: readonly Article[] };
+type ArticleDetailProps = { article: Article; articles: readonly ArticleSummary[] };
 
-function ArticleCard({ article }: { article: Article }) {
+function ArticleCard({ article }: { article: ArticleSummary }) {
   return (
     <Link className="group overflow-hidden rounded-2xl border border-border-subtle bg-white transition hover:-translate-y-0.5 hover:shadow-lg" href={`/tin-tuc/${article.slug}`}>
       <div className="relative aspect-[16/9] overflow-hidden bg-surface-container-low"><Image alt={article.title} className="object-cover transition duration-500 group-hover:scale-[1.03]" fill sizes="(max-width: 640px) 100vw, 360px" src={article.thumbnail} /></div>

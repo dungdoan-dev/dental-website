@@ -32,7 +32,7 @@ export async function searchWebsite(rawQuery: string): Promise<readonly WebsiteS
       id: doctor.id,
       type: "Bác sĩ" as const,
       title: getDoctorFullName(doctor),
-      description: [doctor.position, ...(doctor.profile?.specialties ?? [])].filter(Boolean).join(" · "),
+      description: [doctor.position, ...doctor.specialties].filter(Boolean).join(" · "),
       href: `/bac-si/${doctor.slug}`,
     })),
     ...articles.map((article) => ({

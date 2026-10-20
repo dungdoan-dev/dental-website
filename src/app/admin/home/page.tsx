@@ -13,6 +13,7 @@ import { InsurancePartnersManager, type InsurancePartnerRecord } from "@/feature
 import { updateHomeSectionCopy, updateStructuredSiteContent } from "@/features/admin/content-actions";
 import { updateCoreValue } from "@/features/admin/actions";
 import { AdminActionForm } from "@/features/admin/components/AdminActionForm";
+import { HomeSectionCopyEditor } from "@/features/admin/components/HomeSectionCopyEditor";
 import { ImageUploadField } from "@/features/admin/components/ImageUploadField";
 import { CoreValueIcon } from "@/features/home/components/CoreValueIcon";
 import { HOME_SECTION_COPY, type HomeSectionCopyMap } from "@/features/home/home-section-copy";
@@ -44,7 +45,7 @@ export default async function AdminHomePage() {
   const nextFaqSort = Math.max(-1, ...faqRows.map((row) => row.sort_order)) + 1;
   const nextTestimonialSort = Math.max(-1, ...testimonialRows.map((row) => row.sort_order)) + 1;
   const heroSlideRows = (heroSlides.data ?? []).map((row) => ({
-    ...row, imageAlt: row.image_alt, badgeVariant: row.badge_variant,
+    ...row, imageAlt: row.image_alt,
     objectPosition: row.object_position, sortOrder: row.sort_order,
   }));
   const insurancePartnerRows: InsurancePartnerRecord[] = (insurancePartners.data ?? []).map((row) => ({
@@ -79,11 +80,8 @@ export default async function AdminHomePage() {
 
       <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
         <div className="border-b px-6 py-5"><h2 className="text-base font-bold text-text-primary">Tiêu đề và ghi chú trang chủ</h2><p className="text-xs text-text-secondary">Quản lý tiêu đề cùng dòng mô tả nhỏ bên dưới từng tiêu đề section.</p></div>
-        <AdminActionForm action={updateHomeSectionCopy} submitLabel="Lưu tất cả tiêu đề" className="grid gap-4 p-6 md:grid-cols-2">
-          {(Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>).map((key) => {
-            const labels: Record<keyof typeof HOME_SECTION_COPY, string> = { services: "Dịch vụ", doctors: "Đội ngũ bác sĩ", whyChoose: "Lý do lựa chọn", clinics: "Cơ sở", insurance: "Bảo hiểm", faq: "Câu hỏi thường gặp", testimonials: "Đánh giá khách hàng", vision: "Tầm nhìn & sứ mệnh", values: "Giá trị cốt lõi" };
-            return <fieldset className="space-y-3 rounded-xl border border-border-subtle p-4" key={key}><legend className="px-1 text-xs font-bold text-brand-blue-dark">{labels[key]}</legend><label className="block text-xs font-semibold text-text-secondary">Tiêu đề<input className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={sectionCopy[key].title} maxLength={160} name={`${key}Title`} required /></label><label className="block text-xs font-semibold text-text-secondary">Ghi chú nhỏ<textarea className="mt-1 w-full rounded-lg border border-border-subtle bg-white px-3 py-2 text-sm font-normal text-text-primary" defaultValue={sectionCopy[key].note} maxLength={400} name={`${key}Note`} rows={2} /></label></fieldset>;
-          })}
+        <AdminActionForm action={updateHomeSectionCopy} submitLabel="Lưu tất cả tiêu đề" className="space-y-6 p-5 sm:p-6">
+          <HomeSectionCopyEditor initialCopy={sectionCopy} />
         </AdminActionForm>
       </section>
 
@@ -105,12 +103,12 @@ export default async function AdminHomePage() {
               </div>
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="font-bold text-text-primary">{slide.title}</div>
-                <div className="text-xs text-text-secondary">{slide.badge || "Không có nhãn"} · Mã: <span className="font-mono">{slide.id}</span></div>
+                <div className="text-xs text-text-secondary">Mã: <span className="font-mono">{slide.id}</span></div>
                 <div className="truncate text-[11px] text-text-secondary" title={slide.image}>{slide.image}</div>
                 <span className="inline-flex rounded-full bg-brand-blue-light px-2 py-0.5 text-[11px] font-semibold text-brand-blue-dark">Thứ tự: {slide.sortOrder}</span>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <HeroSlideFormDialog slide={{ ...slide, badgeVariant: slide.badgeVariant === "green" ? "green" : "blue", objectPosition: slide.objectPosition === "top" ? "top" : "center" }} buttonLabel="Sửa" />
+                <HeroSlideFormDialog slide={{ ...slide, objectPosition: slide.objectPosition === "top" ? "top" : "center" }} buttonLabel="Sửa" />
                 <DeleteHeroSlideButton id={slide.id} name={slide.title} />
               </div>
             </div>

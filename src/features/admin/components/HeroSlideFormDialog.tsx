@@ -12,16 +12,14 @@ type HeroSlideData = {
   id: string;
   image: string;
   imageAlt: string;
-  badge: string;
   title: string;
-  badgeVariant: "blue" | "green";
   objectPosition: "center" | "top";
   sortOrder: number;
 };
 
 const emptySlide: HeroSlideData = {
-  id: "", image: "", imageAlt: "", badge: "", title: "",
-  badgeVariant: "blue", objectPosition: "center", sortOrder: 0,
+  id: "", image: "", imageAlt: "", title: "",
+  objectPosition: "center", sortOrder: 0,
 };
 
 export function HeroSlideFormDialog({
@@ -80,13 +78,8 @@ export function HeroSlideFormDialog({
               </fieldset>
               <fieldset className="admin-form-section">
                 <legend>Nội dung</legend>
-                <label>Tiêu đề *<input onChange={(event) => updateField("title", event.target.value)} required value={formData.title} /></label>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label>Nhãn nhỏ<input onChange={(event) => updateField("badge", event.target.value)} value={formData.badge} /></label>
-                  <label>Màu nhãn
-                    <select onChange={(event) => updateField("badgeVariant", event.target.value as HeroSlideData["badgeVariant"])} value={formData.badgeVariant}><option value="blue">Xanh dương</option><option value="green">Xanh lá</option></select>
-                  </label>
-                </div>
+                <label>Tên slide *<input maxLength={200} onChange={(event) => updateField("title", event.target.value)} required value={formData.title} /></label>
+                <p className="admin-form-hint">Dùng để nhận diện slide trong quản trị và hỗ trợ trình đọc màn hình. Không hiển thị chữ hay nhãn trên ảnh trang chủ.</p>
               </fieldset>
               <fieldset className="admin-form-section">
                 <legend>Sắp xếp</legend>

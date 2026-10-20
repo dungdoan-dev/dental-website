@@ -4,15 +4,15 @@ import { revalidatePath, updateTag } from "next/cache";
 import { requireAdmin } from "./auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { z } from "zod";
-import { serviceFormSchema, serviceSortOrderSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, faqSchema, testimonialSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema } from "./schemas/admin.schema";
-import { runMutation, validationFailure, saveRevision, SlugConflictError } from "./services/mutation";
+import { serviceFormSchema, serviceSortOrderSchema, doctorFormSchema, doctorSortOrderSchema, articleFormSchema, faqSchema, testimonialSchema, numericIdSchema, recordIdSchema, appointmentStatusSchema, imagePathSchema, clinicFormSchema } from "./schemas/admin.schema";
+import { runMutation, validationFailure, saveContent } from "./services/mutation";
 import { publicDataTags } from "@/lib/public-data-cache";
 import { sanitizeArticleContent } from "@/features/articles/lib/article-content";
 
 const heroSlideSchema = z.object({
   id: recordIdSchema, image: imagePathSchema, imageAlt: z.string().trim().min(1).max(200),
-  badge: z.string().trim().max(120), title: z.string().trim().min(1).max(200),
-  badgeVariant: z.enum(["blue", "green"]), objectPosition: z.enum(["center", "top"]),
+  title: z.string().trim().min(1).max(200),
+  objectPosition: z.enum(["center", "top"]),
   sortOrder: z.number().int().min(0).max(9999),
 });
 
@@ -23,16 +23,6 @@ const coreValueSchema = z.object({
   description: z.string().trim().min(1).max(1200),
   iconKey: z.enum(["heart", "care", "honesty", "innovation"]),
   sortOrder: z.number().int().min(0).max(999),
-});
-
-const clinicFormSchema = z.object({
-  id: recordIdSchema,
-  name: z.string().trim().min(1).max(200),
-  address: z.string().trim().min(1).max(500),
-  phone: z.string().trim().min(1).max(100),
-  workingHours: z.string().trim().min(1).max(200),
-  description: z.string().trim().max(2000),
-  image: imagePathSchema,
 });
 
 export async function updateCoreValue(_previous: import("./services/mutation").MutationResult | null, formData: FormData) {
@@ -80,14 +70,10 @@ export async function upsertHeroSlide(input: z.infer<typeof heroSlideSchema>) {
   const parsed = heroSlideSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   return runMutation(async () => {
-    const supabase = await getSupabaseServerClient();
-    const { error } = await supabase.from("hero_slides").upsert({
-      id: parsed.data.id, image: parsed.data.image, image_alt: parsed.data.imageAlt, badge: parsed.data.badge,
-      title: parsed.data.title, badge_variant: parsed.data.badgeVariant, object_position: parsed.data.objectPosition,
-      sort_order: parsed.data.sortOrder,
-    });
-    if (error) throw error;
-    await saveRevision("slider", parsed.data.id, parsed.data.title, parsed.data);
+    await saveContent("slider", { record: {
+      id: parsed.data.id, image: parsed.data.image, image_alt: parsed.data.imageAlt,
+      title: parsed.data.title, object_position: parsed.data.objectPosition, sort_order: parsed.data.sortOrder,
+    } }, parsed.data.title, parsed.data);
     revalidateContent(["/admin/home", "/"]);
   });
 }
@@ -132,20 +118,11 @@ export async function upsertService(input: ServiceFormData) {
   if (!parsed.success) return validationFailure(parsed.error);
   const data = parsed.data;
   return runMutation(async () => {
-    const supabase = await getSupabaseServerClient();
-    const { data: duplicate, error: duplicateError } = await supabase.from("services").select("id").eq("slug", data.slug).maybeSingle();
-    if (duplicateError) throw duplicateError;
-    if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
-    const { data: existing, error: existingError } = await supabase.from("services").select("sort_order").eq("id", data.id).maybeSingle();
-    if (existingError) throw existingError;
-    const { error } = await supabase.from("services").upsert({
+    await saveContent("service", { record: {
       id: data.id, name: data.name, slug: data.slug, short_description: data.shortDescription,
       description: data.description, image: data.image, badge: data.badge, badge_variant: data.badgeVariant,
-      featured: data.featured, sort_order: existing?.sort_order ?? 0, category: data.category,
-      updated_at: new Date().toISOString(),
-    });
-    if (error) throw error;
-    await saveRevision("service", data.id, data.name, data);
+      featured: data.featured, category: data.category,
+    } }, data.name, data);
     revalidateContent(["/admin/services", "/dich-vu", "/dich-vu/[slug]", "/"]);
   });
 }
@@ -180,29 +157,12 @@ export async function upsertDoctor(input: DoctorFormData) {
   const { education, specialties, experienceHighlights, certificates, ...data } = parsed.data;
   const base = { ...data, licenseNumber: data.licenseNumber || null, quote: data.quote || null, sourceUrl: data.sourceUrl || null };
   return runMutation(async () => {
-    const supabase = await getSupabaseServerClient();
-    const { data: duplicate, error: duplicateError } = await supabase.from("doctors").select("id").eq("slug", data.slug).maybeSingle();
-    if (duplicateError) throw duplicateError;
-    if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
-    const { error } = await supabase.from("doctors").upsert({
+    await saveContent("doctor", { record: {
       id: base.id, name: base.name, slug: base.slug, avatar: base.avatar, position: base.position,
-      experience: base.experience, sort_order: base.sortOrder,
-      degree: base.degree, description: base.description,
+      experience: base.experience, sort_order: base.sortOrder, degree: base.degree, description: base.description,
       badge: base.badge, highlight: base.highlight, category: base.category, directory_title: base.directoryTitle,
       license_number: base.licenseNumber, quote: base.quote, languages: base.languages, source_url: base.sourceUrl,
-      updated_at: new Date().toISOString(),
-    });
-    if (error) throw error;
-    // One DB transaction: a failed insert keeps the old rows instead of leaving them deleted.
-    const { error: detailsError } = await supabase.rpc("replace_doctor_details", {
-      p_doctor_id: data.id,
-      p_education: education ?? null,
-      p_specialties: specialties ?? null,
-      p_experience_highlights: experienceHighlights ?? null,
-      p_certificates: certificates ?? null,
-    });
-    if (detailsError) throw detailsError;
-    await saveRevision("doctor", data.id, data.name, parsed.data);
+    }, education, specialties, experienceHighlights, certificates }, data.name, parsed.data);
     revalidateContent(["/admin/doctors", "/bac-si", "/bac-si/[slug]", "/"]);
   });
 }
@@ -236,21 +196,11 @@ export async function upsertArticle(input: ArticleFormData) {
   if (!parsed.success) return validationFailure(parsed.error);
   const data = { ...parsed.data, content: sanitizeArticleContent(parsed.data.content) };
   return runMutation(async () => {
-    const supabase = await getSupabaseServerClient();
-    const { data: duplicate, error: duplicateError } = await supabase.from("articles").select("id").eq("slug", data.slug).maybeSingle();
-    if (duplicateError) throw duplicateError;
-    if (duplicate && duplicate.id !== data.id) throw new SlugConflictError();
-    const { data: previous, error: previousError } = await supabase.from("articles").select("status,published_at").eq("id", data.id).maybeSingle();
-    if (previousError) throw previousError;
-    const publishedAt = data.status === "published" && previous?.status !== "published" ? new Date().toISOString() : previous?.published_at ?? new Date().toISOString();
-    const { error } = await supabase.from("articles").upsert({
+    await saveContent("article", { record: {
       id: data.id, title: data.title, slug: data.slug, excerpt: data.excerpt, content: data.content,
-      thumbnail: data.thumbnail, published_at: publishedAt, author: data.author, category: data.category,
+      thumbnail: data.thumbnail, author: data.author, category: data.category,
       reading_minutes: data.readingMinutes, featured: data.featured, status: data.status,
-      updated_at: new Date().toISOString(),
-    });
-    if (error) throw error;
-    await saveRevision("article", data.id, data.title, { ...data, publishedAt });
+    } }, data.title, data);
     revalidateContent(["/admin/articles", "/tin-tuc", "/tin-tuc/[slug]", "/"]);
   });
 }
@@ -341,6 +291,7 @@ export async function updateClinic(data: {
   workingHours: string;
   description: string;
   image: string;
+  googleMapsUrl?: string;
 }) {
   await requireAdmin();
   const parsed = clinicFormSchema.safeParse(data);
@@ -350,6 +301,7 @@ export async function updateClinic(data: {
     const { error } = await (await getSupabaseServerClient()).from("clinics").update({
       name: clinicData.name, address: clinicData.address, phone: clinicData.phone,
       working_hours: clinicData.workingHours, description: clinicData.description, image: clinicData.image,
+      ...(clinicData.googleMapsUrl !== undefined ? { google_maps_url: clinicData.googleMapsUrl || null } : {}),
       updated_at: new Date().toISOString(),
     }).eq("id", id);
     if (error) throw error;

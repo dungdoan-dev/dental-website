@@ -11,6 +11,7 @@ export function HeroCarouselView({ slides }: { slides: readonly HeroSlide[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocus, setHasFocus] = useState(false);
+  const [loadedSlides, setLoadedSlides] = useState<ReadonlySet<string>>(() => new Set());
   const showNext = useCallback(() => {
     if (slides.length > 1) setActiveIndex((current) => (current + 1) % slides.length);
   }, [slides.length]);
@@ -48,7 +49,10 @@ export function HeroCarouselView({ slides }: { slides: readonly HeroSlide[] }) {
           const isActive = currentIndex === index;
           return (
             <div aria-hidden={!isActive} className={`absolute inset-0 h-full w-full transition-opacity duration-700 ease-out motion-reduce:transition-none ${isActive ? "z-10 opacity-100" : "pointer-events-none z-0 opacity-0"}`} key={slide.id}>
-              <Image alt={slide.imageAlt} className={`object-cover ${slide.objectPosition === "top" ? "object-top" : "object-center"}`} fill priority={index === 0} sizes="(max-width: 1920px) 100vw, 1920px" src={slide.image} />
+              {isActive || loadedSlides.has(slide.id) || (index === (currentIndex + 1) % slides.length && loadedSlides.has(slides[currentIndex].id)) ? <Image alt={slide.imageAlt} className={`object-cover ${slide.objectPosition === "top" ? "object-top" : "object-center"}`} fill priority={index === 0} loading={index === 0 ? undefined : "eager"} onLoad={() => {
+                // After the active image loads, allow one image ahead; retain viewed slides for instant navigation back.
+                setLoadedSlides((current) => current.has(slide.id) ? current : new Set([...current, slide.id]));
+              }} sizes="(max-width: 1920px) 100vw, 1920px" src={slide.image} /> : null}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
             </div>
           );

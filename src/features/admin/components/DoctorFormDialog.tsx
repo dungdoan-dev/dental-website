@@ -135,7 +135,7 @@ function DoctorEditor({
                 <legend>Hiển thị trên thẻ bác sĩ</legend>
                 <p className="admin-form-hint">Thẻ hiển thị theo thứ tự: Học vị, Họ và tên, Chức vị (nếu có), Chuyên môn.</p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
-                  <ImageUploadField aspect={1} label="Ảnh chân dung *" onChange={(avatar) => setFormData({ ...formData, avatar })} required value={formData.avatar} />
+                  <ImageUploadField aspect={3 / 4} label="Ảnh chân dung (tỉ lệ 3:4) *" onChange={(avatar) => setFormData({ ...formData, avatar })} required value={formData.avatar} />
                   <div className="flex flex-col gap-4">
                     <label>Học vị<input maxLength={60} onChange={(e) => setFormData({ ...formData, degree: e.target.value })} placeholder="THẠC SĨ, BÁC SĨ CKII" type="text" value={formData.degree} /></label>
                     <label>Họ và tên *<input onChange={handleNameChange} placeholder="Võ Văn Tự Hiến" required type="text" value={formData.name} /></label>
@@ -149,9 +149,8 @@ function DoctorEditor({
                 <legend>Giới thiệu trên trang hồ sơ</legend>
                 <label>Mô tả kinh nghiệm *<textarea onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Hơn 15 năm kinh nghiệm phục hình dán sứ vi phẫu..." required rows={3} value={formData.description} /></label>
                 <label>Trích dẫn y đức (không bắt buộc)<textarea onChange={(e) => setFormData({ ...formData, quote: e.target.value })} rows={2} value={formData.quote} /></label>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label>Số năm kinh nghiệm *<input min="0" onChange={(e) => setFormData({ ...formData, experience: Number(e.target.value) })} required type="number" value={formData.experience} /></label>
-                  <label>Điểm nổi bật<input onChange={(e) => setFormData({ ...formData, highlight: e.target.value })} placeholder="Hơn 35 năm kinh nghiệm" type="text" value={formData.highlight} /></label>
                   <label>Số chứng chỉ hành nghề<input onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })} placeholder="010749/HCM-CCHN" type="text" value={formData.licenseNumber} /></label>
                 </div>
               </fieldset>

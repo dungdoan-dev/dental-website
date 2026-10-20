@@ -108,11 +108,11 @@ export function TestimonialFormDialog({
                 </div>
                 <div>
                   <label className="block font-semibold text-text-primary mb-1">
-                    Chữ cái đầu (Initials)
+                    Chữ viết tắt (dùng khi chưa có ảnh)
                   </label>
                   <input
                     type="text"
-                    maxLength={3}
+                    maxLength={4}
                     value={formData.initials}
                     onChange={(e) =>
                       setFormData({ ...formData, initials: e.target.value })
@@ -123,6 +123,7 @@ export function TestimonialFormDialog({
               </div>
 
               <ImageUploadField aspect={1} label="Ảnh khách hàng (không bắt buộc)" onChange={(avatar) => setFormData((prev) => ({ ...prev, avatar }))} value={formData.avatar} />
+              <p className="admin-form-hint">Trang chủ ưu tiên ảnh khách hàng. Chữ viết tắt và màu đại diện chỉ được dùng khi chưa có ảnh.</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -139,6 +140,8 @@ export function TestimonialFormDialog({
                     <option value={5}>⭐⭐⭐⭐⭐ 5 sao</option>
                     <option value={4}>⭐⭐⭐⭐ 4 sao</option>
                     <option value={3}>⭐⭐⭐ 3 sao</option>
+                    <option value={2}>2 sao</option>
+                    <option value={1}>1 sao</option>
                   </select>
                 </div>
                 <div>
@@ -178,7 +181,7 @@ export function TestimonialFormDialog({
               </label>
 
               <div>
-                <label className="block font-semibold text-text-primary mb-1">Màu sắc đại diện</label>
+                <label className="block font-semibold text-text-primary mb-1">Màu nền chữ viết tắt (khi chưa có ảnh)</label>
                 <div className="flex items-center gap-4 pt-1">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
