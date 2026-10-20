@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { updateDoctorSortOrder } from "../actions";
 import { showAdminToast, showMutationToast } from "./AdminToast";
 
@@ -43,7 +44,7 @@ export function DoctorSortOrderInput({ id, sortOrder }: { id: string; sortOrder:
         value={value}
       />
       <button
-        className="rounded-lg bg-brand-blue-dark px-3 py-2 text-xs font-semibold text-white hover:bg-brand-blue disabled:cursor-wait disabled:opacity-60"
+        className={buttonVariants({ variant: "soft", size: "sm" })}
         disabled={isPending || Number(value) === sortOrder}
         type="submit"
       >

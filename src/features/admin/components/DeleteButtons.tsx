@@ -5,6 +5,8 @@ import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
 import { showMutationToast } from "./AdminToast";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { Trash2 } from "lucide-react";
+import { buttonVariants } from "@/components/admin-ui/button";
 import {
   deleteService,
   deleteDoctor,
@@ -54,9 +56,9 @@ function BaseDeleteButton({
       type="button"
       disabled={isPending}
       onClick={() => setConfirming(true)}
-      className="inline-flex items-center gap-1 rounded-xl border border-error-container bg-error-container/60 px-2.5 py-1 text-xs font-bold text-error transition hover:bg-error hover:text-white disabled:opacity-50"
+      className={buttonVariants({ variant: "soft-destructive", size: "sm" })}
     >
-      <span className="material-symbols-outlined text-[15px]">delete</span>
+      <Trash2 />
       <span>{isPending ? "Đang xóa..." : label}</span>
     </button>
     <FormFeedback result={result?.success ? null : result} />

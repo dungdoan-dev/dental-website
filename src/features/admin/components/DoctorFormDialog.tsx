@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { AdminDialog } from "./AdminDialog";
-import { FormSectionNav } from "./FormSectionNav";
 import { DialogFooter } from "./DialogFooter";
 import type { MutationResult } from "../services/mutation";
 import { FormFeedback } from "./FormFeedback";
@@ -25,7 +25,7 @@ const CATEGORIES: { label: string; value: DoctorCategory }[] = [
   { label: "Nha Khoa Trẻ Em & Tổng Quát", value: "pediatric" },
 ];
 
-const defaultButtonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm";
+const defaultButtonClassName = buttonVariants({ variant: "soft", size: "sm" });
 
 // With doctorId the full profile is fetched on click; without it the dialog adds a new doctor.
 export function DoctorFormDialog({ doctorId, buttonLabel = "Sửa", buttonClassName = defaultButtonClassName }: { doctorId?: string; buttonLabel?: string; buttonClassName?: string }) {
@@ -129,10 +129,9 @@ function DoctorEditor({
 
       <AdminDialog icon="badge" onOpenChange={(open) => { if (!open) (close)(); }} open={isOpen} size="xl" title={doctor ? "Chỉnh sửa Hồ Sơ Bác Sĩ" : "Thêm Bác Sĩ Mới"}>
             <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
-              <FormSectionNav />
               <FormFeedback result={result} />
 
-              <fieldset className="admin-form-section" data-nav="Thẻ bác sĩ">
+              <fieldset className="admin-form-section">
                 <legend>Hiển thị trên thẻ bác sĩ</legend>
                 <p className="admin-form-hint">Thẻ hiển thị theo thứ tự: Học vị, Họ và tên, Chức vị (nếu có), Chuyên môn.</p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
@@ -146,7 +145,7 @@ function DoctorEditor({
                 </div>
               </fieldset>
 
-              <fieldset className="admin-form-section" data-nav="Giới thiệu">
+              <fieldset className="admin-form-section">
                 <legend>Giới thiệu trên trang hồ sơ</legend>
                 <label>Mô tả kinh nghiệm *<textarea onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Hơn 15 năm kinh nghiệm phục hình dán sứ vi phẫu..." required rows={3} value={formData.description} /></label>
                 <label>Trích dẫn y đức (không bắt buộc)<textarea onChange={(e) => setFormData({ ...formData, quote: e.target.value })} rows={2} value={formData.quote} /></label>
@@ -157,7 +156,7 @@ function DoctorEditor({
                 </div>
               </fieldset>
 
-              <fieldset className="admin-form-section" data-nav="Hồ sơ">
+              <fieldset className="admin-form-section">
                 <legend>Hồ sơ chuyên môn</legend>
                 <EditableRows label="Chuyên môn chi tiết * (ít nhất 1 dòng)" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.specialties.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, specialties: rows.map((row) => row.value) })} />
                 <EditableRows label="Học vấn và đào tạo" columns={[{ key: "value", label: "Nội dung", multiline: true }]} value={formData.education.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, education: rows.map((row) => row.value) })} />
@@ -166,7 +165,7 @@ function DoctorEditor({
                 <EditableRows label="Ngôn ngữ" columns={[{ key: "value", label: "Nội dung" }]} value={formData.languages.map((value) => ({ value }))} onChange={(rows) => setFormData({ ...formData, languages: rows.map((row) => row.value) })} />
               </fieldset>
 
-              <fieldset className="admin-form-section" data-nav="Hiển thị">
+              <fieldset className="admin-form-section">
                 <legend>Lọc và sắp xếp trên trang Bác sĩ</legend>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label>Nhóm chuyên môn (bộ lọc) *
@@ -179,7 +178,7 @@ function DoctorEditor({
                 <p className="admin-form-hint">Số nhỏ hiển thị trước.</p>
               </fieldset>
 
-              <details className="admin-form-section" data-nav="Nâng cao">
+              <details className="admin-form-section">
                 <summary>Cài đặt nâng cao</summary>
                 <label>Đường dẫn trang (slug) *<input className="font-mono" onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="vo-van-tu-hien" required type="text" value={formData.slug} /></label>
                 <p className="admin-form-hint">Tự tạo từ họ tên khi thêm mới. Đổi slug sẽ làm đường dẫn cũ /bac-si/… không còn hoạt động.</p>

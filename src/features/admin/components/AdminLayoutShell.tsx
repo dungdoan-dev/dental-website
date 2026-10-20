@@ -3,24 +3,23 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { usePathname } from "next/navigation";
+import { SidebarInset, SidebarProvider } from "@/components/admin-ui/sidebar";
 import { AdminHeader } from "./AdminHeader";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminToastViewport } from "./AdminToast";
 
-export function AdminLayoutShell({ children }: { children: ReactNode }) {
+export function AdminLayoutShell({ children, email, pendingAppointments }: { children: ReactNode; email: string; pendingAppointments: Promise<number> }) {
   const pathname = usePathname();
   if (pathname === "/admin/login") return children;
 
   return (
-    <div className="min-h-dvh min-w-0 bg-[#f4f8fb] font-body-md text-body-md text-on-surface antialiased">
-      <Suspense fallback={null}><AdminSidebar /></Suspense>
-      <div className="min-w-0 lg:pl-72">
-        <AdminHeader />
-        <main className="relative min-h-dvh min-w-0 w-full bg-background pt-20">
-          {children}
-        </main>
-      </div>
+    <SidebarProvider className="admin-root font-body-md text-body-md text-foreground antialiased">
+      <Suspense fallback={null}><AdminSidebar pendingAppointments={pendingAppointments} /></Suspense>
+      <SidebarInset className="min-w-0 bg-background">
+        <AdminHeader email={email} pendingAppointments={pendingAppointments} />
+        <main className="relative min-w-0 flex-1">{children}</main>
+      </SidebarInset>
       <AdminToastViewport />
-    </div>
+    </SidebarProvider>
   );
 }

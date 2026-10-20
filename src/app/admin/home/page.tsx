@@ -1,5 +1,9 @@
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+import { Button } from "@/components/admin-ui/button";
+import { PageHeader } from "@/features/admin/components/PageHeader";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { FaqFormDialog } from "@/features/admin/components/FaqFormDialog";
 import { TestimonialFormDialog } from "@/features/admin/components/TestimonialFormDialog";
@@ -66,32 +70,15 @@ export default async function AdminHomePage() {
   }
 
   return (
-    <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
-            Cấu Hình Nội Dung Trang Chủ
-          </h1>
-          <p className="text-sm text-text-secondary mt-1 max-w-2xl">
-            Cấu hình các khối theo thứ tự hiển thị từ đầu đến cuối trang chủ.
-          </p>
-        </div>
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        actions={<Button asChild size="sm" variant="soft"><Link prefetch={false} href="/" rel="noreferrer" target="_blank"><ExternalLink /> Xem trang chủ thực tế</Link></Button>}
+        description="Cấu hình các khối theo thứ tự hiển thị từ đầu đến cuối trang chủ."
+        title="Nội dung trang chủ"
+      />
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            target="_blank"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-text-primary hover:bg-surface-container-low text-xs font-semibold shadow-sm border border-border-subtle/50 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px] text-brand-blue-dark">open_in_new</span>
-            <span>Xem Trang Chủ Thực Tế</span>
-          </Link>
-        </div>
-      </div>
-
-      <section className="overflow-hidden rounded-2xl border border-border-subtle/50 bg-white shadow-sm">
-        <div className="border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4"><h2 className="text-base font-bold text-text-primary">Tiêu đề và ghi chú trang chủ</h2><p className="text-xs text-text-secondary">Quản lý tiêu đề cùng dòng mô tả nhỏ bên dưới từng tiêu đề section.</p></div>
+      <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
+        <div className="border-b px-6 py-5"><h2 className="text-base font-bold text-text-primary">Tiêu đề và ghi chú trang chủ</h2><p className="text-xs text-text-secondary">Quản lý tiêu đề cùng dòng mô tả nhỏ bên dưới từng tiêu đề section.</p></div>
         <AdminActionForm action={updateHomeSectionCopy} submitLabel="Lưu tất cả tiêu đề" className="grid gap-4 p-6 md:grid-cols-2">
           {(Object.keys(HOME_SECTION_COPY) as Array<keyof typeof HOME_SECTION_COPY>).map((key) => {
             const labels: Record<keyof typeof HOME_SECTION_COPY, string> = { services: "Dịch vụ", doctors: "Đội ngũ bác sĩ", whyChoose: "Lý do lựa chọn", clinics: "Cơ sở", insurance: "Bảo hiểm", faq: "Câu hỏi thường gặp", testimonials: "Đánh giá khách hàng", vision: "Tầm nhìn & sứ mệnh", values: "Giá trị cốt lõi" };
@@ -100,8 +87,8 @@ export default async function AdminHomePage() {
         </AdminActionForm>
       </section>
 
-      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="flex flex-col gap-3 border-b border-border-subtle/60 bg-surface-container-low/50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
+        <div className="flex flex-col gap-3 border-b px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-bold text-text-primary">Slider trang chủ</h2>
             <p className="text-xs text-text-secondary">Quản lý hình ảnh, nội dung, vị trí ảnh và thứ tự trình chiếu.</p>
@@ -132,8 +119,8 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
+      <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
+        <div className="border-b px-6 py-5">
           <h2 className="text-base font-bold text-text-primary">{sectionCopy.values.title}</h2>
           <p className="text-xs text-text-secondary">Chỉnh sửa tiêu đề, thông điệp, mô tả, biểu tượng và thứ tự hiển thị trên trang chủ.</p>
         </div>
@@ -167,17 +154,17 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-3 rounded-[7px] bg-card shadow-card p-5 sm:flex-row sm:items-center sm:justify-between">
         <div><h2 className="font-bold text-text-primary">Dịch vụ</h2><p className="text-xs text-text-secondary">Các dịch vụ đang hoạt động được hiển thị trong danh sách dịch vụ trang chủ.</p></div>
         <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/services">Quản lý dịch vụ →</Link>
       </section>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-3 rounded-[7px] bg-card shadow-card p-5 sm:flex-row sm:items-center sm:justify-between">
         <div><h2 className="font-bold text-text-primary">Đội ngũ bác sĩ</h2><p className="text-xs text-text-secondary">Các hồ sơ bác sĩ đang hoạt động được hiển thị trong danh sách trang chủ.</p></div>
         <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/doctors">Quản lý bác sĩ →</Link>
       </section>
 
-      <section className="rounded-2xl border border-border-subtle/50 bg-white p-6 shadow-sm">
+      <section className="rounded-[7px] bg-card shadow-card p-6">
         <div className="mb-4"><h2 className="text-base font-bold text-text-primary">Lý do lựa chọn</h2><p className="text-xs text-text-secondary">Cập nhật hình ảnh hiển thị trong section này trên trang chủ.</p></div>
         <AdminActionForm action={updateStructuredSiteContent} submitLabel="Lưu hình ảnh" className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <input name="key" type="hidden" value="home_why_choose" />
@@ -185,15 +172,15 @@ export default async function AdminHomePage() {
         </AdminActionForm>
       </section>
 
-      <section className="flex flex-col gap-3 rounded-2xl border border-border-subtle/50 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-3 rounded-[7px] bg-card shadow-card p-5 sm:flex-row sm:items-center sm:justify-between">
         <div><h2 className="font-bold text-text-primary">Cơ sở vật chất</h2><p className="text-xs text-text-secondary">Thông tin và hình ảnh cơ sở được quản lý cùng hồ sơ từng phòng khám.</p></div>
         <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/clinics">Quản lý cơ sở →</Link>
       </section>
 
       <div><InsurancePartnersManager partners={insurancePartnerRows} /></div>
 
-      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="flex items-center justify-between border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
+      <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
+        <div className="flex items-center justify-between border-b px-6 py-5">
           <div>
             <h2 className="text-base font-bold text-text-primary">Câu hỏi thường gặp (FAQ)</h2>
             <p className="text-xs text-text-secondary">Câu hỏi và câu trả lời hiển thị trong mục FAQ trên trang chủ; thứ tự theo số thứ tự.</p>
@@ -201,7 +188,7 @@ export default async function AdminHomePage() {
           <FaqFormDialog
             nextSortOrder={nextFaqSort}
             buttonLabel="+ Thêm Câu Hỏi"
-            buttonClassName="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-brand-blue-dark hover:bg-brand-blue text-white text-xs font-bold shadow-sm transition-all"
+            buttonClassName={buttonVariants({ size: "sm" })}
           />
         </div>
 
@@ -221,7 +208,7 @@ export default async function AdminHomePage() {
                 <FaqFormDialog
                   faq={{ ...faq, id: faq.id.toString() }}
                   buttonLabel="Sửa"
-                  buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
+                  buttonClassName={buttonVariants({ variant: "soft", size: "sm" })}
                 />
                 <DeleteFaqButton id={faq.id.toString()} name={faq.question} />
               </div>
@@ -230,8 +217,8 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div className="flex items-center justify-between border-b border-border-subtle/60 px-6 py-4 bg-surface-container-low/50">
+      <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
+        <div className="flex items-center justify-between border-b px-6 py-5">
           <div>
             <h2 className="text-base font-bold text-text-primary">Đánh giá của Khách hàng</h2>
             <p className="text-xs text-text-secondary">Các lời chia sẻ từ bệnh nhân sau khi điều trị thành công</p>
@@ -239,7 +226,7 @@ export default async function AdminHomePage() {
           <TestimonialFormDialog
             nextSortOrder={nextTestimonialSort}
             buttonLabel="+ Thêm Đánh Giá"
-            buttonClassName="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-brand-blue-dark hover:bg-brand-blue text-white text-xs font-bold shadow-sm transition-all"
+            buttonClassName={buttonVariants({ size: "sm" })}
           />
         </div>
 
@@ -270,7 +257,7 @@ export default async function AdminHomePage() {
                 <TestimonialFormDialog
                   testimonial={{ ...item, source: item.source ?? undefined, avatar: item.avatar }}
                   buttonLabel="Sửa"
-                  buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
+                  buttonClassName={buttonVariants({ variant: "soft", size: "sm" })}
                 />
                 <DeleteTestimonialButton id={item.id} name={`Đánh giá của ${item.customerName}`} />
               </div>

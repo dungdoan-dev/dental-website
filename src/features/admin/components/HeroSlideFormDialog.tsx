@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { AdminDialog } from "./AdminDialog";
 import { DialogFooter } from "./DialogFooter";
 import { upsertHeroSlide } from "../actions";
@@ -62,7 +63,7 @@ export function HeroSlideFormDialog({
 
   return (
     <>
-      <button className="inline-flex items-center gap-1.5 rounded-2xl bg-brand-blue-dark px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-brand-blue" onClick={() => setIsOpen(true)} type="button">
+      <button className={buttonVariants({ size: "sm" })} onClick={() => setIsOpen(true)} type="button">
         {buttonLabel}
       </button>
       <AdminDialog icon="home" onOpenChange={(open) => { if (!open) setIsOpen(false); }} open={isOpen} size="lg" title={slide ? "Chỉnh sửa slide" : "Thêm slide trang chủ"}>

@@ -10,7 +10,7 @@ export default async function AdminDashboardPage() {
   await requireAdmin();
   return (
     <div className="w-full">
-      <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full">
+      <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-[1440px] mx-auto w-full">
         <PagesTableManager />
       </div>
     </div>

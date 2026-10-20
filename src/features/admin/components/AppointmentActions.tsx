@@ -7,6 +7,8 @@ import type { AppointmentStatus } from "@/features/appointments/types/appointmen
 import { deleteAppointment, updateAppointmentStatus } from "../actions";
 import { showMutationToast } from "./AdminToast";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { Trash2 } from "lucide-react";
+import { buttonVariants } from "@/components/admin-ui/button";
 
 export function AppointmentActions({
   id,
@@ -60,7 +62,7 @@ export function AppointmentActions({
         onChange={(e) =>
           handleStatusChange(e.target.value as AppointmentStatus)
         }
-        className="rounded-xl border border-border-subtle bg-background-secondary px-3 py-1.5 text-xs font-semibold text-text-primary transition focus:border-brand-blue-dark focus:outline-none cursor-pointer"
+        className="h-8 cursor-pointer rounded-md border border-input bg-white px-2.5 text-xs font-medium text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/30 disabled:opacity-50"
       >
         <option value="pending">Chờ duyệt</option>
         <option value="confirmed">Đã xác nhận</option>
@@ -72,10 +74,11 @@ export function AppointmentActions({
         type="button"
         disabled={isPending}
         onClick={() => setConfirmingDelete(true)}
-        className="p-1.5 rounded-xl text-text-secondary hover:text-error hover:bg-error-container transition-colors disabled:opacity-50"
+        aria-label="Xóa lịch hẹn"
+        className={buttonVariants({ variant: "soft-destructive", size: "icon-sm" })}
         title="Xóa lịch hẹn"
       >
-        <span className="material-symbols-outlined text-[18px]">delete</span>
+        <Trash2 />
       </button>
     </div><div className="mt-2 text-left"><FormFeedback result={result} /></div>
       <ConfirmDialog confirmLabel="Xóa lịch hẹn" description="Lịch hẹn sẽ bị xóa khỏi hệ thống và không thể khôi phục." onConfirm={handleDelete} onOpenChange={setConfirmingDelete} open={confirmingDelete} title={name ? `Xóa lịch hẹn của "${name}"?` : "Xóa lịch hẹn này?"} />

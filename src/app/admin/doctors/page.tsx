@@ -1,7 +1,13 @@
 import Image from "next/image";
+import { ExternalLink } from "lucide-react";
+import { Badge } from "@/components/admin-ui/badge";
+import { Button, buttonVariants } from "@/components/admin-ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/admin-ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin-ui/table";
+import { PageHeader } from "@/features/admin/components/PageHeader";
 import { getDoctorFullName } from "@/features/doctors/utils/doctor-card-name";
 import Link from "next/link";
-import { DirectoryHeroForm } from "@/features/admin/components/DirectoryHeroForm";
+import { DirectoryHeroForm, loadDirectoryHero } from "@/features/admin/components/DirectoryHeroForm";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { DoctorFormDialog } from "@/features/admin/components/DoctorFormDialog";
@@ -14,6 +20,7 @@ export const metadata = {
 
 export default async function AdminDoctorsPage() {
   await requireAdmin();
+  const hero = loadDirectoryHero("doctors");
   // List rows only: the profile (description, education, certificates…) loads when "Sửa" is clicked.
   const { data, error } = await (await getSupabaseServerClient()).from("doctors")
     .select("id,name,slug,avatar,position,degree,experience,sort_order,doctor_specialties(specialty,sort_order)")
@@ -26,112 +33,65 @@ export default async function AdminDoctorsPage() {
   }));
 
   return (
-    <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
-            Quản Lý Đội Ngũ Bác Sĩ &amp; Chuyên Gia
-          </h1>
-          <p className="text-sm text-text-secondary mt-1 max-w-2xl">
-            Danh bạ hội đồng chuyên gia, bác sĩ điều trị và chứng chỉ hành nghề tại Nha Khoa 2000.
-          </p>
-        </div>
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        actions={<>
+          <Button asChild size="sm" variant="outline"><Link prefetch={false} href="/bac-si" rel="noreferrer" target="_blank"><ExternalLink /> Xem trang bác sĩ</Link></Button>
+          <DoctorFormDialog buttonClassName={buttonVariants({ size: "sm" })} buttonLabel="+ Thêm bác sĩ" />
+        </>}
+        description="Danh bạ bác sĩ, chuyên gia và chứng chỉ hành nghề tại Nha Khoa 2000."
+        title="Đội ngũ bác sĩ"
+      />
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/bac-si"
-            target="_blank"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-text-primary hover:bg-surface-container-low text-xs font-semibold shadow-sm border border-border-subtle/50 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px] text-brand-blue-dark">open_in_new</span>
-            <span>Xem Trang Bác Sĩ</span>
-          </Link>
-          <DoctorFormDialog
-            buttonLabel="+ Thêm Bác Sĩ Mới"
-            buttonClassName="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-blue-dark hover:bg-brand-blue text-white text-xs font-bold shadow-md transition-all"
-          />
-        </div>
-      </div>
+      <DirectoryHeroForm loading={hero} page="doctors" />
 
-      <DirectoryHeroForm page="doctors" />
-
-      {/* Doctors Table */}
-      <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div aria-label="Danh sách bác sĩ" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
-          <table className="admin-responsive-table w-full min-w-[1090px] table-fixed border-collapse text-left text-sm">
-            <thead>
-              <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="w-[290px] px-4 py-4">Bác sĩ</th>
-                <th className="w-[330px] px-4 py-4">Chức vụ &amp; Chuyên khoa</th>
-                <th className="w-[110px] px-4 py-4">Kinh nghiệm</th>
-                <th className="w-[180px] px-4 py-4">Thứ tự</th>
-                <th className="w-[180px] px-4 py-4 text-right">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-on-surface">
-              {doctors.map((doctor, idx) => {
-                return (
-                  <tr
-                    key={doctor.id}
-                    className={`hover:bg-background-secondary transition-colors ${
-                      idx % 2 === 1 ? "bg-background-secondary/30" : ""
-                    }`}
-                  >
-                    <td className="px-4 py-3.5" data-label="Bác sĩ">
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-slate-100 border border-border-subtle shadow-sm">
-                          <Image
-                            src={doctor.avatar}
-                            alt={doctor.name}
-                            fill
-                            className="object-cover"
-                            sizes="44px"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors">
-                            <Link href={`/bac-si/${doctor.slug}`} target="_blank">
-                              {getDoctorFullName(doctor)}
-                            </Link>
-                          </div>
-                          <div className="truncate text-[11px] text-text-secondary font-mono">
-                            /bac-si/{doctor.slug}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-3.5" data-label="Chức vụ & chuyên khoa">
-                      <div className="font-semibold text-text-primary text-xs">{doctor.position}</div>
-                      <div className="text-[11px] text-text-secondary">{doctor.specialties.join(" · ") || "—"}</div>
-                    </td>
-
-                    <td className="px-4 py-3.5 font-bold text-xs text-text-primary" data-label="Kinh nghiệm">
-                      {doctor.experience} năm
-                    </td>
-
-                    <td className="px-4 py-3.5" data-label="Thứ tự">
-                      <DoctorSortOrderInput id={doctor.id} sortOrder={doctor.sortOrder} />
-                    </td>
-
-                    <td className="px-4 py-3.5 text-right" data-label="Thao tác">
-                      <div className="inline-flex items-center gap-2 whitespace-nowrap">
-                        <DoctorFormDialog
-                          doctorId={doctor.id}
-                          buttonLabel="Sửa"
-                          buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
-                        />
-                        <DeleteDoctorButton id={doctor.id} name={getDoctorFullName(doctor)} />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Card className="gap-0 overflow-hidden py-0">
+        <CardHeader className="border-b py-4">
+          <CardTitle className="text-base">Danh sách bác sĩ</CardTitle>
+          <CardDescription>{doctors.length} bác sĩ, sắp theo thứ tự hiển thị.</CardDescription>
+        </CardHeader>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead className="w-[300px] pl-6">Bác sĩ</TableHead>
+              <TableHead>Chức vụ &amp; chuyên khoa</TableHead>
+              <TableHead className="w-32">Kinh nghiệm</TableHead>
+              <TableHead className="w-44">Thứ tự</TableHead>
+              <TableHead className="w-48 pr-6 text-right">Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {doctors.map((doctor) => (
+              <TableRow key={doctor.id}>
+                <TableCell className="pl-6">
+                  <div className="flex items-center gap-3">
+                    <div className="relative size-11 shrink-0 overflow-hidden rounded-full border bg-muted">
+                      <Image alt={doctor.name} className="object-cover" fill sizes="44px" src={doctor.avatar} />
+                    </div>
+                    <div className="min-w-0">
+                      <Link prefetch={false} className="block truncate text-sm font-semibold hover:text-primary" href={`/bac-si/${doctor.slug}`} target="_blank">{getDoctorFullName(doctor)}</Link>
+                      <div className="truncate font-mono text-xs text-muted-foreground">/bac-si/{doctor.slug}</div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="whitespace-normal">
+                  <div className="text-sm font-medium">{doctor.position}</div>
+                  <div className="text-xs text-muted-foreground">{doctor.specialties.join(" · ") || "—"}</div>
+                </TableCell>
+                <TableCell><Badge variant="secondary">{doctor.experience} năm</Badge></TableCell>
+                <TableCell><DoctorSortOrderInput id={doctor.id} sortOrder={doctor.sortOrder} /></TableCell>
+                <TableCell className="pr-6 text-right">
+                  <div className="inline-flex items-center gap-2">
+                    <DoctorFormDialog buttonClassName={buttonVariants({ variant: "soft", size: "sm" })} buttonLabel="Sửa" doctorId={doctor.id} />
+                    <DeleteDoctorButton id={doctor.id} name={getDoctorFullName(doctor)} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+            {doctors.length === 0 ? <TableRow><TableCell className="h-24 text-center text-muted-foreground" colSpan={5}>Chưa có bác sĩ nào. Bấm “+ Thêm bác sĩ” để tạo hồ sơ đầu tiên.</TableCell></TableRow> : null}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }

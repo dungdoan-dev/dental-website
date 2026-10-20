@@ -12,7 +12,7 @@ export type InsurancePartnerRecord = {
 };
 
 export function InsurancePartnersManager({ partners }: { partners: readonly InsurancePartnerRecord[] }) {
-  return <section className="overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm">
+  return <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
     <div className="border-b border-border-subtle bg-surface-container-low/50 px-6 py-4">
       <h2 className="text-base font-bold text-text-primary">Đối tác bảo hiểm &amp; bảo lãnh viện phí</h2>
       <p className="mt-1 text-xs text-text-secondary">Cấu hình logo, tên hiển thị và thứ tự ở khu vực bảo hiểm trang chủ.</p>

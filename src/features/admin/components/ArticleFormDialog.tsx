@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { AdminDialog } from "./AdminDialog";
-import { FormSectionNav } from "./FormSectionNav";
 import { DialogFooter } from "./DialogFooter";
 import { useState, useTransition } from "react";
 import type { MutationResult } from "../services/mutation";
@@ -36,7 +36,7 @@ const CATEGORIES: { label: string; value: ArticleCategory }[] = [
 export function ArticleFormDialog({
   article,
   buttonLabel = "Sửa",
-  buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
+  buttonClassName = buttonVariants({ variant: "soft", size: "sm" }),
 }: {
   article?: Omit<Article, "content">;
   buttonLabel?: string;
@@ -141,10 +141,9 @@ export function ArticleFormDialog({
             {isLoading ? <p className="p-7 text-sm text-text-secondary" role="status">Đang tải nội dung bài viết…</p> : null}
             {loadError ? <p className="p-7 text-sm text-error" role="alert">{loadError}</p> : null}
             {!isLoading && !loadError ? <form onSubmit={handleSubmit} className="admin-dialog-form min-h-0 flex-1 flex flex-col gap-5 overflow-y-auto px-5 py-5 text-sm sm:px-7">
-              <FormSectionNav />
               <FormFeedback result={result} />
 
-              <fieldset className="admin-form-section" data-nav="Nội dung">
+              <fieldset className="admin-form-section">
                 <legend>Nội dung bài viết</legend>
                 <label>Tiêu đề *<input onChange={handleTitleChange} placeholder="Tiêu đề chuẩn SEO y khoa..." required type="text" value={formData.title} /></label>
                 <label>Tóm tắt ngắn *<textarea onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} placeholder="Mô tả tóm tắt nội dung bài viết..." required rows={2} value={formData.excerpt} /></label>
@@ -156,7 +155,7 @@ export function ArticleFormDialog({
                 </div>
               </fieldset>
 
-              <fieldset className="admin-form-section" data-nav="Xuất bản">
+              <fieldset className="admin-form-section">
                 <legend>Xuất bản và hiển thị</legend>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label>Trạng thái<select onChange={(event) => setFormData({ ...formData, status: event.target.value as "draft" | "published" })} value={formData.status}><option value="draft">Bản nháp (chưa hiển thị)</option><option value="published">Xuất bản (hiển thị trên website)</option></select></label>
@@ -174,7 +173,7 @@ export function ArticleFormDialog({
                 <label><input checked={formData.featured} className="h-4 w-4 accent-brand-blue-dark" onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} type="checkbox" />Bài nổi bật (hiển thị lớn ở đầu trang Kiến thức)</label>
               </fieldset>
 
-              <details className="admin-form-section" data-nav="Nâng cao">
+              <details className="admin-form-section">
                 <summary>Cài đặt nâng cao</summary>
                 <label>Đường dẫn bài viết (slug) *<input className="font-mono" onChange={(e) => setFormData({ ...formData, slug: e.target.value })} required type="text" value={formData.slug} /></label>
                 <p className="admin-form-hint">Tự tạo từ tiêu đề khi thêm mới. Đổi slug sẽ làm đường dẫn cũ /tin-tuc/… không còn hoạt động.</p>

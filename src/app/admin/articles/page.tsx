@@ -1,6 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { DirectoryHeroForm } from "@/features/admin/components/DirectoryHeroForm";
+import { ChevronLeft, ChevronRight, CircleCheck, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/admin-ui/badge";
+import { Button, buttonVariants } from "@/components/admin-ui/button";
+import { Card } from "@/components/admin-ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin-ui/table";
+import { PageHeader } from "@/features/admin/components/PageHeader";
+import { DirectoryHeroForm, loadDirectoryHero } from "@/features/admin/components/DirectoryHeroForm";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ArticleFormDialog } from "@/features/admin/components/ArticleFormDialog";
@@ -15,6 +21,7 @@ export const metadata = {
 
 export default async function AdminArticlesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireAdmin();
+  const hero = loadDirectoryHero("articles");
   const raw = await searchParams;
   const query = articleListQuerySchema.parse({
     status: typeof raw.status === "string" ? raw.status : "all",
@@ -22,20 +29,24 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
   });
   const pageSize = 20;
   const supabase = await getSupabaseServerClient();
-  let countQuery = supabase.from("articles").select("id", { count: "exact", head: true });
-  let articleQuery = supabase.from("articles")
-    .select("id,title,slug,excerpt,thumbnail,published_at,author,category,reading_minutes,featured,status");
-  if (query.status !== "all") {
-    countQuery = countQuery.eq("status", query.status);
-    articleQuery = articleQuery.eq("status", query.status);
-  }
-  const { count, error: countError } = await countQuery;
+  // Fresh builders per call: a Postgrest builder mutates itself, so it cannot be reused for a second page.
+  const countQuery = () => {
+    const q = supabase.from("articles").select("id", { count: "exact", head: true });
+    return query.status !== "all" ? q.eq("status", query.status) : q;
+  };
+  const pageQuery = (pageNumber: number) => {
+    const q = supabase.from("articles").select("id,title,slug,excerpt,thumbnail,published_at,author,category,reading_minutes,featured,status");
+    return (query.status !== "all" ? q.eq("status", query.status) : q)
+      .order("published_at", { ascending: false })
+      .range((pageNumber - 1) * pageSize, pageNumber * pageSize - 1);
+  };
+  // Count and the requested page run together; the page is only refetched when the URL asks for one past the end.
+  const [{ count, error: countError }, firstPage] = await Promise.all([countQuery(), pageQuery(query.page)]);
   if (countError) throw countError;
   const total = count ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const page = Math.min(query.page, pageCount);
-  const { data: articleRows, error } = await articleQuery.order("published_at", { ascending: false })
-    .range((page - 1) * pageSize, page * pageSize - 1);
+  const { data: articleRows, error } = page === query.page ? firstPage : await pageQuery(page);
   if (error) throw error;
   const articles = articleRows.map((article) => ({
     ...article,
@@ -51,150 +62,89 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
   }
 
   return (
-    <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
-            Quản Lý Bài Viết &amp; Cẩm Nang Y Khoa
-          </h1>
-          <p className="text-sm text-text-secondary mt-1 max-w-2xl">
-            Các bài viết chia sẻ kiến thức nha khoa, nghiên cứu lâm sàng và cẩm nang chăm sóc răng miệng.
-          </p>
-        </div>
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader
+        actions={<>
+          <Button asChild size="sm" variant="outline"><Link prefetch={false} href="/tin-tuc" rel="noreferrer" target="_blank"><ExternalLink /> Xem trang tin tức</Link></Button>
+          <ArticleFormDialog buttonClassName={buttonVariants({ size: "sm" })} buttonLabel="+ Viết bài mới" />
+        </>}
+        description="Các bài viết chia sẻ kiến thức nha khoa, nghiên cứu lâm sàng và cẩm nang chăm sóc răng miệng."
+        title="Bài viết & cẩm nang"
+      />
 
-        <div className="flex items-center gap-3">
+      <DirectoryHeroForm loading={hero} page="articles" />
+
+      <nav aria-label="Lọc trạng thái bài viết" className="flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-[7px] bg-white p-1 shadow-card">
+        {[{ label: "Tất cả", value: "all" }, { label: "Bản nháp", value: "draft" }, { label: "Đã xuất bản", value: "published" }].map((filter) => (
           <Link
-            href="/tin-tuc"
-            target="_blank"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-text-primary hover:bg-surface-container-low text-xs font-semibold shadow-sm border border-border-subtle/50 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[18px] text-brand-blue-dark">open_in_new</span>
-            <span>Xem Trang Tin Tức</span>
-          </Link>
-          <ArticleFormDialog
-            buttonLabel="+ Viết Bài Mới"
-            buttonClassName="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-blue-dark hover:bg-brand-blue text-white text-xs font-bold shadow-md transition-all"
-          />
-        </div>
-      </div>
-
-      <nav aria-label="Lọc trạng thái bài viết" className="flex flex-wrap gap-2">
-        {[{ label: "Tất cả", value: "all" }, { label: "Bản nháp", value: "draft" }, { label: "Đã xuất bản", value: "published" }].map((filter) => <Link aria-current={query.status === filter.value ? "page" : undefined} className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold ${query.status === filter.value ? "bg-brand-blue-dark text-white" : "border border-border-subtle bg-white text-text-primary"}`} href={filter.value === "all" ? "/admin/articles" : `/admin/articles?status=${filter.value}`} key={filter.value}>{filter.label}</Link>)}
+            aria-current={query.status === filter.value ? "page" : undefined}
+            className={`whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors ${query.status === filter.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-sidebar-accent hover:text-primary"}`}
+            href={filter.value === "all" ? "/admin/articles" : `/admin/articles?status=${filter.value}`}
+            key={filter.value}
+          >{filter.label}</Link>
+        ))}
       </nav>
 
-      <DirectoryHeroForm page="articles" />
+      <Card className="gap-0 overflow-hidden py-0">
+        <Table aria-label="Danh sách bài viết" className="min-w-[1100px]">
+          <TableHeader>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead className="w-24 pl-6">Ảnh</TableHead>
+              <TableHead>Tiêu đề &amp; slug</TableHead>
+              <TableHead className="w-32">Trạng thái</TableHead>
+              <TableHead className="w-40">Chuyên mục</TableHead>
+              <TableHead className="w-44">Tác giả</TableHead>
+              <TableHead className="w-32">Ngày đăng</TableHead>
+              <TableHead className="w-24">Nổi bật</TableHead>
+              <TableHead className="w-44 pr-6 text-right">Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {articles.map((article) => {
+              const articleObj: Omit<Article, "content"> = {
+                ...article,
+                publishedAt: article.publishedAt.toISOString(),
+                category: article.category as Article["category"],
+              };
 
-      {/* Articles Table */}
-      <div className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(20,70,85,0.06)] border border-border-subtle/50">
-        <div aria-label="Danh sách bài viết" className="admin-table-scroll overflow-x-auto" role="region" tabIndex={0}>
-          <table className="admin-responsive-table w-full min-w-[1320px] table-fixed border-collapse text-left text-sm">
-            <thead>
-              <tr className="bg-surface-container-low text-text-secondary text-[11px] font-bold uppercase tracking-wider">
-                <th className="w-24 px-4 py-4">Ảnh</th>
-                <th className="w-[360px] px-4 py-4">Tiêu đề &amp; Slug</th>
-                <th className="w-[130px] px-3 py-4">Trạng thái</th>
-                <th className="w-[150px] px-3 py-4">Chuyên mục</th>
-                <th className="w-[180px] px-3 py-4">Tác giả</th>
-                <th className="w-[132px] px-3 py-4">Ngày đăng</th>
-                <th className="w-24 px-3 py-4">Nổi bật</th>
-                <th className="w-[176px] px-4 py-4 text-right">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-on-surface">
-              {articles.map((article, idx) => {
-                const articleObj: Omit<Article, "content"> = {
-                  ...article,
-                  publishedAt: article.publishedAt.toISOString(),
-                  category: article.category as Article["category"],
-                };
+              return (
+                <TableRow key={article.id}>
+                  <TableCell className="pl-6">
+                    <div className="relative h-12 w-16 overflow-hidden rounded-md border bg-muted">
+                      <Image alt={article.title} className="object-cover" fill sizes="64px" src={article.thumbnail} />
+                    </div>
+                  </TableCell>
+                  <TableCell className="whitespace-normal">
+                    <Link prefetch={false} className="line-clamp-1 text-sm font-semibold hover:text-primary" href={article.status === "published" ? `/tin-tuc/${article.slug}` : "/admin/articles"} target={article.status === "published" ? "_blank" : undefined}>{article.title}</Link>
+                    <div className="truncate font-mono text-xs text-muted-foreground">/tin-tuc/{article.slug}</div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={article.status === "published" ? "bg-emerald-500/10 text-emerald-700" : ""} variant={article.status === "published" ? "secondary" : "outline"}>{article.status === "published" ? "Đã xuất bản" : "Bản nháp"}</Badge>
+                  </TableCell>
+                  <TableCell><Badge variant="secondary">{getArticleCategoryLabel(article.category as Article["category"])}</Badge></TableCell>
+                  <TableCell className="whitespace-normal text-sm"><span className="line-clamp-2" title={article.author}>{article.author}</span></TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{new Date(article.publishedAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })}</TableCell>
+                  <TableCell>{article.featured ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700"><CircleCheck className="size-4" /> Hero</span> : <span className="text-xs text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="pr-6 text-right">
+                    <div className="inline-flex items-center gap-2">
+                      <ArticleFormDialog article={articleObj} buttonClassName={buttonVariants({ variant: "soft", size: "sm" })} buttonLabel="Sửa" />
+                      <DeleteArticleButton id={article.id} name={article.title} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {articles.length === 0 ? <TableRow><TableCell className="h-24 text-center text-muted-foreground" colSpan={8}>Chưa có bài viết nào ở mục này.</TableCell></TableRow> : null}
+          </TableBody>
+        </Table>
+      </Card>
 
-                return (
-                  <tr
-                    key={article.id}
-                    className={`hover:bg-background-secondary transition-colors ${
-                      idx % 2 === 1 ? "bg-background-secondary/30" : ""
-                    }`}
-                  >
-                    <td className="px-4 py-3.5" data-label="Ảnh">
-                      <div className="relative h-12 w-16 overflow-hidden rounded-xl bg-slate-100 border border-border-subtle shadow-sm">
-                        <Image
-                          src={article.thumbnail}
-                          alt={article.title}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-3.5" data-label="Bài viết">
-                      <div className="font-bold text-text-primary text-sm hover:text-brand-blue-dark transition-colors line-clamp-1">
-                        <Link href={article.status === "published" ? `/tin-tuc/${article.slug}` : "/admin/articles"} target={article.status === "published" ? "_blank" : undefined}>
-                          {article.title}
-                        </Link>
-                      </div>
-                      <div className="text-[11px] text-text-secondary font-mono mt-0.5 truncate">
-                        /tin-tuc/{article.slug}
-                      </div>
-                    </td>
-
-                    <td className="px-3 py-3.5" data-label="Trạng thái">
-                      <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-bold ${article.status === "published" ? "bg-brand-green-light text-brand-green-dark" : "bg-surface-container text-text-secondary"}`}>{article.status === "published" ? "Đã xuất bản" : "Bản nháp"}</span>
-                    </td>
-
-                    <td className="px-3 py-3.5" data-label="Chuyên mục">
-                      <span className="inline-flex items-center rounded-full bg-brand-blue-light px-2.5 py-0.5 text-[11px] font-bold text-brand-blue-dark">
-                        {getArticleCategoryLabel(article.category as Article["category"])}
-                      </span>
-                    </td>
-
-                    <td className="px-3 py-3.5 text-xs font-medium text-text-primary" data-label="Tác giả">
-                      <span className="line-clamp-2" title={article.author}>{article.author}</span>
-                    </td>
-
-                    <td className="whitespace-nowrap px-3 py-3.5 font-mono text-xs text-text-secondary" data-label="Ngày đăng">
-                      {new Date(article.publishedAt).toLocaleDateString("vi-VN", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
-                    </td>
-
-                    <td className="px-3 py-3.5" data-label="Nổi bật">
-                      {article.featured ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-green-dark">
-                          <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                          <span>Hero</span>
-                        </span>
-                      ) : (
-                        <span className="text-xs text-text-secondary">—</span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3.5 text-right" data-label="Thao tác">
-                      <div className="inline-flex items-center gap-2 whitespace-nowrap">
-                        <ArticleFormDialog
-                          article={articleObj}
-                          buttonLabel="Sửa"
-                          buttonClassName="rounded-xl border border-border-subtle bg-white px-3 py-1 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm"
-                        />
-                        <DeleteArticleButton id={article.id} name={article.title} />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <nav aria-label="Phân trang bài viết" className="flex flex-wrap items-center justify-between gap-3 text-sm text-text-secondary">
+      <nav aria-label="Phân trang bài viết" className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
         <p>Hiển thị {total === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} / {total} bài viết</p>
         <div className="flex items-center gap-2">
-          <Link aria-disabled={page <= 1} className={`inline-flex min-h-10 items-center rounded-lg border border-border-subtle bg-white px-4 font-semibold ${page <= 1 ? "pointer-events-none opacity-50" : "hover:border-brand-blue"}`} href={pageHref(Math.max(1, page - 1))}>Trước</Link>
-          <span aria-current="page" className="min-w-20 text-center font-semibold text-text-primary">Trang {page} / {pageCount}</span>
-          <Link aria-disabled={page >= pageCount} className={`inline-flex min-h-10 items-center rounded-lg border border-border-subtle bg-white px-4 font-semibold ${page >= pageCount ? "pointer-events-none opacity-50" : "hover:border-brand-blue"}`} href={pageHref(Math.min(pageCount, page + 1))}>Tiếp</Link>
+          {page > 1 ? <Button asChild size="sm" variant="outline"><Link href={pageHref(page - 1)}><ChevronLeft /> Trang trước</Link></Button> : <Button aria-disabled="true" disabled size="sm" variant="outline"><ChevronLeft /> Trang trước</Button>}
+          <span aria-current="page" className="min-w-20 text-center font-semibold text-foreground">Trang {page} / {pageCount}</span>
+          {page < pageCount ? <Button asChild size="sm" variant="outline"><Link href={pageHref(page + 1)}>Trang sau <ChevronRight /></Link></Button> : <Button aria-disabled="true" disabled size="sm" variant="outline">Trang sau <ChevronRight /></Button>}
         </div>
       </nav>
     </div>

@@ -2,6 +2,7 @@ import { updateStructuredSiteContent } from "../content-actions";
 import type { AboutPageData } from "@/features/about/schemas/about.schema";
 import type { ImplantDetailData } from "@/features/services/schemas/implant-detail.schema";
 import { EditableRows } from "./EditableRows";
+import { PageHeader } from "./PageHeader";
 import { AdminActionForm } from "./AdminActionForm";
 import { ImageUploadField } from "./ImageUploadField";
 
@@ -76,7 +77,7 @@ function ContentEditor({ record }: { record: SiteContentRecord }) {
   }
 
   const data = record.content;
-  return <AdminActionForm action={updateStructuredSiteContent} className="space-y-4 rounded-2xl border border-border-subtle bg-white p-5 shadow-sm" submitLabel="Lưu nội dung Implant">
+  return <AdminActionForm action={updateStructuredSiteContent} className="space-y-4 rounded-[7px] bg-card shadow-card p-5" submitLabel="Lưu nội dung Implant">
     <input name="key" type="hidden" value={record.key} />
     <h3 className="font-bold text-text-primary">Chi tiết dịch vụ Implant</h3>
     <TextField label="Liên kết nguồn bảng giá" name="priceSourceUrl" value={data.priceSourceUrl} required />
@@ -97,17 +98,13 @@ export function ContentDatabaseManager({
 }) {
   const visibleContent = contentRecords.filter((record) => section === "all" || (section === "about" && record.key === "about_page"));
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-8">
-      <header>
-        <p className="text-sm font-bold uppercase tracking-wider text-brand-blue">Quản trị dữ liệu</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-text-primary">Nội dung website &amp; bảo hiểm</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">Quản lý nội dung trang bằng các trường nhập liệu.</p>
-      </header>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <PageHeader description="Chỉnh nội dung trang giới thiệu bằng các trường nhập liệu." title="Trang giới thiệu" />
 
       <section aria-labelledby="site-content-heading" className="space-y-4">
         <div><h2 className="text-xl font-bold text-text-primary" id="site-content-heading">Nội dung website</h2><p className="mt-1 text-sm text-text-secondary">Chỉnh nội dung theo từng trang bằng form; các danh sách được nhập mỗi mục trên một dòng theo hướng dẫn.</p></div>
         {section === "about" && contentWarning ? <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950" role="alert">{contentWarning}</p> : null}
-        {visibleContent.length ? visibleContent.map((record) => <ContentEditor key={record.key} record={record} />) : <p className="rounded-2xl border border-border-subtle bg-white p-5 text-sm text-text-secondary">Chưa có nội dung cấu hình cho mục này.</p>}
+        {visibleContent.length ? visibleContent.map((record) => <ContentEditor key={record.key} record={record} />) : <p className="rounded-[7px] bg-card shadow-card p-5 text-sm text-text-secondary">Chưa có nội dung cấu hình cho mục này.</p>}
       </section>
 
     </div>

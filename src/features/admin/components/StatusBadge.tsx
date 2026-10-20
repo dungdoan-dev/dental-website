@@ -6,23 +6,23 @@ const STATUS_CONFIG: Record<
 > = {
   pending: {
     label: "Chờ duyệt",
-    bg: "bg-[#ffdcbf] text-[#854c00]",
-    dot: "bg-[#a86100]",
+    bg: "bg-amber-500/10 text-amber-700",
+    dot: "bg-amber-500",
   },
   confirmed: {
     label: "Đã xác nhận",
-    bg: "bg-brand-blue-light text-brand-blue-dark",
-    dot: "bg-brand-blue-dark",
+    bg: "bg-primary/10 text-primary",
+    dot: "bg-primary",
   },
   completed: {
     label: "Hoàn thành",
-    bg: "bg-brand-green-light text-brand-green-dark",
-    dot: "bg-brand-green",
+    bg: "bg-emerald-500/10 text-emerald-700",
+    dot: "bg-emerald-500",
   },
   cancelled: {
     label: "Đã hủy",
-    bg: "bg-[#ffdad6] text-[#ba1a1a]",
-    dot: "bg-[#ba1a1a]",
+    bg: "bg-destructive/10 text-destructive",
+    dot: "bg-destructive",
   },
 };
 
@@ -39,7 +39,7 @@ export function StatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${config.bg}`}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${config.bg}`}
     >
       <span className={`h-2 w-2 rounded-full ${config.dot}`} />
       {config.label}

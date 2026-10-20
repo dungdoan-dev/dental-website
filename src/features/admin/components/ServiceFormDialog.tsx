@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { AdminDialog } from "./AdminDialog";
 import { DialogFooter } from "./DialogFooter";
 import type { MutationResult } from "../services/mutation";
@@ -22,7 +23,7 @@ const CATEGORIES: { label: string; value: ServiceCategory }[] = [
   { label: "Khác", value: "other" },
 ];
 
-const defaultButtonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm";
+const defaultButtonClassName = buttonVariants({ variant: "soft", size: "sm" });
 
 // With serviceId the full record is fetched on click; without it the dialog adds a new service.
 export function ServiceFormDialog({ serviceId, buttonLabel = "Sửa", buttonClassName = defaultButtonClassName }: { serviceId?: string; buttonLabel?: string; buttonClassName?: string }) {

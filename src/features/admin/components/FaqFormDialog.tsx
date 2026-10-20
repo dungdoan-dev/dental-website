@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { buttonVariants } from "@/components/admin-ui/button";
 import { AdminDialog } from "./AdminDialog";
 import { DialogFooter } from "./DialogFooter";
 import { upsertFaq } from "../actions";
@@ -10,7 +11,7 @@ export function FaqFormDialog({
   faq,
   nextSortOrder = 0,
   buttonLabel = "Sửa",
-  buttonClassName = "rounded-xl border border-border-subtle bg-white px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-surface-container-low transition-colors shadow-sm",
+  buttonClassName = buttonVariants({ variant: "soft", size: "sm" }),
 }: {
   faq?: { id: string; question: string; answer: string; sortOrder: number };
   nextSortOrder?: number;
