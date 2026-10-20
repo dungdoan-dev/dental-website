@@ -49,7 +49,7 @@ npm test
 npm run build
 ```
 
-`npm run dev` dùng `.next`, còn `npm run build` và `npm start` dùng `.next-production` để tránh tranh chấp file trên Windows. Dừng server production trước khi build lại vì server đó đang dùng chính thư mục build. Có thể đổi thư mục bằng `NEXT_BUILD_DIR`, nhưng phải dùng cùng giá trị khi build và start. Các test database dùng PostgreSQL cục bộ qua PGlite, không ghi vào Supabase đang chạy.
+Ở local, `npm run dev` dùng `.next`, còn `npm run build` và `npm start` dùng `.next-production` để tránh tranh chấp file trên Windows. Dừng server production trước khi build lại vì server đó đang dùng chính thư mục build. Có thể đổi thư mục local bằng `NEXT_BUILD_DIR`, nhưng phải dùng cùng giá trị khi build và start. Trên Vercel (`VERCEL=1`), output luôn là `.next`; giữ Framework Preset là Next.js và không override Output Directory sang `.next-production`. Các test database dùng PostgreSQL cục bộ qua PGlite, không ghi vào Supabase đang chạy.
 
 ## Cấu trúc chính
 

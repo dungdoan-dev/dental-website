@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
 export default function config(phase: string): NextConfig {
   return {
     ...nextConfig,
-    // Separate dev files from production output to avoid Windows file locks.
-    distDir: process.env.NEXT_BUILD_DIR || (phase === PHASE_DEVELOPMENT_SERVER ? ".next" : ".next-production"),
+    // Vercel expects .next; isolate local production builds from dev file locks.
+    distDir: process.env.VERCEL === "1" ? ".next"
+      : process.env.NEXT_BUILD_DIR || (phase === PHASE_DEVELOPMENT_SERVER ? ".next" : ".next-production"),
   };
 }
