@@ -57,3 +57,7 @@ npm run build
 - `src/features`: các domain nội dung, dịch vụ, bác sĩ, lịch hẹn và quản trị.
 - `src/lib/supabase`: client public và client server có cookie Auth.
 - `supabase/migrations`: schema, dữ liệu khởi tạo và RLS policies.
+
+
+
+hehe
