@@ -1,5 +1,5 @@
--- Apply after 20251006_init.sql. This migration is additive and preserves admin edits.
--- Do not re-run 20251006_init.sql on a database containing real data: it drops tables.
+-- Apply after 20261006000000_init.sql. This migration is additive and preserves admin edits.
+-- Do not re-run 20261006000000_init.sql on a database containing real data: it drops tables.
 
 BEGIN;
 

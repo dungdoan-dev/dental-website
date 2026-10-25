@@ -5,9 +5,8 @@ import { PageHeader } from "@/features/admin/components/PageHeader";
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { buttonVariants } from "@/components/admin-ui/button";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { FaqFormDialog } from "@/features/admin/components/FaqFormDialog";
 import { TestimonialFormDialog } from "@/features/admin/components/TestimonialFormDialog";
-import { DeleteFaqButton, DeleteHeroSlideButton, DeleteTestimonialButton } from "@/features/admin/components/DeleteButtons";
+import { DeleteHeroSlideButton, DeleteTestimonialButton } from "@/features/admin/components/DeleteButtons";
 import { HeroSlideFormDialog } from "@/features/admin/components/HeroSlideFormDialog";
 import { InsurancePartnersManager, type InsurancePartnerRecord } from "@/features/admin/components/InsurancePartnersManager";
 import { updateHomeSectionCopy, updateStructuredSiteContent } from "@/features/admin/content-actions";
@@ -25,8 +24,7 @@ export const metadata = {
 export default async function AdminHomePage() {
   await requireAdmin();
   const supabase = await getSupabaseServerClient();
-  const [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent] = await Promise.all([
-    supabase.from("faq_items").select("*").order("sort_order").order("id"),
+  const [testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent] = await Promise.all([
     supabase.from("testimonials").select("*").order("sort_order"),
     supabase.from("core_values").select("*").order("sort_order"),
     supabase.from("hero_slides").select("*").order("sort_order"),
@@ -35,14 +33,12 @@ export default async function AdminHomePage() {
     supabase.from("site_content").select("content").eq("key", "home_faq_heading").maybeSingle(),
     supabase.from("site_content").select("content").eq("key", "home_section_copy").maybeSingle(),
   ]);
-  for (const result of [faqs, testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent]) {
+  for (const result of [testimonials, coreValues, heroSlides, insurancePartners, whyChooseContent, faqHeadingContent, sectionCopyContent]) {
     if (result.error) throw result.error;
   }
-  const faqRows = faqs.data ?? [];
   const testimonialRows = testimonials.data ?? [];
   const coreValueRows = coreValues.data ?? [];
-  // New FAQ/testimonials go last instead of jumping to the top at sort_order 0.
-  const nextFaqSort = Math.max(-1, ...faqRows.map((row) => row.sort_order)) + 1;
+  // New testimonials go last instead of jumping to the top at sort_order 0.
   const nextTestimonialSort = Math.max(-1, ...testimonialRows.map((row) => row.sort_order)) + 1;
   const heroSlideRows = (heroSlides.data ?? []).map((row) => ({
     ...row, imageAlt: row.image_alt,
@@ -177,42 +173,9 @@ export default async function AdminHomePage() {
 
       <div><InsurancePartnersManager partners={insurancePartnerRows} /></div>
 
-      <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
-        <div className="flex items-center justify-between border-b px-6 py-5">
-          <div>
-            <h2 className="text-base font-bold text-text-primary">Câu hỏi thường gặp (FAQ)</h2>
-            <p className="text-xs text-text-secondary">Câu hỏi và câu trả lời hiển thị trong mục FAQ trên trang chủ; thứ tự theo số thứ tự.</p>
-          </div>
-          <FaqFormDialog
-            nextSortOrder={nextFaqSort}
-            buttonLabel="+ Thêm Câu Hỏi"
-            buttonClassName={buttonVariants({ size: "sm" })}
-          />
-        </div>
-
-        <div className="divide-y divide-slate-100">
-          {faqRows.map((faq) => (
-            <div key={faq.id} className="flex items-start justify-between gap-4 p-5 hover:bg-background-secondary transition">
-              <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-blue-light text-[11px] font-bold text-brand-blue-dark">
-                    ?
-                  </span>
-                  {faq.question}
-                </h3>
-                <p className="text-xs text-text-secondary leading-relaxed pl-7">{faq.answer}</p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <FaqFormDialog
-                  faq={{ ...faq, id: faq.id.toString() }}
-                  buttonLabel="Sửa"
-                  buttonClassName={buttonVariants({ variant: "soft", size: "sm" })}
-                />
-                <DeleteFaqButton id={faq.id.toString()} name={faq.question} />
-              </div>
-            </div>
-          ))}
-        </div>
+      <section className="flex flex-col gap-3 rounded-[7px] bg-card shadow-card p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div><h2 className="font-bold text-text-primary">Câu hỏi thường gặp (FAQ)</h2><p className="text-xs text-text-secondary">Câu hỏi và câu trả lời của mục FAQ trang chủ và trang Hỏi đáp được quản lý chung.</p></div>
+        <Link className="rounded-lg border border-border-subtle px-4 py-2 text-xs font-bold text-brand-blue-dark hover:bg-brand-blue-light" href="/admin/faq">Quản lý câu hỏi →</Link>
       </section>
 
       <section className="overflow-hidden rounded-[7px] bg-card shadow-card">

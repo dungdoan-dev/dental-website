@@ -19,6 +19,7 @@ const SECTION_LABELS: Record<string, string> = {
   "/admin/services": "Dịch vụ",
   "/admin/doctors": "Đội ngũ bác sĩ",
   "/admin/articles": "Bài viết",
+  "/admin/faq": "Hỏi đáp",
   "/admin/appointments": "Lịch hẹn",
   "/admin/clinics": "Liên hệ & Cơ sở",
 };

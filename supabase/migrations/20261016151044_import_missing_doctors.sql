@@ -1,5 +1,5 @@
 -- Doctors missing from the new site, copied from https://nhakhoa2000.com/gioi-thieu/ (2026-10-16).
--- Run after 20261016_doctor_degree.sql. Re-runnable: existing doctors and their rows are left untouched.
+-- Run after 20261016151042_doctor_degree.sql. Re-runnable: existing doctors and their rows are left untouched.
 BEGIN;
 
 INSERT INTO doctors (id, name, slug, avatar, position, experience, description, badge, highlight, featured, category, directory_title, license_number, quote, languages, source_url, sort_order, degree)

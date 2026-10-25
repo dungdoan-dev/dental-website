@@ -1,5 +1,5 @@
 -- Add Dr. Thân Trọng Nguyên from the official public profile.
--- Apply after 20251006_init.sql and the later additive migrations.
+-- Apply after 20261006000000_init.sql and the later additive migrations.
 BEGIN;
 
 -- Remove the original AI-generated placeholder doctors from the initial seed.

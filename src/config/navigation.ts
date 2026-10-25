@@ -24,6 +24,7 @@ export const navigation: readonly NavigationItem[] = [
   },
   { label: "Đội ngũ bác sĩ", href: "/bac-si" },
   { label: "Kiến thức", href: "/tin-tuc" },
+  { label: "Hỏi đáp", href: "/hoi-dap" },
   { label: "Liên hệ", href: "/lien-he" },
 ];
 

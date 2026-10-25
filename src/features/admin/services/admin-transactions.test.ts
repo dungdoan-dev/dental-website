@@ -5,7 +5,7 @@ import { testDatabase, migration } from "../../../lib/testing/database";
 test("admin saves roll back records, child lists and revisions together and reject non-admin callers", async () => {
   const db = await testDatabase();
   try {
-    await db.exec(migration("20261016_appointment_insert_and_doctor_details.sql"));
+    await db.exec(migration("20261015142630_appointment_insert_and_doctor_details.sql"));
     await db.exec(migration("20261020152834_atomic_admin_content_saves.sql"));
     const save = (kind: string, data: unknown) => db.query("SELECT public.admin_save_content($1,$2::jsonb,'Test',NULL)",[kind,JSON.stringify(data)]);
     await db.exec("SET ROLE authenticated");

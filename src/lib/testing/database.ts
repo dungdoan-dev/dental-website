@@ -16,7 +16,7 @@ export async function testDatabase() {
       SELECT coalesce(auth.jwt()->'app_metadata'->>'role'='admin',false);
     $$;
   `);
-  await db.exec(migration("20251006_init.sql").split("-- SECTION 4:")[0]);
+  await db.exec(migration("20261006000000_init.sql").split("-- SECTION 4:")[0]);
   await db.exec(`
     ALTER TABLE doctors ADD COLUMN degree TEXT NOT NULL DEFAULT '';
     ALTER TABLE doctors ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0;

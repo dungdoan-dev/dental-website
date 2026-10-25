@@ -13,9 +13,9 @@ Tạo `.env.local` từ `.env.example`, sau đó điền `NEXT_PUBLIC_SUPABASE_U
 
 ## Database và quyền truy cập
 
-Các thay đổi schema/policy được quản lý bằng SQL trong `supabase/migrations`. Với database hiện có, chạy migration mới theo thứ tự sau các migration trước đó; **không chạy lại** `20251006_init.sql` trên database đã có dữ liệu vì file khởi tạo có thao tác xóa bảng.
+Các thay đổi schema/policy được quản lý bằng SQL trong `supabase/migrations`. Với database hiện có, chạy migration mới theo thứ tự sau các migration trước đó; **không chạy lại** `20261006000000_init.sql` trên database đã có dữ liệu vì file khởi tạo có thao tác xóa bảng.
 
-`20261012_supabase_auth_admin_rls.sql` chuyển quyền quản trị sang Supabase Auth và RLS. Thao tác quản trị yêu cầu người dùng Supabase Auth có `app_metadata.role = "admin"`.
+`20261012201305_supabase_auth_admin_rls.sql` chuyển quyền quản trị sang Supabase Auth và RLS. Thao tác quản trị yêu cầu người dùng Supabase Auth có `app_metadata.role = "admin"`.
 
 Hai migration tối ưu mới phải được áp dụng cùng đợt triển khai mã tương ứng:
 

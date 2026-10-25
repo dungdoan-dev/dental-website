@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CalendarDays, FileText, HeartPulse, House, Info, LayoutDashboard, Phone, Users, type LucideIcon } from "lucide-react";
+import { CalendarDays, CircleHelp, FileText, HeartPulse, House, Info, LayoutDashboard, Phone, Users, type LucideIcon } from "lucide-react";
 import { PendingCount } from "./PendingCount";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarRail, useSidebar } from "@/components/admin-ui/sidebar";
 
@@ -24,6 +24,7 @@ export function AdminSidebar({ pendingAppointments }: { pendingAppointments: Pro
       { href: "/admin/services", label: "Dịch vụ", icon: HeartPulse },
       { href: "/admin/doctors", label: "Bác sĩ", icon: Users },
       { href: "/admin/articles", label: "Kiến thức", icon: FileText },
+      { href: "/admin/faq", label: "Hỏi đáp", icon: CircleHelp },
       { href: "/admin/clinics", label: "Liên hệ & Cơ sở", icon: Phone },
     ] },
   ];

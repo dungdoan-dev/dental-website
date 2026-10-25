@@ -221,6 +221,8 @@ export async function deleteArticle(id: string) {
 // ─────────────────────────────────────────────────────────────
 function revalidateHome(tag: string) {
   revalidatePath("/admin/home");
+  revalidatePath("/admin/faq");
+  revalidatePath("/hoi-dap");
   revalidatePath("/");
   updateTag(tag);
 }

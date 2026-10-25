@@ -10,6 +10,7 @@ const quickLinks = [
   { label: "Đội Ngũ Bác Sĩ", href: "/bac-si" },
   { label: "Cơ Sở Vật Chất Hiện Đại", href: "/#co-so-vat-chat" },
   servicePriceLink,
+  { label: "Câu Hỏi Thường Gặp", href: "/hoi-dap" },
   { label: "Chỉ Đường & Liên Hệ", href: "/lien-he" },
 ] as const;
 

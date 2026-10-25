@@ -1,5 +1,5 @@
 -- Refine homepage hero copy to use concise, factual language.
--- Safe to run after 20251006_init.sql and preserves unrelated slide fields.
+-- Safe to run after 20261006000000_init.sql and preserves unrelated slide fields.
 
 BEGIN;
 
