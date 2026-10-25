@@ -4,16 +4,16 @@ import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { FAQItem } from "../types/home.type";
 
-export function FAQAccordion({ items, title, note }: { items: readonly FAQItem[]; title: string; note: string }) {
+export function FAQAccordion({ items, title, note, TitleTag = "h2" }: { items: readonly FAQItem[]; title: string; note: string; TitleTag?: "h1" | "h2" }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <section className="bg-white py-5 lg:py-6">
       <div className="mx-auto max-w-4xl px-margin-mobile md:px-margin">
         <div className="mx-auto mb-4 max-w-2xl space-y-1 text-center">
-          <h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">
+          <TitleTag className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">
             {title}
-          </h2>
+          </TitleTag>
           <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
             {note}
           </p>

@@ -17,7 +17,7 @@ export default async function AdminFaqPage() {
   if (error) throw error;
   const faqRows = data ?? [];
   // New questions go last instead of jumping to the top at sort_order 0.
-  const nextFaqSort = Math.max(-1, ...faqRows.map((row) => row.sort_order)) + 1;
+  const nextFaqSort = faqRows.reduce((max, row) => Math.max(max, row.sort_order), -1) + 1;
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -42,7 +42,7 @@ export default async function AdminFaqPage() {
         <div className="divide-y divide-slate-100">
           {faqRows.map((faq) => (
             <div key={faq.id} className="flex items-start justify-between gap-4 p-5 hover:bg-background-secondary transition">
-              <div className="space-y-1.5">
+              <div className="min-w-0 space-y-1.5">
                 <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-blue-light text-[11px] font-bold text-brand-blue-dark">
                     ?

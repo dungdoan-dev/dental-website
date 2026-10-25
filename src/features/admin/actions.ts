@@ -221,10 +221,14 @@ export async function deleteArticle(id: string) {
 // ─────────────────────────────────────────────────────────────
 function revalidateHome(tag: string) {
   revalidatePath("/admin/home");
-  revalidatePath("/admin/faq");
-  revalidatePath("/hoi-dap");
   revalidatePath("/");
   updateTag(tag);
+}
+
+function revalidateFaq() {
+  revalidatePath("/admin/faq");
+  revalidatePath("/hoi-dap");
+  revalidateHome(publicDataTags.faqs);
 }
 
 export async function upsertFaq(input: z.infer<typeof faqSchema>) {
@@ -237,7 +241,7 @@ export async function upsertFaq(input: z.infer<typeof faqSchema>) {
     const supabase = await getSupabaseServerClient();
     const { error } = id ? await supabase.from("faq_items").update(row).eq("id", id) : await supabase.from("faq_items").insert(row);
     if (error) throw error;
-    revalidateHome(publicDataTags.faqs);
+    revalidateFaq();
   });
 }
 
@@ -248,7 +252,7 @@ export async function deleteFaq(id: string) {
   return runMutation(async () => {
     const { error } = await (await getSupabaseServerClient()).from("faq_items").delete().eq("id", parsed.data);
     if (error) throw error;
-    revalidateHome(publicDataTags.faqs);
+    revalidateFaq();
   });
 }
 
