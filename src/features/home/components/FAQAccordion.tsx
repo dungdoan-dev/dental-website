@@ -4,8 +4,12 @@ import { useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { FAQItem } from "../types/home.type";
 
-export function FAQAccordion({ items, title, note, TitleTag = "h2" }: { items: readonly FAQItem[]; title: string; note: string; TitleTag?: "h1" | "h2" }) {
+export function FAQAccordion({ items, title, note, TitleTag = "h2", filterable = false }: { items: readonly FAQItem[]; title: string; note: string; TitleTag?: "h1" | "h2"; filterable?: boolean }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [category, setCategory] = useState<string | null>(null);
+  const categories = [...new Set(items.map((item) => item.category))];
+  const visible = category ? items.filter((item) => item.category === category) : items;
+  const select = (next: string | null) => { setCategory(next); setOpenIndex(null); };
 
   return (
     <section className="bg-white py-5 lg:py-6">
@@ -18,8 +22,23 @@ export function FAQAccordion({ items, title, note, TitleTag = "h2" }: { items: r
             {note}
           </p>
         </div>
+        {filterable && categories.length > 1 && (
+          <div aria-label="Lọc theo chủ đề" className="mb-5 flex flex-wrap justify-center gap-2" role="group">
+            {[null, ...categories].map((name) => (
+              <button
+                aria-pressed={category === name}
+                className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${category === name ? "border-brand-blue-dark bg-brand-blue-dark text-white" : "border-border-subtle bg-white text-text-secondary hover:text-brand-blue"}`}
+                key={name ?? "all"}
+                onClick={() => select(name)}
+                type="button"
+              >
+                {name ?? "Tất cả"}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="space-y-4">
-          {items.map((item, index) => {
+          {visible.map((item, index) => {
             const isOpen = openIndex === index;
             const answerId = `faq-answer-${index}`;
             return (

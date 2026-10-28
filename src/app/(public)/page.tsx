@@ -21,6 +21,8 @@ export default function HomePage() {
   return (
     <>
       <h1 className="sr-only">Nha Khoa 2000 – Nha khoa chuyên sâu, cấy ghép Implant tại TP. Hồ Chí Minh</h1>
+      {/* Hides the booking section on the home page via CSS: on Vercel the static home HTML is rendered with a pathname other than "/", so the usePathname check mismatched. */}
+      <div data-no-appointment hidden />
       <HeroCarousel />
       <VisionMissionSection />
       <CoreValuesSection />
@@ -29,7 +31,7 @@ export default function HomePage() {
       <div className="home-section-reveal"><WhyChooseSection /></div>
       <div className="home-section-reveal"><ClinicFacilitiesSection /></div>
       <div className="home-section-reveal"><InsurancePartnersSection /></div>
-      <div className="home-section-reveal"><FAQSection /></div>
+      <div className="home-section-reveal"><FAQSection limit={4} /></div>
       <div className="home-section-reveal"><TestimonialsSection /></div>
     </>
   );

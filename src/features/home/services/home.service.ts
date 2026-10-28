@@ -21,7 +21,7 @@ const getCachedInsurancePartners = cachePublicData("home:insurance-partners", [p
   return data;
 });
 const getCachedFaqItems = cachePublicData("home:faqs", [publicDataTags.faqs], async () => {
-  const { data, error } = await getPublicSupabaseClient().from("faq_items").select("question,answer,sort_order").order("sort_order");
+  const { data, error } = await getPublicSupabaseClient().from("faq_items").select("question,answer,category,sort_order").order("sort_order");
   if (error) throw error;
   return data;
 });
@@ -95,7 +95,7 @@ export async function getWhyChooseImage(): Promise<string | null> {
 export async function getFaqItems(): Promise<readonly FAQItem[]> {
   try {
     const items = await getCachedFaqItems();
-    return items.map((i) => ({ question: i.question, answer: i.answer }));
+    return items.map((i) => ({ question: i.question, answer: i.answer, category: i.category }));
   } catch (error) {
     console.error("[home.service] public data load failed", error);
     return [];

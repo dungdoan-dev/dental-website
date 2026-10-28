@@ -10,10 +10,12 @@ import { showAdminToast } from "./AdminToast";
 export function FaqFormDialog({
   faq,
   nextSortOrder = 0,
+  categories = [],
   buttonLabel = "Sửa",
   buttonClassName = buttonVariants({ variant: "soft", size: "sm" }),
 }: {
-  faq?: { id: string; question: string; answer: string; sortOrder: number };
+  faq?: { id: string; question: string; answer: string; category: string; sortOrder: number };
+  categories?: string[];
   nextSortOrder?: number;
   buttonLabel?: string;
   buttonClassName?: string;
@@ -25,6 +27,7 @@ export function FaqFormDialog({
     id: faq?.id,
     question: faq?.question ?? "",
     answer: faq?.answer ?? "",
+    category: faq?.category ?? "Chung",
     sortOrder: faq?.sortOrder ?? nextSortOrder,
   });
 
@@ -80,6 +83,11 @@ export function FaqFormDialog({
                   placeholder="Nội dung giải đáp thắc mắc chi tiết..."
                 />
               </div>
+
+              <label className="block font-semibold text-text-primary">Chủ đề *
+                <input required list="faq-categories" maxLength={60} className="mt-1 w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 font-normal text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none" onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="Ví dụ: Implant" type="text" value={formData.category} />
+                <datalist id="faq-categories">{categories.map((c) => <option key={c} value={c} />)}</datalist>
+              </label>
 
               <label className="block font-semibold text-text-primary">Thứ tự hiển thị
                 <input className="mt-1 w-full rounded-xl border border-border-subtle bg-background-secondary px-3.5 py-2 font-normal text-text-primary focus:border-brand-blue-dark focus:bg-white focus:outline-none" min={0} name="sortOrder" onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })} type="number" value={formData.sortOrder} />

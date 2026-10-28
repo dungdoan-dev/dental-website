@@ -17,6 +17,7 @@ export default async function AdminFaqPage() {
   if (error) throw error;
   const faqRows = data ?? [];
   // New questions go last instead of jumping to the top at sort_order 0.
+  const categories = [...new Set(faqRows.map((row) => row.category))];
   const nextFaqSort = faqRows.reduce((max, row) => Math.max(max, row.sort_order), -1) + 1;
 
   return (
@@ -33,6 +34,7 @@ export default async function AdminFaqPage() {
             <p className="text-xs text-text-secondary">Thêm, sửa hoặc xóa câu hỏi và câu trả lời.</p>
           </div>
           <FaqFormDialog
+            categories={categories}
             nextSortOrder={nextFaqSort}
             buttonLabel="+ Thêm Câu Hỏi"
             buttonClassName={buttonVariants({ size: "sm" })}
@@ -48,11 +50,13 @@ export default async function AdminFaqPage() {
                     ?
                   </span>
                   {faq.question}
+                  <span className="rounded-full bg-background-secondary px-2 py-0.5 text-[11px] font-semibold text-text-secondary">{faq.category}</span>
                 </h3>
                 <p className="text-xs text-text-secondary leading-relaxed pl-7">{faq.answer}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <FaqFormDialog
+                  categories={categories}
                   faq={{ ...faq, id: faq.id.toString() }}
                   buttonLabel="Sửa"
                   buttonClassName={buttonVariants({ variant: "soft", size: "sm" })}

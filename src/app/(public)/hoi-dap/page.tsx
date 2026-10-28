@@ -25,7 +25,7 @@ export default async function FaqPage() {
       <Container className="pt-6 sm:pt-8">
         <Breadcrumb items={[{ label: "Hỏi đáp" }]} />
       </Container>
-      <FAQSection TitleTag="h1" />
+      <FAQSection TitleTag="h1" filterable />
     </>
   );
 }

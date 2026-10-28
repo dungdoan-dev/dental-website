@@ -74,7 +74,7 @@ export const articleListQuerySchema = z.object({
 });
 
 const sortOrder = z.number().int().min(0).max(99999);
-export const faqSchema = z.object({ id: numericIdSchema.optional(), question: text(300), answer: text(3000), sortOrder });
+export const faqSchema = z.object({ id: numericIdSchema.optional(), question: text(300), answer: text(3000), category: text(60), sortOrder });
 export const testimonialSchema = z.object({
   id: recordIdSchema, customerName: text(100), rating: z.number().int().min(1, "Điểm đánh giá từ 1 đến 5.").max(5, "Điểm đánh giá từ 1 đến 5."),
   content: text(1500), source: optionalText(100).optional(), initials: text(4), accent: z.enum(["blue", "green", "blue-dark"]),

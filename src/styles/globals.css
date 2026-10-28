@@ -162,6 +162,10 @@ a {
   }
 }
 
+main:has([data-no-appointment]) ~ #dat-lich {
+  display: none;
+}
+
 .insurance-marquee:hover {
   animation-play-state: paused;
 }

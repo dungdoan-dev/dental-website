@@ -26,7 +26,7 @@ export function AppShell({ topBar, header, footer, appointmentFooter, floatingCo
       {topBar}
       {header}
       <main className="min-h-[60vh] pt-[98px]" id="site-main" tabIndex={-1}>{children}</main>
-      {pathname !== "/" && !hideAppointmentFooter ? appointmentFooter : null}
+      {!hideAppointmentFooter ? appointmentFooter : null}
       {footer}
       {floatingContact}
     </>
