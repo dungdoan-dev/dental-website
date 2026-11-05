@@ -49,15 +49,6 @@ export function ArticleDetail({ article, articles }: ArticleDetailProps) {
           <h2 className="text-sm font-extrabold text-text-primary" id="recent-articles-title">Bài viết mới</h2>
           <div className="mt-3 space-y-3">{recentArticles.map((item) => <Link className="group flex gap-3" href={`/tin-tuc/${item.slug}`} key={item.id}><span className="relative h-16 w-20 shrink-0 overflow-hidden rounded-md bg-surface-container-low"><Image alt="" className="object-cover transition group-hover:scale-105" fill sizes="80px" src={item.thumbnail} /></span><span className="min-w-0"><span className="line-clamp-2 text-xs font-bold leading-relaxed text-text-primary group-hover:text-brand-blue-dark">{item.title}</span><time className="mt-1 block text-[11px] text-text-secondary" dateTime={item.publishedAt}>{new Intl.DateTimeFormat("vi-VN", { timeZone: "UTC" }).format(new Date(item.publishedAt))}</time></span></Link>)}</div>
         </section>
-
-        <section className="overflow-hidden rounded-md bg-brand-blue-dark p-5 text-white">
-          <span aria-hidden="true" className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-white/12"><Icon name="calendar" /></span>
-          <h2 className="mt-4 text-lg font-extrabold">Cần tư vấn thêm?</h2>
-          <p className="mt-2 text-sm leading-relaxed text-white/80">Bác sĩ sẽ thăm khám và trao đổi phương án phù hợp với tình trạng răng miệng của bạn.</p>
-          <AppointmentButton className="mt-5 w-full justify-center gap-2 rounded-md bg-white px-4 py-3 text-sm font-bold text-brand-blue-dark hover:bg-brand-blue-light"><Icon className="h-4 w-4" name="calendar" />Đặt lịch thăm khám</AppointmentButton>
-        </section>
-
-        <div className="rounded-md border border-brand-green/20 bg-brand-green-light p-4"><div className="flex items-center gap-2 text-sm font-extrabold text-text-primary"><Icon className="h-5 w-5 text-brand-green-dark" name="check-circle" />Thông tin tham khảo</div><p className="mt-2 text-xs leading-relaxed text-text-secondary">Nội dung giúp bạn tìm hiểu thêm, không thay thế chẩn đoán hoặc tư vấn trực tiếp từ bác sĩ.</p></div>
       </aside>
 
       <main className="order-1 min-w-0 lg:order-2">
@@ -73,7 +64,8 @@ export function ArticleDetail({ article, articles }: ArticleDetailProps) {
             </div>
           </header>
 
-          <div className="relative aspect-[16/9] max-h-[34rem] bg-surface-container-low"><Image alt={article.title} className="object-cover" fill priority sizes="(max-width: 1024px) 100vw, 900px" src={article.coverImage || article.thumbnail} /></div>
+          {/* The thumbnail is only for listings; the article shows its own large image when one is set. */}
+          {article.coverImage ? <div className="relative aspect-[16/9] max-h-[34rem] bg-surface-container-low"><Image alt={article.title} className="object-cover" fill priority sizes="(max-width: 1024px) 100vw, 900px" src={article.coverImage} /></div> : null}
 
           <div className="px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
             {headings.length ? <nav aria-label="Mục lục bài viết" className="mb-9 rounded-md border border-brand-blue/20 bg-brand-blue-light/50 p-5 sm:p-6"><h2 className="flex items-center gap-2 text-base font-extrabold text-text-primary"><Icon className="h-5 w-5 text-brand-blue-dark" name="list" />Trong bài viết</h2><ol className="mt-3 space-y-2">{headings.map((heading, index) => <li className={heading.level === 3 ? "pl-4" : ""} key={`${heading.id}-${index}`}><a className="text-sm leading-relaxed text-text-secondary transition hover:text-brand-blue-dark hover:underline" href={`#${heading.id}`}>{heading.text}</a></li>)}</ol></nav> : null}

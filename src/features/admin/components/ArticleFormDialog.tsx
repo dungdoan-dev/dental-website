@@ -169,7 +169,7 @@ export function ArticleFormDialog({
                 </div>
                 <ImageUploadField aspect={16 / 9} label="Ảnh nhỏ (thumbnail) ở danh sách bài viết (16:9) *" onChange={(thumbnail) => setFormData({ ...formData, thumbnail })} required value={formData.thumbnail} />
                 <ImageUploadField aspect={16 / 9} label="Ảnh lớn trong bài viết (16:9)" onChange={(coverImage) => setFormData({ ...formData, coverImage })} value={formData.coverImage} />
-                <p className="-mt-2 text-xs text-text-secondary">Để trống thì trong bài viết dùng ảnh thumbnail.</p>
+                <p className="-mt-2 text-xs text-text-secondary">Để trống thì đầu bài viết không có ảnh.</p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,10rem)]">
                   <label>Tác giả / Bác sĩ kiểm duyệt<input onChange={(e) => setFormData({ ...formData, author: e.target.value })} placeholder="Bác sĩ Võ Văn Tự Hiến" type="text" value={formData.author} /></label>
                   <label>Thời gian đọc (phút)<input min="1" onChange={(e) => setFormData({ ...formData, readingMinutes: Number(e.target.value) })} type="number" value={formData.readingMinutes} /></label>
