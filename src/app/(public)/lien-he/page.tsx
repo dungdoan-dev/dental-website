@@ -30,11 +30,7 @@ export default async function ContactPage() {
           <Breadcrumb items={[{ label: "Liên hệ" }]} />
           <div className="grid items-start gap-10 lg:grid-cols-[1fr_0.9fr] lg:gap-12">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-white/80 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.14em] text-brand-blue-dark">
-                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-brand-green" />
-                Nha Khoa 2000 · TP. Hồ Chí Minh
-              </p>
-              <h1 className="mt-5 text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold leading-tight tracking-tight text-text-primary">
+              <h1 className="text-[clamp(1.5rem,5vw,2.25rem)] font-extrabold leading-tight tracking-tight text-text-primary">
                 {hero.title}
               </h1>
               {/* No-break space keeps "Đội ngũ" on one line. */}
@@ -48,7 +44,7 @@ export default async function ContactPage() {
                 <p className="mt-2 max-w-xl text-sm leading-6 text-text-secondary">Xem địa chỉ, giờ làm việc và liên hệ trực tiếp từng cơ sở trước khi đến thăm khám.</p>
                 {clinics.length > 0 ? (
                   <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-2">
-                    {clinics.map((clinic) => <ClinicCard clinic={clinic} compact key={clinic.id} />)}
+                    {clinics.map((clinic) => <ClinicCard clinic={clinic} compact key={clinic.id} showEmail />)}
                   </div>
                 ) : (
                   <div className="mt-6 rounded-md border border-border-subtle bg-white p-8 text-center text-text-secondary">

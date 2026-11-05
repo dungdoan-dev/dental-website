@@ -228,6 +228,7 @@ function revalidateHome(tag: string) {
 function revalidateFaq() {
   revalidatePath("/admin/faq");
   revalidatePath("/hoi-dap");
+  revalidatePath("/gioi-thieu");
   revalidateHome(publicDataTags.faqs);
 }
 
@@ -235,9 +236,9 @@ export async function upsertFaq(input: z.infer<typeof faqSchema>) {
   await requireAdmin();
   const parsed = faqSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
-  const { id, question, answer, category, sortOrder } = parsed.data;
+  const { id, question, answer, category, showOnHome, showOnAbout, sortOrder } = parsed.data;
   return runMutation(async () => {
-    const row = { question, answer, category, sort_order: sortOrder };
+    const row = { question, answer, category, show_on_home: showOnHome, show_on_about: showOnAbout, sort_order: sortOrder };
     const supabase = await getSupabaseServerClient();
     const { error } = id ? await supabase.from("faq_items").update(row).eq("id", id) : await supabase.from("faq_items").insert(row);
     if (error) throw error;

@@ -24,7 +24,7 @@ export default async function AdminFaqPage() {
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <PageHeader
         actions={<Button asChild size="sm" variant="soft"><Link prefetch={false} href="/hoi-dap" rel="noreferrer" target="_blank"><ExternalLink /> Xem trang Hỏi đáp</Link></Button>}
-        description="Câu hỏi hiển thị ở trang Hỏi đáp và mục FAQ trang chủ; thứ tự theo số thứ tự. Tiêu đề mục chỉnh trong Nội dung trang chủ."
+        description="Trang Hỏi đáp hiện tất cả câu hỏi; trang chủ và Giới thiệu chỉ hiện các câu được tick; thứ tự theo số thứ tự. Tiêu đề mục chỉnh trong Nội dung trang chủ."
         title="Câu hỏi thường gặp"
       />
       <section className="overflow-hidden rounded-[7px] bg-card shadow-card">
@@ -51,13 +51,15 @@ export default async function AdminFaqPage() {
                   </span>
                   {faq.question}
                   <span className="rounded-full bg-background-secondary px-2 py-0.5 text-[11px] font-semibold text-text-secondary">{faq.category}</span>
+                  {faq.show_on_home ? <span className="rounded-full bg-brand-blue-light px-2 py-0.5 text-[11px] font-semibold text-brand-blue-dark">Trang chủ</span> : null}
+                  {faq.show_on_about ? <span className="rounded-full bg-brand-blue-light px-2 py-0.5 text-[11px] font-semibold text-brand-blue-dark">Giới thiệu</span> : null}
                 </h3>
                 <p className="text-xs text-text-secondary leading-relaxed pl-7">{faq.answer}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <FaqFormDialog
                   categories={categories}
-                  faq={{ ...faq, id: faq.id.toString() }}
+                  faq={{ ...faq, id: faq.id.toString(), showOnHome: faq.show_on_home, showOnAbout: faq.show_on_about }}
                   buttonLabel="Sửa"
                   buttonClassName={buttonVariants({ variant: "soft", size: "sm" })}
                 />

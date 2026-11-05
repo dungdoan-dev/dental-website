@@ -15,7 +15,7 @@ export type CoreValue = {
   iconKey: "heart" | "care" | "honesty" | "innovation";
 };
 
-export type FAQItem = { question: string; answer: string; category: string };
+export type FAQItem = { question: string; answer: string; category: string; showOnHome: boolean; showOnAbout: boolean };
 
 export type InsurancePartner = {
   code: string;

@@ -31,7 +31,7 @@ export default function HomePage() {
       <div className="home-section-reveal"><WhyChooseSection /></div>
       <div className="home-section-reveal"><ClinicFacilitiesSection /></div>
       <div className="home-section-reveal"><InsurancePartnersSection /></div>
-      <div className="home-section-reveal"><FAQSection limit={4} /></div>
+      <div className="home-section-reveal"><FAQSection placement="home" /></div>
       <div className="home-section-reveal"><TestimonialsSection /></div>
     </>
   );

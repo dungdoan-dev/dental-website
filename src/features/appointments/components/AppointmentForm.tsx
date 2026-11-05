@@ -135,7 +135,7 @@ export function AppointmentForm({
 
   return (
     <div
-      className={`border border-border-subtle bg-white ${compact ? "rounded-md p-4 sm:p-5" : "rounded-md p-6 sm:p-8"}`}
+      className={`@container border border-border-subtle bg-white ${compact ? "rounded-md p-4 sm:p-5" : "rounded-md p-6 sm:p-8"}`}
     >
       <h2
         className={`pr-10 font-bold text-text-primary ${compact ? "text-lg" : "text-2xl"}`}
@@ -185,10 +185,10 @@ export function AppointmentForm({
           </div>
         ) : null}
         <div
-          className={`grid sm:grid-cols-2 ${compact ? "gap-x-3 gap-y-2.5" : "gap-5"}`}
+          className={`grid @md:grid-cols-2 ${compact ? "gap-x-3 gap-y-2.5" : "gap-5"}`}
         >
           <label
-            className="block min-w-0 text-sm font-semibold text-text-primary"
+            className="block min-w-0 text-sm font-semibold text-text-primary @md:col-span-2"
             htmlFor={fieldId("name")}
           >
             Họ và tên <span className="text-red-600">*</span>
@@ -215,7 +215,7 @@ export function AppointmentForm({
             ) : null}
           </label>
           <label
-            className="block min-w-0 text-sm font-semibold text-text-primary"
+            className="block min-w-0 text-sm font-semibold text-text-primary @md:col-span-2"
             htmlFor={fieldId("phone")}
           >
             Số điện thoại <span className="text-red-600">*</span>
@@ -292,7 +292,7 @@ export function AppointmentForm({
             ) : null}
           </label>
           <label
-            className="block min-w-0 text-sm font-semibold text-text-primary sm:col-span-2"
+            className="block min-w-0 text-sm font-semibold text-text-primary @md:col-span-2"
             htmlFor={fieldId("clinic")}
           >
             Cơ sở thăm khám <span className="text-red-600">*</span>
