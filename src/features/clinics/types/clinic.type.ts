@@ -6,6 +6,7 @@ export type Clinic = {
   badge: string;
   address: string;
   phone: string;
+  email?: string;
   image: string;
   description: string;
   workingHours: string;

@@ -8,12 +8,12 @@ export async function CoreValuesSection() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-7xl px-margin-mobile pb-5 pt-4 md:px-margin lg:pb-6 lg:pt-5">
-        <div className="mb-4 text-center"><h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.values.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.values.note}</p></div>
+        <div className="mb-4 text-center"><h2 className="whitespace-nowrap uppercase text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.values.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.values.note}</p></div>
         <CoreValuesReveal>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {coreValues.map((value) => (
               <article
-                className="core-value-card group flex flex-col items-center rounded-2xl border border-slate-200/80 bg-surface p-5 text-center shadow-sm transition-[background-color,box-shadow] duration-300 hover:bg-surface-container-low hover:shadow-md sm:p-6"
+                className="core-value-card group flex flex-col items-center rounded-md border border-slate-200/80 bg-surface p-5 text-center transition-[background-color,box-shadow] duration-300 hover:bg-surface-container-low hover:shadow-md sm:p-6"
                 key={value.title}
               >
                 <div className="mb-4 flex h-16 w-16 items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">

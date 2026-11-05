@@ -45,12 +45,12 @@ export function MobileMenu() {
             return (
               <li key={item.href}>
                 <div className="flex items-center">
-                  <Link aria-current={isActive ? "page" : undefined} className={`block flex-1 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide hover:bg-brand-blue-light hover:text-brand-blue-dark ${isActive ? "bg-brand-blue-light text-brand-blue-dark" : "text-text-primary"}`} href={item.href} onClick={() => setIsOpen(false)}>{item.label}</Link>
-                  {item.children && <button aria-controls="mobile-service-groups" aria-expanded={isExpanded} aria-label={isExpanded ? "Đóng nhóm dịch vụ" : "Mở nhóm dịch vụ"} className="ml-1 rounded-xl p-3 text-text-secondary hover:bg-brand-blue-light" onClick={() => setExpandedMenu(isExpanded ? null : item.href)} type="button"><Icon className={`h-5 w-5 transition-transform ${isExpanded ? "rotate-180" : ""}`} name="chevron-down" /></button>}
+                  <Link aria-current={isActive ? "page" : undefined} className={`block flex-1 rounded-md px-4 py-3 text-sm font-bold uppercase tracking-wide hover:bg-brand-blue-light hover:text-brand-blue-dark ${isActive ? "bg-brand-blue-light text-brand-blue-dark" : "text-text-primary"}`} href={item.href} onClick={() => setIsOpen(false)}>{item.label}</Link>
+                  {item.children && <button aria-controls="mobile-service-groups" aria-expanded={isExpanded} aria-label={isExpanded ? "Đóng nhóm dịch vụ" : "Mở nhóm dịch vụ"} className="ml-1 rounded-md p-3 text-text-secondary hover:bg-brand-blue-light" onClick={() => setExpandedMenu(isExpanded ? null : item.href)} type="button"><Icon className={`h-5 w-5 transition-transform ${isExpanded ? "rotate-180" : ""}`} name="chevron-down" /></button>}
                 </div>
                 {item.children && isExpanded && (
                   <ul className="ml-4 border-l border-border-subtle pl-3" id="mobile-service-groups">
-                    {item.children.map((child) => <li key={child.href}><Link className="block rounded-xl px-3 py-2.5 text-sm text-text-secondary hover:bg-brand-blue-light hover:text-brand-blue-dark" href={child.href} onClick={() => setIsOpen(false)}>{child.label}</Link></li>)}
+                    {item.children.map((child) => <li key={child.href}><Link className="block rounded-md px-3 py-2.5 text-sm text-text-secondary hover:bg-brand-blue-light hover:text-brand-blue-dark" href={child.href} onClick={() => setIsOpen(false)}>{child.label}</Link></li>)}
                   </ul>
                 )}
               </li>

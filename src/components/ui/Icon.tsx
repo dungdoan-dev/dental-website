@@ -13,6 +13,7 @@ export type IconName =
   | "list"
   | "map"
   | "medical-services"
+  | "mail"
   | "menu"
   | "person"
   | "phone"
@@ -41,6 +42,7 @@ const paths: Record<IconName, React.ReactNode> = {
   list: <><path d="M9 6h11M9 12h11M9 18h11" /><path d="M4 6h.01M4 12h.01M4 18h.01" /></>,
   map: <><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z" /><path d="M9 3v15M15 6v15" /></>,
   "medical-services": <><rect height="17" rx="2" width="18" x="3" y="5" /><path d="M9 5V3h6v2M12 9v6M9 12h6M7 18h10" /></>,
+  mail: <><rect height="14" rx="2" width="20" x="2" y="5" /><path d="m3 7 9 6 9-6" /></>,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   person: <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>,
   phone: <path d="M6.6 3h3l1.5 4-2 1.5a15 15 0 0 0 6.4 6.4l1.5-2 4 1.5v3c0 2-1.6 3.6-3.6 3.4C9.9 20 4 14.1 3.2 6.6 3 4.6 4.6 3 6.6 3Z" />,

@@ -20,6 +20,9 @@ export const aboutPageSchema = z.object({
     commitments: z.array(z.string()), image: z.string(),
   }),
   clinics: z.object({ eyebrow: z.string(), title: z.string(), description: z.string() }),
+  // Optional so records saved before these sections existed still parse.
+  licenses: z.array(z.object({ name: z.string(), number: z.string(), issuer: z.string() })).default([]),
+  activities: z.array(z.object({ title: z.string(), date: z.string(), description: z.string() })).default([]),
 });
 
 export type AboutPageData = z.infer<typeof aboutPageSchema>;

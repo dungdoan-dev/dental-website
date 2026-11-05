@@ -24,7 +24,7 @@ export function DatePickerField({ id, errorId, invalid = false, compact = false 
   }, []);
 
   return (
-    <div className={`relative flex min-w-0 items-center justify-between rounded-xl border border-border-subtle bg-background-secondary text-text-primary transition focus-within:border-brand-blue focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-blue/20 ${compact ? "mt-0.5 h-11 px-3 text-base sm:text-sm" : "mt-1.5 h-[50px] px-4 text-base"}`} ref={containerRef}>
+    <div className={`relative flex min-w-0 items-center justify-between rounded-md border border-border-subtle bg-background-secondary text-text-primary transition focus-within:border-brand-blue focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-blue/20 ${compact ? "mt-0.5 h-12 px-3 text-base sm:text-sm" : "mt-1.5 h-12 px-4 text-base"}`} ref={containerRef}>
       <span aria-hidden="true" className={date ? "" : "text-text-secondary"}>{displayDate}</span>
       <Icon className="h-5 w-5 text-text-secondary" name="calendar" />
       <input

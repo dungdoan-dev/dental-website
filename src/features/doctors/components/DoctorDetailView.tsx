@@ -39,17 +39,17 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
       <article className="bg-white py-8 md:py-10">
         <div className="mx-auto grid max-w-7xl items-start gap-8 px-margin-mobile md:px-margin lg:grid-cols-12 lg:gap-10">
           <div className="flex flex-col gap-6 lg:col-span-5 xl:col-span-4">
-            <ImageLightbox alt={`Chân dung ${getDoctorFullName(doctor)}`} caption={getDoctorFullName(doctor)} className="relative block aspect-[3/4] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-sm" src={doctor.avatar}>
+            <ImageLightbox alt={`Chân dung ${getDoctorFullName(doctor)}`} caption={getDoctorFullName(doctor)} className="relative block aspect-[3/4] overflow-hidden rounded-md border border-border-subtle bg-surface" src={doctor.avatar}>
               <Image alt={`Chân dung ${getDoctorFullName(doctor)}`} className="object-cover object-top" fill priority sizes="(max-width: 1024px) 100vw, 400px" src={doctor.avatar} />
             </ImageLightbox>
             <div className="space-y-3">
               {profile?.licenseNumber ? (
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-subtle bg-white p-4">
                   <span className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chứng chỉ hành nghề</span>
                   <span className="rounded bg-brand-green-light px-2.5 py-1 text-xs font-bold tracking-wide text-brand-green-dark">{profile.licenseNumber}</span>
                 </div>
               ) : null}
-              {specialties.length ? <div className="rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+              {specialties.length ? <div className="rounded-md border border-border-subtle bg-white p-4">
                 <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary"><Icon className="h-5 w-5 text-brand-blue" name="shield-check" />Chuyên môn</div>
                 <div className="flex flex-wrap gap-2">
                   {specialties.map((specialty) => (
@@ -60,7 +60,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
                 </div>
               </div> : null}
               {profile?.languages.length ? (
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-white p-4 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-subtle bg-white p-4">
                   <span className="text-sm font-medium text-text-secondary">Ngôn ngữ</span>
                   <span className="flex flex-wrap gap-2">{profile.languages.map((language) => <span className="rounded-full border border-border-subtle bg-surface-container-low px-3 py-1 text-xs font-medium text-text-primary" key={language}>{language}</span>)}</span>
                 </div>
@@ -87,7 +87,7 @@ export function DoctorDetailView({ doctor }: DoctorDetailViewProps) {
               </div>
             )}
             <div className="pt-2">
-              <AppointmentButton className="gap-2 rounded-full bg-brand-blue px-6 py-3 font-bold shadow-sm hover:bg-brand-blue-dark">
+              <AppointmentButton className="gap-2 rounded-full bg-brand-blue px-6 py-3 font-bold hover:bg-brand-blue-dark">
                 <Icon className="h-5 w-5" name="calendar" />Đặt lịch thăm khám
               </AppointmentButton>
             </div>

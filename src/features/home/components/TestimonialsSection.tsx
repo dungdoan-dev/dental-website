@@ -10,10 +10,10 @@ export async function TestimonialsSection() {
   return (
     <section className="bg-brand-blue-light/50 py-5 lg:py-6">
       <div className="mx-auto max-w-7xl px-margin-mobile md:px-margin">
-        <div className="mb-4 text-center"><h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.testimonials.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.testimonials.note}</p></div>
+        <div className="mb-4 text-center"><h2 className="whitespace-nowrap uppercase text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.testimonials.title}</h2><p className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.testimonials.note}</p></div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {testimonials.map((testimonial) => (
-            <article className="flex flex-col justify-between rounded-2xl bg-white p-7 shadow-sm" key={testimonial.id}>
+            <article className="flex flex-col justify-between rounded-md bg-white p-7" key={testimonial.id}>
               <div className="space-y-4">
                 <StarRating className="text-lg" rating={testimonial.rating} />
                 <p className="leading-relaxed text-text-primary italic">{testimonial.content}</p>

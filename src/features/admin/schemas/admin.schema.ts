@@ -18,6 +18,7 @@ export const clinicFormSchema = z.object({
   name: text(200),
   address: text(500),
   phone: text(100),
+  email: z.union([z.literal(""), z.string().trim().email("Email không hợp lệ.").max(200)]).optional(),
   workingHours: text(200),
   description: optionalText(2000),
   image: imagePathSchema,

@@ -9,10 +9,10 @@ type ArticleCardProps = { article: ArticleSummary };
 export function ArticleCard({ article }: ArticleCardProps) {
   const publishedDate = new Intl.DateTimeFormat("vi-VN", { timeZone: "UTC" }).format(new Date(article.publishedAt));
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_4px_20px_rgba(20,70,85,0.05)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(20,70,85,0.1)]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-md bg-white shadow-[0_4px_20px_rgba(20,70,85,0.05)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(20,70,85,0.1)]">
       <Link aria-label={`Đọc bài viết: ${article.title}`} className="relative block aspect-[16/10] overflow-hidden bg-surface-container" href={`/tin-tuc/${article.slug}`}>
         <Image alt={article.title} className="object-cover transition-transform duration-500 group-hover:scale-105" fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" src={article.thumbnail} />
-        <span className="absolute left-3.5 top-3.5 rounded-full bg-brand-blue-light/95 px-3 py-1 text-[11px] font-semibold text-brand-blue-dark shadow-sm backdrop-blur-sm">{getArticleCategoryLabel(article.category)}</span>
+        <span className="absolute left-3.5 top-3.5 rounded-full bg-brand-blue-light/95 px-3 py-1 text-[11px] font-semibold text-brand-blue-dark backdrop-blur-sm">{getArticleCategoryLabel(article.category)}</span>
       </Link>
       <div className="flex flex-1 flex-col p-6">
         <div className="mb-2.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary"><time dateTime={article.publishedAt}>{publishedDate}</time><span aria-hidden="true">•</span><span className="inline-flex items-center gap-1"><Icon className="h-3.5 w-3.5" name="clock" />{article.readingMinutes} phút đọc</span></div>

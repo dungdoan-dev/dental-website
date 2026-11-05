@@ -28,7 +28,7 @@ export const serviceFilters: readonly { label: string; value: ServiceFilter }[] 
 ];
 
 export const servicePriceLink = {
-  label: "Bảng giá theo danh mục kĩ thuật",
+  label: "Bảng Giá Theo Danh Mục Kỹ Thuật",
   href: "/bang-gia",
 } as const;
 

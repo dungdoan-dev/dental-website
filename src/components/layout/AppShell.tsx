@@ -14,7 +14,7 @@ type AppShellProps = {
 
 export function AppShell({ topBar, header, footer, appointmentFooter, floatingContact, children }: AppShellProps) {
   const pathname = usePathname();
-  const appointmentFormExcludedRoutes = ["/gioi-thieu", "/dich-vu", "/bac-si", "/tin-tuc"];
+  const appointmentFormExcludedRoutes = ["/gioi-thieu", "/dich-vu", "/bac-si", "/tin-tuc", "/lien-he"];
   const normalizedPath = pathname?.replace(/\/$/, "") ?? "";
   const hideAppointmentFooter = appointmentFormExcludedRoutes.some(
     (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),
@@ -22,7 +22,7 @@ export function AppShell({ topBar, header, footer, appointmentFooter, floatingCo
 
   return (
     <>
-      <a className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:font-semibold focus:text-brand-blue-dark focus:shadow-lg" href="#site-main">Bỏ qua menu, đến nội dung chính</a>
+      <a className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-white focus:px-4 focus:py-3 focus:font-semibold focus:text-brand-blue-dark focus:shadow-lg" href="#site-main">Bỏ qua menu, đến nội dung chính</a>
       {topBar}
       {header}
       <main className="min-h-[60vh] pt-[98px]" id="site-main" tabIndex={-1}>{children}</main>

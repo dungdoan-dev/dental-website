@@ -13,7 +13,8 @@ export async function processAppointmentNotifications(): Promise<{ sent: number;
     try {
       const { data: row, error: readError } = await supabase.from("appointments").select("name,phone,email,clinic_id,appointment_date,note").eq("id", job.appointment_id).single();
       if (readError) throw readError;
-      await sendAppointmentNotification({ name: row.name, phone: row.phone, email: row.email ?? undefined, clinicId: row.clinic_id, appointmentDate: row.appointment_date, note: row.note ?? undefined }, String(job.appointment_id));
+      const { data: clinic } = await supabase.from("clinics").select("email").eq("id", row.clinic_id).maybeSingle();
+      await sendAppointmentNotification({ name: row.name, phone: row.phone, email: row.email ?? undefined, clinicId: row.clinic_id, appointmentDate: row.appointment_date, note: row.note ?? undefined }, String(job.appointment_id), clinic?.email);
       const { error: updateError } = await supabase.from("appointment_notification_outbox").update({ status: "sent", sent_at: new Date().toISOString(), last_error: null }).eq("appointment_id", job.appointment_id).eq("attempts", job.attempts);
       if (updateError) throw updateError;
       sent++;

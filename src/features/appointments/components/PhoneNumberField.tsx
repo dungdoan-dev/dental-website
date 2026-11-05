@@ -14,6 +14,7 @@ type PhoneNumberFieldProps = {
 export function PhoneNumberField({ id, errorId, invalid = false, compact = false }: PhoneNumberFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [phone, setPhone] = useState("");
+  const [dialCode, setDialCode] = useState("84");
 
   useEffect(() => {
     const container = containerRef.current;
@@ -35,21 +36,23 @@ export function PhoneNumberField({ id, errorId, invalid = false, compact = false
   }, []);
 
   return (
-    <div className={`${compact ? "mt-0.5" : "mt-1.5"} min-w-0`} ref={containerRef}>
+    <div className={`${compact ? "mt-0.5" : "mt-1.5"} relative min-w-0`} ref={containerRef}>
       <PhoneInput
         containerClass={`appointment-phone-input${compact ? " appointment-phone-input--compact" : ""}`}
         country="vn"
-        countryCodeEditable={false}
         enableSearch
         inputProps={{ id, autoComplete: "tel", required: true, "aria-invalid": invalid, "aria-describedby": errorId }}
-        onChange={(value) => setPhone(value)}
-        placeholder="Nhập số điện thoại"
+        disableCountryCode
+        disableCountryGuess
+        onChange={(value, country) => { setPhone(value); setDialCode((country as { dialCode?: string }).dialCode ?? "84"); }}
+        placeholder="Nhập số điện thoại của bạn"
         preferredCountries={["vn", "us", "gb", "kr", "jp", "sg", "th", "cn"]}
         searchNotFound="Không tìm thấy quốc gia"
         searchPlaceholder="Tìm quốc gia..."
         value={phone}
       />
-      <input name="phone" type="hidden" value={phone ? `+${phone}` : ""} />
+      <span aria-hidden="true" className="appointment-phone-dial">+{dialCode}</span>
+      <input name="phone" type="hidden" value={phone ? `+${dialCode}${phone.replace(/^0+/, "")}` : ""} />
     </div>
   );
 }

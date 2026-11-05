@@ -14,7 +14,7 @@ function PartnerGroup({ partners, duplicate = false }: PartnerGroupProps) {
   return (
     <ul aria-hidden={duplicate || undefined} className="flex shrink-0 gap-5 pr-5">
       {partners.map((partner) => (
-        <li className="relative h-36 w-[220px] shrink-0 overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm" key={partner.code}>
+        <li className="relative h-36 w-[220px] shrink-0 overflow-hidden rounded-md border border-border-subtle bg-white" key={partner.code}>
           <Image alt={`Logo ${partner.name}`} className="object-contain p-3" fill sizes="220px" src={partner.logoSrc} />
         </li>
       ))}
@@ -44,7 +44,7 @@ export async function InsurancePartnersSection() {
     <section className="select-none overflow-hidden border-t border-border-subtle bg-surface py-5 lg:py-6" id="doi-tac-bao-hiem">
       <div className="mx-auto mb-4 max-w-7xl px-margin-mobile md:px-margin">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.insurance.title}</h2>
+          <h2 className="whitespace-nowrap uppercase text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">{copy.insurance.title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">{copy.insurance.note}</p>
         </div>
       </div>

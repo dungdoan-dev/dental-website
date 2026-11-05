@@ -27,6 +27,7 @@ export default async function AdminClinicsPage() {
   const clinics = clinicRows.map((clinic) => ({
     ...clinic,
     workingHours: clinic.working_hours,
+    email: clinic.email ?? undefined,
     googleMapsUrl: clinic.google_maps_url,
     accent: clinic.accent,
     facilities: (clinic.clinic_facilities ?? []).sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order),

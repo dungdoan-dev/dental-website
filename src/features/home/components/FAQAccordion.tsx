@@ -15,7 +15,7 @@ export function FAQAccordion({ items, title, note, TitleTag = "h2", filterable =
     <section className="bg-white py-5 lg:py-6">
       <div className="mx-auto max-w-4xl px-margin-mobile md:px-margin">
         <div className="mx-auto mb-4 max-w-2xl space-y-1 text-center">
-          <TitleTag className="whitespace-nowrap text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">
+          <TitleTag className="whitespace-nowrap uppercase text-[clamp(0.8rem,3.8vw,1.875rem)] font-extrabold tracking-tight text-text-primary">
             {title}
           </TitleTag>
           <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
@@ -27,7 +27,7 @@ export function FAQAccordion({ items, title, note, TitleTag = "h2", filterable =
             {[null, ...categories].map((name) => (
               <button
                 aria-pressed={category === name}
-                className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${category === name ? "border-brand-blue-dark bg-brand-blue-dark text-white" : "border-border-subtle bg-white text-text-secondary hover:text-brand-blue"}`}
+                className={`rounded border px-4 py-1.5 text-sm font-semibold transition ${category === name ? "border-brand-blue-dark bg-brand-blue-dark text-white" : "border-border-subtle bg-white text-text-secondary hover:text-brand-blue"}`}
                 key={name ?? "all"}
                 onClick={() => select(name)}
                 type="button"
@@ -42,7 +42,7 @@ export function FAQAccordion({ items, title, note, TitleTag = "h2", filterable =
             const isOpen = openIndex === index;
             const answerId = `faq-answer-${index}`;
             return (
-              <article className="overflow-hidden rounded-2xl bg-surface transition-all duration-200" key={item.question}>
+              <article className="overflow-hidden rounded-md bg-surface transition-all duration-200" key={item.question}>
                 <h3>
                   <button
                     aria-controls={answerId}

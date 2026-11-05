@@ -18,6 +18,7 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
     name: clinic.name,
     address: clinic.address,
     phone: clinic.phone,
+    email: clinic.email ?? "",
     workingHours: clinic.workingHours,
     description: clinic.description,
     image: clinic.image,
@@ -112,6 +113,11 @@ export function ClinicFormDialog({ clinic }: { clinic: Clinic }) {
                   />
                 </div>
               </div>
+
+              <label>Email cơ sở
+                <input maxLength={200} onChange={(event) => setFormData({ ...formData, email: event.target.value })} placeholder="ten@example.com" type="email" value={formData.email} />
+                <span className="text-xs font-normal text-text-secondary">Hiện ở trang Liên hệ và thẻ cơ sở; thông báo đặt lịch của cơ sở này cũng gửi về email này.</span>
+              </label>
 
               <label>Liên kết chỉ đường
                 <input maxLength={2000} onChange={(event) => setFormData({ ...formData, googleMapsUrl: event.target.value })} placeholder="https://maps.google.com/..." type="url" value={formData.googleMapsUrl} />

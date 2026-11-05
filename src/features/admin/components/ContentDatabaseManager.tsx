@@ -26,7 +26,7 @@ function EditorSection({ title, children, columns = "" }: { title: string; child
 
 function ContentEditor({ record }: { record: SiteContentRecord }) {
   if (record.key === "about_page") {
-    const { hero, highlights, story, visionMission, principles, expertise, clinics } = record.content;
+    const { hero, highlights, story, visionMission, principles, expertise, clinics, licenses, activities } = record.content;
     return <AdminActionForm action={updateStructuredSiteContent} className="space-y-5 rounded-2xl border border-border-subtle bg-background-secondary p-4 sm:p-6" submitLabel="Lưu trang giới thiệu">
       <input name="key" type="hidden" value={record.key} />
       <div><h3 className="text-lg font-bold text-text-primary">Nội dung trang Giới thiệu</h3><p className="mt-1 text-sm text-text-secondary">Các trường được nhóm theo đúng thứ tự nội dung trên /gioi-thieu. Chọn và cắt ảnh trước khi tải lên.</p></div>
@@ -72,6 +72,12 @@ function ContentEditor({ record }: { record: SiteContentRecord }) {
         <TextField label="Tiêu đề" name="clinicsTitle" value={clinics.title} />
         <TextAreaField label="Mô tả" name="clinicsDescription" value={clinics.description} />
         <p className="text-xs leading-5 text-text-secondary sm:col-span-2">Địa chỉ, số điện thoại, hình ảnh và đường dẫn bản đồ của từng cơ sở được lấy từ mục Quản trị → Cơ sở phòng khám, không lưu trong phần nội dung này.</p>
+      </EditorSection>
+      <EditorSection title="Giấy phép hoạt động">
+        <EditableRows label="Danh sách giấy phép" name="licenses" columns={[{ key: "name", label: "Tên giấy phép" }, { key: "number", label: "Số giấy phép" }, { key: "issuer", label: "Cơ quan cấp" }]} initialRows={licenses.map((item) => ({ name: item.name, number: item.number, issuer: item.issuer }))} />
+      </EditorSection>
+      <EditorSection title="Hoạt động nội bộ">
+        <EditableRows label="Danh sách hoạt động (mới nhất đặt trên cùng)" name="activities" columns={[{ key: "date", label: "Thời gian" }, { key: "title", label: "Tên hoạt động" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={activities.map((item) => ({ date: item.date, title: item.title, description: item.description }))} />
       </EditorSection>
     </AdminActionForm>;
   }

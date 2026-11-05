@@ -46,7 +46,7 @@ export function DoctorFilterGrid({ doctors }: DoctorFilterGridProps) {
             <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary" name="search" />
             <input
               autoComplete="off"
-              className="min-h-12 w-full rounded-full border border-border-subtle bg-white py-3 pl-12 pr-12 text-sm text-text-primary shadow-sm outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+              className="min-h-12 w-full rounded-full border border-border-subtle bg-white py-3 pl-12 pr-12 text-sm text-text-primary outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
               id="doctor-name-search"
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Tìm theo tên bác sĩ..."
@@ -78,7 +78,7 @@ export function DoctorFilterGrid({ doctors }: DoctorFilterGridProps) {
               return (
                 <button
                   aria-pressed={active}
-                  className={`min-h-11 shrink-0 snap-start whitespace-nowrap rounded-full px-5 py-2.5 text-[13px] font-bold shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${active ? "bg-brand-blue-dark text-white" : "bg-white text-text-secondary hover:bg-brand-blue-light hover:text-brand-blue-dark"}`}
+                  className={`min-h-11 shrink-0 snap-start whitespace-nowrap rounded-full px-5 py-2.5 text-[13px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${active ? "bg-brand-blue-dark text-white" : "bg-white text-text-secondary hover:bg-brand-blue-light hover:text-brand-blue-dark"}`}
                   key={filter.value}
                   onClick={() => setActiveFilter(filter.value)}
                   type="button"
@@ -101,7 +101,7 @@ export function DoctorFilterGrid({ doctors }: DoctorFilterGridProps) {
             {filteredDoctors.map((doctor) => <DoctorRosterCard doctor={doctor} key={doctor.id} />)}
           </div>
         ) : (
-          <div className="rounded-2xl border border-border-subtle bg-white px-6 py-12 text-center shadow-sm">
+          <div className="rounded-md border border-border-subtle bg-white px-6 py-12 text-center">
             <h3 className="text-lg font-bold text-text-primary">Không tìm thấy bác sĩ phù hợp</h3>
             <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-text-secondary">
               Thử tên khác hoặc xóa bộ lọc chuyên khoa để xem toàn bộ đội ngũ bác sĩ.

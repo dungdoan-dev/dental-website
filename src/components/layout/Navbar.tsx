@@ -18,9 +18,9 @@ export function Navbar() {
               <Link aria-current={isActive ? "page" : undefined} className={`py-1 text-[13px] font-bold uppercase tracking-wider transition-colors ${isActive ? "border-b-2 border-brand-blue-dark text-brand-blue-dark" : "text-on-surface-variant hover:text-brand-blue-dark"}`} href={item.href}>{item.label}</Link>
               {item.children && (
                 <div className="invisible absolute left-0 top-full z-50 w-80 pt-4 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                  <ul className="rounded-2xl border border-border-subtle bg-white p-2 shadow-xl">
+                  <ul className="rounded-md border border-border-subtle bg-white p-2 shadow-xl">
                     {item.children.map((child) => (
-                      <li key={child.href}><Link className="block rounded-xl px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-brand-blue-light hover:text-brand-blue-dark focus:bg-brand-blue-light focus:text-brand-blue-dark" href={child.href}>{child.label}</Link></li>
+                      <li key={child.href}><Link className="block rounded-md px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors hover:bg-brand-blue-light hover:text-brand-blue-dark focus:bg-brand-blue-light focus:text-brand-blue-dark" href={child.href}>{child.label}</Link></li>
                     ))}
                   </ul>
                 </div>

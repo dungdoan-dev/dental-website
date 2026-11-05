@@ -26,7 +26,7 @@ export function DoctorCertificateCarousel({ certificates }: DoctorCertificateCar
         previousLabel="Xem chứng chỉ trước"
       >
         {certificates.map((certificate) => (
-          <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm transition-shadow duration-300 hover:shadow-md" key={`${certificate.title}-${certificate.image}`}>
+          <article className="group flex h-full flex-col overflow-hidden rounded-md border border-border-subtle bg-white transition-shadow duration-300 hover:shadow-md" key={`${certificate.title}-${certificate.image}`}>
             <ImageLightbox
               alt={certificate.title}
               caption={[certificate.title, certificate.issuer, certificate.detail].filter(Boolean).join(" · ")}

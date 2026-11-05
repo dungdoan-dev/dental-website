@@ -78,6 +78,8 @@ export async function updateStructuredSiteContent(_previous: State, formData: Fo
         principles: { eyebrow: readField(formData, "principlesEyebrow"), title: readField(formData, "principlesTitle"), introduction: readField(formData, "principlesIntroduction"), items: principles },
         expertise: { eyebrow: readField(formData, "expertiseEyebrow"), title: readField(formData, "expertiseTitle"), description: readField(formData, "expertiseDescription"), commitments: readStringList(formData, "commitments"), image: images.data.expertiseImage },
         clinics: { eyebrow: readField(formData, "clinicsEyebrow"), title: readField(formData, "clinicsTitle"), description: readField(formData, "clinicsDescription") },
+        licenses: readRowList(formData, "licenses", ["name", "number", "issuer"]),
+        activities: readRowList(formData, "activities", ["title", "date", "description"]),
       };
       const parsed = aboutPageSchema.safeParse(content);
       if (!parsed.success) return validationFailure(parsed.error);

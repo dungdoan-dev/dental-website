@@ -15,6 +15,7 @@ export const clinicRepository = {
       badge: c.badge,
       address: c.address,
       phone: c.phone,
+      email: c.email ?? undefined,
       image: c.image,
       description: c.description,
       workingHours: c.working_hours,

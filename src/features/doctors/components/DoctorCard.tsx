@@ -10,7 +10,7 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
   const fullName = getDoctorFullName(doctor);
 
   return (
-    <Link className="group flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl" href={`/bac-si/${doctor.slug}`}>
+    <Link className="group flex flex-col overflow-hidden rounded-md border border-border-subtle bg-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl" href={`/bac-si/${doctor.slug}`}>
       <div className="relative h-80 w-full shrink-0 overflow-hidden bg-slate-100">
         <Image alt={fullName} className="object-cover object-top transition-transform duration-500 group-hover:scale-105" fill sizes="(max-width: 768px) 100vw, 33vw" src={doctor.avatar} />
       </div>

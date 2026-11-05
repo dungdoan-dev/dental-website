@@ -294,6 +294,7 @@ export async function updateClinic(data: {
   name: string;
   address: string;
   phone: string;
+  email?: string;
   workingHours: string;
   description: string;
   image: string;
@@ -307,6 +308,7 @@ export async function updateClinic(data: {
     const { error } = await (await getSupabaseServerClient()).from("clinics").update({
       name: clinicData.name, address: clinicData.address, phone: clinicData.phone,
       working_hours: clinicData.workingHours, description: clinicData.description, image: clinicData.image,
+      ...(clinicData.email !== undefined ? { email: clinicData.email || null } : {}),
       ...(clinicData.googleMapsUrl !== undefined ? { google_maps_url: clinicData.googleMapsUrl || null } : {}),
       updated_at: new Date().toISOString(),
     }).eq("id", id);

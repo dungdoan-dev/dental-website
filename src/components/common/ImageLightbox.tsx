@@ -32,7 +32,7 @@ export function ImageLightbox({ src, alt, caption, className, children }: ImageL
       </a>
       <dialog
         aria-label={alt}
-        className="fixed inset-0 m-auto h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-5xl overflow-hidden rounded-2xl border-0 bg-transparent p-0 backdrop:bg-black/80"
+        className="fixed inset-0 m-auto h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-5xl overflow-hidden rounded-md border-0 bg-transparent p-0 backdrop:bg-black/80"
         onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }}
         ref={dialogRef}
       >

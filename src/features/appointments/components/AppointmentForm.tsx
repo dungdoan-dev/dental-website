@@ -20,7 +20,7 @@ type FormStatus = "idle" | "submitting" | "success" | "error";
 type FieldErrors = Partial<Record<keyof AppointmentSchemaInput, string>>;
 
 const fieldBaseClassName =
-  "min-h-11 min-w-0 w-full rounded-xl border border-border-subtle bg-background-secondary text-base sm:text-sm font-normal text-text-primary outline-none transition focus:border-brand-blue-dark focus:bg-white focus:ring-2 focus:ring-brand-blue-dark/20";
+  "h-12 min-w-0 w-full rounded-md border border-border-subtle bg-background-secondary text-base sm:text-sm font-normal text-text-primary outline-none transition focus:border-brand-blue-dark focus:bg-white focus:ring-2 focus:ring-brand-blue-dark/20";
 
 const fieldNames = {
   name: "name",
@@ -135,7 +135,7 @@ export function AppointmentForm({
 
   return (
     <div
-      className={`border border-border-subtle bg-white shadow-sm ${compact ? "rounded-2xl p-4 sm:p-5" : "rounded-3xl p-6 sm:p-8"}`}
+      className={`border border-border-subtle bg-white ${compact ? "rounded-md p-4 sm:p-5" : "rounded-md p-6 sm:p-8"}`}
     >
       <h2
         className={`pr-10 font-bold text-text-primary ${compact ? "text-lg" : "text-2xl"}`}
@@ -156,7 +156,7 @@ export function AppointmentForm({
         <div aria-hidden="true" className="sr-only"><label htmlFor={fieldId("website")}>Website</label><input autoComplete="off" id={fieldId("website")} name="website" tabIndex={-1} type="text" /></div>
         {status === "error" && message ? (
           <div
-            className="rounded-xl bg-red-50 p-3 text-sm text-red-700"
+            className="rounded-md bg-red-50 p-3 text-sm text-red-700"
             ref={errorSummaryRef}
             role="alert"
             tabIndex={-1}
@@ -392,7 +392,7 @@ export function AppointmentForm({
               fieldErrors.note ? fieldId("note-error") : undefined
             }
             aria-invalid={Boolean(fieldErrors.note)}
-            className={`${fieldClassName} ${compact ? "min-h-14" : "min-h-28"} resize-y`}
+            className={`${fieldClassName} ${compact ? "min-h-14" : "min-h-28"} h-auto resize-y`}
             id={fieldId("note")}
             maxLength={1000}
             name="note"
@@ -408,7 +408,7 @@ export function AppointmentForm({
           ) : null}
         </label>
         <button
-          className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-dark px-6 font-bold text-white transition hover:bg-brand-blue-hover disabled:cursor-wait disabled:opacity-60 sm:w-auto ${compact ? "py-2.5 text-sm" : "py-3.5"}`}
+          className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-brand-blue-dark px-6 font-bold text-white transition hover:bg-brand-blue-hover disabled:cursor-wait disabled:opacity-60 ${compact ? "py-2.5 text-sm" : "py-3.5"}`}
           disabled={status === "submitting"}
           type="submit"
         >
@@ -418,7 +418,7 @@ export function AppointmentForm({
         {status === "success" && message ? (
           <p
             aria-live="polite"
-            className="rounded-xl bg-brand-green-light px-4 py-3 text-sm text-text-primary"
+            className="rounded-md bg-brand-green-light px-4 py-3 text-sm text-text-primary"
             role="status"
           >
             {message}

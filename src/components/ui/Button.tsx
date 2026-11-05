@@ -11,7 +11,7 @@ type ButtonLinkProps = {
   className?: string;
 };
 
-const buttonClassName = "inline-flex items-center justify-center rounded-lg bg-teal-700 px-5 py-3 font-semibold text-white transition hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2";
+const buttonClassName = "inline-flex items-center justify-center rounded-md bg-teal-700 px-5 py-3 font-semibold text-white transition hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2";
 
 export function Button({ children, className = "", ...props }: ButtonProps) {
   return <button className={`${buttonClassName} ${className}`} {...props}>{children}</button>;

@@ -7,7 +7,7 @@ import type { AppointmentClinicOption } from "../types/appointment.type";
 
 const AppointmentForm = dynamic(
   () => import("./AppointmentForm").then((module) => module.AppointmentForm),
-  { loading: () => <div aria-busy="true" className="min-h-72 rounded-2xl bg-white" /> },
+  { loading: () => <div aria-busy="true" className="min-h-72 rounded-md bg-white" /> },
 );
 
 type ServiceOption = { id: string; name: string };
@@ -58,7 +58,7 @@ export function AppointmentDialogProvider({ children, services, clinics }: Appoi
       {children}
       <dialog
         aria-label="Đặt lịch hẹn"
-        className="fixed left-1/2 top-1/2 m-0 max-h-[calc(100dvh-1rem)] w-[min(36rem,calc(100vw-1rem))] max-w-none -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto rounded-2xl border-0 bg-transparent p-0 shadow-2xl backdrop:bg-slate-950/60"
+        className="fixed left-1/2 top-1/2 m-0 max-h-[calc(100dvh-1rem)] w-[min(36rem,calc(100vw-1rem))] max-w-none -translate-x-1/2 -translate-y-1/2 overflow-x-hidden overflow-y-auto rounded-md border-0 bg-transparent p-0 shadow-2xl backdrop:bg-slate-950/60"
         onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }}
         onClose={() => setIsOpen(false)}
         ref={dialogRef}

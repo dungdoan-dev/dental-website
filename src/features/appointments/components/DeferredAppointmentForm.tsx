@@ -29,10 +29,10 @@ export function DeferredAppointmentForm({ clinics, services }: {
   }, []);
 
   return <div className="min-h-[760px] sm:min-h-[640px]" ref={root}>
-    {ready ? <AppointmentForm clinics={clinics} services={services} /> : <div className="rounded-2xl border border-border-subtle bg-white p-6 text-center sm:p-8">
+    {ready ? <AppointmentForm clinics={clinics} services={services} /> : <div className="rounded-md border border-border-subtle bg-white p-6 text-center sm:p-8">
       <h2 className="text-xl font-bold text-text-primary">Đăng ký lịch thăm khám</h2>
       <p className="mt-3 text-sm text-text-secondary">Chọn cơ sở và thời gian phù hợp để gửi yêu cầu đặt lịch.</p>
-      <button className="mt-6 min-h-11 rounded-lg bg-brand-blue-dark px-5 font-semibold text-white" onClick={() => setReady(true)} type="button">Mở form đặt lịch</button>
+      <button className="mt-6 min-h-11 rounded-md bg-brand-blue-dark px-5 font-semibold text-white" onClick={() => setReady(true)} type="button">Mở form đặt lịch</button>
     </div>}
   </div>;
 }
