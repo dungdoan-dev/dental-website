@@ -60,7 +60,7 @@ export function FAQAccordion({ items, title, note, TitleTag = "h2", filterable =
                   id={answerId}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-6 pb-5 text-sm leading-relaxed text-text-secondary sm:text-base">{item.answer}</p>
+                    <p className="whitespace-pre-line px-6 pb-5 text-sm leading-relaxed text-text-secondary sm:text-base">{item.answer}</p>
                   </div>
                 </div>
               </article>
