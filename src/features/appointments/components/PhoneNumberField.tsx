@@ -14,7 +14,10 @@ type PhoneNumberFieldProps = {
 export function PhoneNumberField({ id, errorId, invalid = false, compact = false }: PhoneNumberFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [phone, setPhone] = useState("");
-  const [dialCode, setDialCode] = useState("84");
+  const [country, setCountry] = useState({ iso2: "vn", dialCode: "84" });
+  // The library writes the new dial code into the number when the flag changes; remounting with the kept number undoes that.
+  const [inputKey, setInputKey] = useState(0);
+  const dialCode = country.dialCode;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -39,12 +42,21 @@ export function PhoneNumberField({ id, errorId, invalid = false, compact = false
     <div className={`${compact ? "mt-0.5" : "mt-1.5"} relative min-w-0`} ref={containerRef}>
       <PhoneInput
         containerClass={`appointment-phone-input${compact ? " appointment-phone-input--compact" : ""}`}
-        country="vn"
+        country={country.iso2}
+        key={inputKey}
         enableSearch
         inputProps={{ id, autoComplete: "tel", required: true, "aria-invalid": invalid, "aria-describedby": errorId }}
         disableCountryCode
         disableCountryGuess
-        onChange={(value, country) => { setPhone(value); setDialCode((country as { dialCode?: string }).dialCode ?? "84"); }}
+        onChange={(value, data) => {
+          const next = data as { countryCode?: string; dialCode?: string };
+          if (next.dialCode && next.dialCode !== dialCode) {
+            setCountry({ iso2: next.countryCode ?? country.iso2, dialCode: next.dialCode });
+            setInputKey((key) => key + 1);
+            return;
+          }
+          setPhone(value);
+        }}
         placeholder="Nhập số điện thoại của bạn"
         preferredCountries={["vn", "us", "gb", "kr", "jp", "sg", "th", "cn"]}
         searchNotFound="Không tìm thấy quốc gia"

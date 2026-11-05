@@ -7,6 +7,8 @@ export type Article = {
   excerpt: string;
   content: string;
   thumbnail: string;
+  /** Large image inside the article; falls back to the thumbnail. */
+  coverImage?: string;
   publishedAt: string;
   author: string;
   category: ArticleCategory;

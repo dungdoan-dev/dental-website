@@ -15,7 +15,7 @@ export async function getAdminArticleForEdit(id: string): Promise<Article> {
   const parsedId = recordIdSchema.parse(id);
   const { data, error } = await (await getSupabaseServerClient())
     .from("articles")
-    .select("id,title,slug,excerpt,content,thumbnail,published_at,author,category,reading_minutes,featured,status")
+    .select("id,title,slug,excerpt,content,thumbnail,cover_image,published_at,author,category,reading_minutes,featured,status")
     .eq("id", parsedId)
     .single();
   if (error) throw error;
@@ -26,6 +26,7 @@ export async function getAdminArticleForEdit(id: string): Promise<Article> {
     excerpt: data.excerpt,
     content: data.content,
     thumbnail: data.thumbnail,
+    coverImage: data.cover_image ?? undefined,
     publishedAt: data.published_at,
     author: data.author,
     category: data.category as Article["category"],

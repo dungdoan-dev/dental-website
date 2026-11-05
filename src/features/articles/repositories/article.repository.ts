@@ -36,6 +36,7 @@ export const articleRepository = {
       excerpt: a.excerpt,
       content: a.content,
       thumbnail: a.thumbnail,
+      coverImage: a.cover_image ?? undefined,
       publishedAt: a.published_at,
       author: a.author,
       category: a.category as ArticleCategory,

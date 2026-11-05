@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Icon } from "@/components/ui/Icon";
 import type { Clinic } from "../types/clinic.type";
 
-export function ClinicCard({ clinic, compact = false, showEmail = false }: { clinic: Clinic; compact?: boolean; showEmail?: boolean }) {
+export function ClinicCard({ clinic, compact = false }: { clinic: Clinic; compact?: boolean }) {
   const linkClassName = compact
     ? "inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-brand-blue-dark transition-colors duration-300 hover:text-brand-blue-hover motion-reduce:transition-none"
     : "inline-flex min-h-11 items-center gap-3 text-sm font-semibold text-brand-blue-dark transition-colors duration-300 hover:text-brand-blue-hover motion-reduce:transition-none";
@@ -20,7 +20,6 @@ export function ClinicCard({ clinic, compact = false, showEmail = false }: { cli
         {clinic.workingHours && <p className={`flex items-start gap-3 text-sm text-text-secondary ${compact ? "mt-2.5 leading-6" : "mt-3 leading-7"}`}><Icon className={`${compact ? "mt-0.5 h-4 w-4" : "mt-1 h-5 w-5"} shrink-0 text-brand-blue-dark`} name="clock" /><span>{clinic.workingHours}</span></p>}
         <div className={`mt-auto ${compact ? "pt-4" : "pt-5"}`}>
           <div className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-border-subtle ${compact ? "pt-3" : "pt-4"}`}>
-            {showEmail && clinic.email && <a aria-label={`Gửi email cho ${clinic.name}: ${clinic.email}`} className={linkClassName} href={`mailto:${clinic.email}`}>{clinic.email}</a>}
             <a aria-label={`Gọi ${clinic.name}: ${clinic.phone}`} className={linkClassName} href={`tel:${clinic.phone.replaceAll(" ", "")}`}><Icon className="h-4 w-4" name="phone" />{clinic.phone}</a>
             {clinic.googleMapsUrl && <a aria-label={`Chỉ đường đến ${clinic.name} (mở tab mới)`} className={linkClassName} href={clinic.googleMapsUrl} rel="noopener noreferrer" target="_blank">Chỉ đường <Icon className="h-4 w-4" name="arrow-right" /></a>}
           </div>

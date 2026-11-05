@@ -73,7 +73,7 @@ export function ArticleDetail({ article, articles }: ArticleDetailProps) {
             </div>
           </header>
 
-          <div className="relative aspect-[16/9] max-h-[34rem] bg-surface-container-low"><Image alt={article.title} className="object-cover" fill priority sizes="(max-width: 1024px) 100vw, 900px" src={article.thumbnail} /></div>
+          <div className="relative aspect-[16/9] max-h-[34rem] bg-surface-container-low"><Image alt={article.title} className="object-cover" fill priority sizes="(max-width: 1024px) 100vw, 900px" src={article.coverImage || article.thumbnail} /></div>
 
           <div className="px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
             {headings.length ? <nav aria-label="Mục lục bài viết" className="mb-9 rounded-md border border-brand-blue/20 bg-brand-blue-light/50 p-5 sm:p-6"><h2 className="flex items-center gap-2 text-base font-extrabold text-text-primary"><Icon className="h-5 w-5 text-brand-blue-dark" name="list" />Trong bài viết</h2><ol className="mt-3 space-y-2">{headings.map((heading, index) => <li className={heading.level === 3 ? "pl-4" : ""} key={`${heading.id}-${index}`}><a className="text-sm leading-relaxed text-text-secondary transition hover:text-brand-blue-dark hover:underline" href={`#${heading.id}`}>{heading.text}</a></li>)}</ol></nav> : null}

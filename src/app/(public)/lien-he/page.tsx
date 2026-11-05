@@ -44,7 +44,7 @@ export default async function ContactPage() {
                 <p className="mt-2 max-w-xl text-sm leading-6 text-text-secondary">Xem địa chỉ, giờ làm việc và liên hệ trực tiếp từng cơ sở trước khi đến thăm khám.</p>
                 {clinics.length > 0 ? (
                   <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-2">
-                    {clinics.map((clinic) => <ClinicCard clinic={clinic} compact key={clinic.id} showEmail />)}
+                    {clinics.map((clinic) => <ClinicCard clinic={clinic} compact key={clinic.id} />)}
                   </div>
                 ) : (
                   <div className="mt-6 rounded-md border border-border-subtle bg-white p-8 text-center text-text-secondary">

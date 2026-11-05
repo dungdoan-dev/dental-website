@@ -198,7 +198,7 @@ export async function upsertArticle(input: ArticleFormData) {
   return runMutation(async () => {
     await saveContent("article", { record: {
       id: data.id, title: data.title, slug: data.slug, excerpt: data.excerpt, content: data.content,
-      thumbnail: data.thumbnail, author: data.author, category: data.category,
+      thumbnail: data.thumbnail, cover_image: data.coverImage || null, author: data.author, category: data.category,
       reading_minutes: data.readingMinutes, featured: data.featured, status: data.status,
     } }, data.title, data);
     revalidateContent(["/admin/articles", "/tin-tuc", "/tin-tuc/[slug]", "/"]);

@@ -245,7 +245,7 @@ export function AboutPageContent({ content, clinics }: AboutPageContentProps) {
         </Container>
       </section>
 
-      <div className="scroll-mt-40 border-t border-border-subtle" id="hoi-dap"><FAQSection filterable placement="about" /></div>
+      <div className="scroll-mt-40 border-t border-border-subtle" id="hoi-dap"><FAQSection placement="about" /></div>
     </div>
   );
 }

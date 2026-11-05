@@ -14,7 +14,7 @@ type AppShellProps = {
 
 export function AppShell({ topBar, header, footer, appointmentFooter, floatingContact, children }: AppShellProps) {
   const pathname = usePathname();
-  const appointmentFormExcludedRoutes = ["/gioi-thieu", "/dich-vu", "/bac-si", "/tin-tuc", "/lien-he"];
+  const appointmentFormExcludedRoutes = ["/gioi-thieu", "/dich-vu", "/bac-si", "/tin-tuc", "/lien-he", "/hoi-dap"];
   const normalizedPath = pathname?.replace(/\/$/, "") ?? "";
   const hideAppointmentFooter = appointmentFormExcludedRoutes.some(
     (route) => normalizedPath === route || normalizedPath.startsWith(`${route}/`),

@@ -7,6 +7,7 @@ export const articleSchema = z.object({
   excerpt: z.string().min(1),
   content: z.string().min(1),
   thumbnail: z.string(),
+  coverImage: z.string().optional(),
   publishedAt: z.iso.datetime({ offset: true }),
   author: z.string().min(1),
   category: z.enum(["implant", "veneer", "orthodontics", "kids", "periodontics", "general"]),

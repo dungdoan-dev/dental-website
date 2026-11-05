@@ -53,7 +53,7 @@ export const doctorSortOrderSchema = z.object({
 });
 export const articleFormSchema = z.object({
   id: recordIdSchema, title: text(240), slug: slugSchema, excerpt: text(2000), content: text(100000),
-  thumbnail: imagePathSchema, author: text(200), category: z.enum(["implant", "veneer", "orthodontics", "kids", "periodontics", "general"]),
+  thumbnail: imagePathSchema, coverImage: z.union([z.literal(""), imagePathSchema]).optional(), author: text(200), category: z.enum(["implant", "veneer", "orthodontics", "kids", "periodontics", "general"]),
   readingMinutes: z.number().int().min(1).max(240), featured: z.boolean(), status: z.enum(["draft", "published"]),
 });
 
