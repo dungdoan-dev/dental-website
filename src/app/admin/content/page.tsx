@@ -2,6 +2,7 @@ import { ContentDatabaseManager, type SiteContentRecord } from "@/features/admin
 import { requireAdmin } from "@/features/admin/auth/admin-auth";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { aboutPageSchema } from "@/features/about/schemas/about.schema";
+import { defaultAboutContent } from "@/features/about/data/about-content";
 
 export const metadata = { title: "Nội dung website | Admin Nha Khoa 2000" };
 
@@ -24,10 +25,12 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
     }
   }
 
+  // Without a valid record the pages show the built-in content; the form starts from it so saving creates the record.
+  if (!aboutRecordFound || aboutRecordInvalid) editableContent.push({ key: "about_page", content: defaultAboutContent });
   const aboutContentWarning = aboutRecordInvalid
-    ? "Dữ liệu trang giới thiệu trong cơ sở dữ liệu không khớp cấu trúc hiện tại nên form chưa thể hiển thị. Dữ liệu chưa bị thay đổi; cần kiểm tra lại nội dung hoặc cấu trúc JSON."
+    ? "Bản ghi about_page trong cơ sở dữ liệu theo cấu trúc cũ. Form đang hiện nội dung mặc định của trang; bấm Lưu để ghi đè bản ghi cũ."
     : !aboutRecordFound
-      ? "Chưa tìm thấy bản ghi about_page. Hãy chạy migration khởi tạo nội dung website trước khi chỉnh sửa trang này."
+      ? "Chưa có bản ghi about_page. Form đang hiện nội dung mặc định của trang; bấm Lưu để tạo bản ghi."
       : undefined;
 
   return (

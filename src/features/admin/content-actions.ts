@@ -58,28 +58,33 @@ export async function updateStructuredSiteContent(_previous: State, formData: Fo
       content = parsed.data;
       title = "Hình ảnh mục lý do lựa chọn";
     } else if (key === "about_page") {
-      const images = z.object({
-        heroImage: imagePathSchema,
-        storyImage: imagePathSchema,
-        expertiseImage: imagePathSchema,
-      }).safeParse({
-        heroImage: readField(formData, "heroImage"),
-        storyImage: readField(formData, "storyImage"),
-        expertiseImage: readField(formData, "expertiseImage"),
-      });
-      if (!images.success) return validationFailure(images.error);
-      const highlights = readRowList(formData, "highlights", ["value", "label"]);
-      const principles = readRowList(formData, "principles", ["number", "title", "description"]);
+      const photo = (src: string, caption: string) => ({ src: imagePathSchema.parse(src), caption });
+      const photosOf = (row: Record<string, string>, count: number) => Array.from({ length: count }, (_, i) => row[`photo${i + 1}`] ? photo(row[`photo${i + 1}`], row[`caption${i + 1}`] ?? "") : null).filter((p) => p !== null);
+      const photoKeys = (count: number) => Array.from({ length: count }, (_, i) => [`photo${i + 1}`, `caption${i + 1}`]).flat();
+      const photoList = (name: string) => readRowList(formData, name, ["photo", "caption"]).filter((row) => row.photo).map((row) => photo(row.photo, row.caption));
+      const titledPhotos = (name: string) => readRowList(formData, name, ["title", "text", "photo", "caption"]).filter((row) => row.photo).map((row) => ({ title: row.title, text: row.text, photo: photo(row.photo, row.caption) }));
       content = {
-        hero: { eyebrow: readField(formData, "heroEyebrow"), title: readField(formData, "heroTitle"), description: readField(formData, "heroDescription"), image: images.data.heroImage },
-        highlights,
-        story: { eyebrow: readField(formData, "storyEyebrow"), title: readField(formData, "storyTitle"), paragraphs: readStringList(formData, "storyParagraphs"), founderName: readField(formData, "founderName"), founderRole: readField(formData, "founderRole"), image: images.data.storyImage },
-        visionMission: { eyebrow: readField(formData, "visionEyebrow"), title: readField(formData, "visionTitle"), introduction: readField(formData, "visionIntroduction"), vision: readField(formData, "vision"), mission: readField(formData, "mission") },
-        principles: { eyebrow: readField(formData, "principlesEyebrow"), title: readField(formData, "principlesTitle"), introduction: readField(formData, "principlesIntroduction"), items: principles },
-        expertise: { eyebrow: readField(formData, "expertiseEyebrow"), title: readField(formData, "expertiseTitle"), description: readField(formData, "expertiseDescription"), commitments: readStringList(formData, "commitments"), image: images.data.expertiseImage },
-        clinics: { eyebrow: readField(formData, "clinicsEyebrow"), title: readField(formData, "clinicsTitle"), description: readField(formData, "clinicsDescription") },
-        licenses: readRowList(formData, "licenses", ["name", "number", "issuer"]),
-        activities: readRowList(formData, "activities", ["title", "date", "description"]),
+        hero: { title: readField(formData, "heroTitle"), description: readField(formData, "heroDescription"), photo: photo(readField(formData, "heroImage"), readField(formData, "heroCaption")) },
+        highlights: readRowList(formData, "highlights", ["value", "label"]),
+        founder: {
+          name: readField(formData, "founderName"), role: readField(formData, "founderRole"),
+          photo: photo(readField(formData, "founderImage"), readField(formData, "founderCaption")),
+          paragraphs: readStringList(formData, "founderParagraphs").filter(Boolean),
+          credentials: readStringList(formData, "founderCredentials").filter(Boolean),
+          traits: readStringList(formData, "founderTraits").filter(Boolean),
+        },
+        history: {
+          title: readField(formData, "historyTitle"), intro: readField(formData, "historyIntro"),
+          milestones: readRowList(formData, "milestones", ["date", "tag", "title", "stat", "text", ...photoKeys(4)]).map((row) => ({ date: row.date, tag: row.tag, title: row.title, stat: row.stat, text: row.text, photos: photosOf(row, 4) })),
+          archive: photoList("archive"),
+        },
+        facilities: { title: readField(formData, "facilitiesTitle"), rooms: titledPhotos("rooms"), equipment: titledPhotos("equipment") },
+        license: { photo: photo(readField(formData, "licenseImage"), readField(formData, "licenseCaption")), companyInfo: readRowList(formData, "companyInfo", ["label", "value"]) },
+        insurance: { steps: readRowList(formData, "insuranceSteps", ["title", "text"]), benefits: readRowList(formData, "insuranceBenefits", ["title", "text"]) },
+        activities: {
+          featured: { title: readField(formData, "featuredTitle"), description: readField(formData, "featuredDescription"), photos: photoList("featuredPhotos") },
+          items: readRowList(formData, "activities", ["category", "title", "description", ...photoKeys(5)]).map((row) => ({ category: row.category, title: row.title, description: row.description, photos: photosOf(row, 5) })),
+        },
       };
       const parsed = aboutPageSchema.safeParse(content);
       if (!parsed.success) return validationFailure(parsed.error);
@@ -107,7 +112,7 @@ export async function updateStructuredSiteContent(_previous: State, formData: Fo
   revalidatePath("/admin");
   revalidatePath("/admin/content");
   revalidatePath("/");
-  revalidatePath("/gioi-thieu");
+  revalidatePath("/gioi-thieu", "layout");
   revalidatePath("/dich-vu/trong-rang-implant");
   return { success: true };
 }

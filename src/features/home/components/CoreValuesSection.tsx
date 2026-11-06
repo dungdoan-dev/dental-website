@@ -16,7 +16,7 @@ export async function CoreValuesSection() {
                 className="core-value-card group flex flex-col items-center rounded-md border border-slate-200/80 bg-surface p-5 text-center transition-[background-color,box-shadow] duration-300 hover:bg-surface-container-low hover:shadow-md sm:p-6"
                 key={value.title}
               >
-                <div className="mb-4 flex h-16 w-16 items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">
                   <CoreValueIcon iconKey={value.iconKey} />
                 </div>
                 <h3 className="mb-3 text-2xl font-extrabold uppercase tracking-wide text-brand-blue-dark">

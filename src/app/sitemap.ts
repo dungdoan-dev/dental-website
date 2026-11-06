@@ -17,6 +17,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPaths = [
     "/",
     "/gioi-thieu",
+    "/gioi-thieu/giay-phep-hoat-dong",
+    "/gioi-thieu/bao-hiem",
+    "/gioi-thieu/hoat-dong-noi-bo",
+    "/gioi-thieu/cau-hoi-thuong-gap",
     "/hoi-dap",
     "/dich-vu",
     "/bac-si",

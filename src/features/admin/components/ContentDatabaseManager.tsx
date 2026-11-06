@@ -26,58 +26,55 @@ function EditorSection({ title, children, columns = "" }: { title: string; child
 
 function ContentEditor({ record }: { record: SiteContentRecord }) {
   if (record.key === "about_page") {
-    const { hero, highlights, story, visionMission, principles, expertise, clinics, licenses, activities } = record.content;
+    const { hero, highlights, founder, history, facilities, license, insurance, activities } = record.content;
+    const photoColumns = (count: number) => Array.from({ length: count }, (_, i) => [{ key: `photo${i + 1}`, label: `Ảnh ${i + 1}`, image: true }, { key: `caption${i + 1}`, label: `Chú thích ảnh ${i + 1}` }]).flat();
+    const photoCells = (photos: readonly { src: string; caption: string }[]) => Object.fromEntries(photos.flatMap((p, i) => [[`photo${i + 1}`, p.src], [`caption${i + 1}`, p.caption]]));
+    const textRows = (values: readonly string[]) => values.map((value) => ({ value }));
+    const photoRow = [{ key: "photo", label: "Ảnh", image: true }, { key: "caption", label: "Chú thích (cũng dùng làm mô tả ảnh)" }] as const;
     return <AdminActionForm action={updateStructuredSiteContent} className="space-y-5 rounded-2xl border border-border-subtle bg-background-secondary p-4 sm:p-6" submitLabel="Lưu trang giới thiệu">
       <input name="key" type="hidden" value={record.key} />
-      <div><h3 className="text-lg font-bold text-text-primary">Nội dung trang Giới thiệu</h3><p className="mt-1 text-sm text-text-secondary">Các trường được nhóm theo đúng thứ tự nội dung trên /gioi-thieu. Chọn và cắt ảnh trước khi tải lên.</p></div>
-      <EditorSection columns="sm:grid-cols-2" title="Banner giới thiệu">
-        <TextField label="Dòng giới thiệu" name="heroEyebrow" value={hero.eyebrow} required />
+      <div><h3 className="text-lg font-bold text-text-primary">Nội dung các trang Giới thiệu</h3><p className="mt-1 text-sm text-text-secondary">Dùng cho 5 trang dưới /gioi-thieu. Chú thích ảnh cũng là mô tả ảnh cho người dùng trình đọc màn hình. Giá trị cốt lõi, tầm nhìn và sứ mệnh dùng chung với trang chủ (sửa ở Nội dung trang chủ); logo bảo hiểm, câu hỏi thường gặp và thông tin cơ sở quản lý ở các mục riêng.</p></div>
+      <EditorSection columns="sm:grid-cols-2" title="Về chúng tôi · Banner">
         <TextField label="Tiêu đề" name="heroTitle" value={hero.title} required />
+        <TextField label="Chú thích ảnh banner" name="heroCaption" value={hero.photo.caption} />
         <div className="sm:col-span-2"><TextAreaField label="Mô tả" name="heroDescription" value={hero.description} /></div>
-        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 3} defaultValue={hero.image} label="Ảnh banner" name="heroImage" required /></div>
+        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 3} defaultValue={hero.photo.src} label="Ảnh banner" name="heroImage" required /></div>
+        <div className="sm:col-span-2"><EditableRows label="Số liệu nổi bật dưới banner" name="highlights" columns={[{ key: "value", label: "Con số" }, { key: "label", label: "Nhãn" }]} initialRows={highlights} /></div>
       </EditorSection>
-      <EditorSection title="Thông tin nổi bật dưới banner">
-        <EditableRows label="Các mục nổi bật" name="highlights" columns={[{ key: "value", label: "Giá trị" }, { key: "label", label: "Nhãn" }]} initialRows={highlights.map((item) => ({ value: item.value, label: item.label }))} />
+      <EditorSection columns="sm:grid-cols-2" title="Về chúng tôi · Người sáng lập">
+        <TextField label="Họ tên" name="founderName" value={founder.name} required />
+        <TextField label="Chức danh" name="founderRole" value={founder.role} />
+        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 5} defaultValue={founder.photo.src} label="Ảnh chân dung" name="founderImage" required /></div>
+        <TextField label="Chú thích ảnh chân dung" name="founderCaption" value={founder.photo.caption} />
+        <div className="sm:col-span-2"><EditableRows label="Các đoạn giới thiệu" name="founderParagraphs" columns={[{ key: "value", label: "Đoạn văn", multiline: true }]} initialRows={textRows(founder.paragraphs)} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Chức vụ, thành tích" name="founderCredentials" columns={[{ key: "value", label: "Nội dung" }]} initialRows={textRows(founder.credentials)} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Phẩm chất (thẻ)" name="founderTraits" columns={[{ key: "value", label: "Phẩm chất" }]} initialRows={textRows(founder.traits)} /></div>
       </EditorSection>
-      <EditorSection columns="sm:grid-cols-2" title="Câu chuyện phòng khám">
-        <TextField label="Dòng giới thiệu" name="storyEyebrow" value={story.eyebrow} required />
-        <TextField label="Tiêu đề" name="storyTitle" value={story.title} required />
-        <div className="sm:col-span-2"><EditableRows label="Các đoạn nội dung" name="storyParagraphs" columns={[{ key: "value", label: "Nội dung", multiline: true }]} initialRows={story.paragraphs.map((value) => ({ value }))} /></div>
-        <TextField label="Người sáng lập" name="founderName" value={story.founderName} />
-        <TextField label="Chức danh" name="founderRole" value={story.founderRole} />
-        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 5} defaultValue={story.image} label="Ảnh người sáng lập" name="storyImage" required /></div>
+      <EditorSection columns="sm:grid-cols-2" title="Về chúng tôi · Lịch sử hình thành">
+        <TextField label="Tiêu đề" name="historyTitle" value={history.title} />
+        <div className="sm:col-span-2"><TextAreaField label="Mở đầu" name="historyIntro" value={history.intro} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Các cột mốc (tối đa 4 ảnh mỗi mốc; ảnh 1 là ảnh lớn)" name="milestones" columns={[{ key: "date", label: "Thời gian" }, { key: "tag", label: "Nhãn" }, { key: "title", label: "Tiêu đề" }, { key: "stat", label: "Điểm nhấn (để trống nếu không có)" }, { key: "text", label: "Nội dung", multiline: true }, ...photoColumns(4)]} initialRows={history.milestones.map(({ photos, ...rest }) => ({ ...rest, ...photoCells(photos) }))} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Tư liệu những năm đầu" name="archive" columns={photoRow} initialRows={history.archive.map((p) => ({ photo: p.src, caption: p.caption }))} /></div>
       </EditorSection>
-      <EditorSection columns="sm:grid-cols-2" title="Tầm nhìn và sứ mệnh">
-        <TextField label="Dòng giới thiệu" name="visionEyebrow" value={visionMission.eyebrow} />
-        <TextField label="Tiêu đề" name="visionTitle" value={visionMission.title} />
-        <TextAreaField label="Mở đầu" name="visionIntroduction" value={visionMission.introduction} />
-        <TextAreaField label="Tầm nhìn" name="vision" value={visionMission.vision} />
-        <TextAreaField label="Sứ mệnh" name="mission" value={visionMission.mission} />
+      <EditorSection columns="sm:grid-cols-2" title="Về chúng tôi · Cơ sở vật chất và trang thiết bị">
+        <TextField label="Tiêu đề" name="facilitiesTitle" value={facilities.title} />
+        <div className="sm:col-span-2"><EditableRows label="Phòng chức năng" name="rooms" columns={[{ key: "title", label: "Tên phòng" }, { key: "text", label: "Mô tả", multiline: true }, ...photoRow]} initialRows={facilities.rooms.map((r) => ({ title: r.title, text: r.text, photo: r.photo.src, caption: r.photo.caption }))} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Trang thiết bị" name="equipment" columns={[{ key: "title", label: "Tên thiết bị" }, { key: "text", label: "Mô tả", multiline: true }, ...photoRow]} initialRows={facilities.equipment.map((r) => ({ title: r.title, text: r.text, photo: r.photo.src, caption: r.photo.caption }))} /></div>
       </EditorSection>
-      <EditorSection columns="sm:grid-cols-2" title="Nguyên tắc hoạt động trên trang giới thiệu">
-        <TextField label="Dòng giới thiệu" name="principlesEyebrow" value={principles.eyebrow} />
-        <TextField label="Tiêu đề" name="principlesTitle" value={principles.title} />
-        <TextAreaField label="Mô tả" name="principlesIntroduction" value={principles.introduction} />
-        <div className="sm:col-span-2"><EditableRows label="Các nguyên tắc" name="principles" columns={[{ key: "number", label: "Số thứ tự" }, { key: "title", label: "Tiêu đề" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={principles.items.map((item) => ({ number: item.number, title: item.title, description: item.description }))} /></div>
+      <EditorSection columns="sm:grid-cols-2" title="Giấy phép hoạt động">
+        <div className="sm:col-span-2"><ImageUploadField aspect={845 / 1200} defaultValue={license.photo.src} fit="contain" label="Ảnh giấy phép Cơ sở 1" name="licenseImage" required /></div>
+        <div className="sm:col-span-2"><TextAreaField label="Chú thích giấy phép" name="licenseCaption" value={license.photo.caption} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Thông tin doanh nghiệp" name="companyInfo" columns={[{ key: "label", label: "Mục" }, { key: "value", label: "Nội dung" }]} initialRows={license.companyInfo} /></div>
       </EditorSection>
-      <EditorSection columns="sm:grid-cols-2" title="Chuyên môn và cam kết">
-        <TextField label="Dòng giới thiệu" name="expertiseEyebrow" value={expertise.eyebrow} />
-        <TextField label="Tiêu đề" name="expertiseTitle" value={expertise.title} />
-        <TextAreaField label="Mô tả" name="expertiseDescription" value={expertise.description} />
-        <div className="sm:col-span-2"><EditableRows label="Cam kết" name="commitments" columns={[{ key: "value", label: "Nội dung", multiline: true }]} initialRows={expertise.commitments.map((value) => ({ value }))} /></div>
-        <div className="sm:col-span-2"><ImageUploadField aspect={4 / 3} defaultValue={expertise.image} label="Ảnh chuyên môn" name="expertiseImage" required /></div>
+      <EditorSection title="Bảo hiểm">
+        <EditableRows label="Quy trình bảo lãnh viện phí" name="insuranceSteps" columns={[{ key: "title", label: "Bước" }, { key: "text", label: "Mô tả", multiline: true }]} initialRows={insurance.steps} />
+        <EditableRows label="Vì sao nên khám bảo hiểm tại Nha Khoa 2000" name="insuranceBenefits" columns={[{ key: "title", label: "Ý" }, { key: "text", label: "Mô tả", multiline: true }]} initialRows={insurance.benefits} />
       </EditorSection>
-      <EditorSection columns="sm:grid-cols-2" title="Thông tin hệ thống phòng khám">
-        <TextField label="Dòng giới thiệu" name="clinicsEyebrow" value={clinics.eyebrow} />
-        <TextField label="Tiêu đề" name="clinicsTitle" value={clinics.title} />
-        <TextAreaField label="Mô tả" name="clinicsDescription" value={clinics.description} />
-        <p className="text-xs leading-5 text-text-secondary sm:col-span-2">Địa chỉ, số điện thoại, hình ảnh và đường dẫn bản đồ của từng cơ sở được lấy từ mục Quản trị → Cơ sở phòng khám, không lưu trong phần nội dung này.</p>
-      </EditorSection>
-      <EditorSection title="Giấy phép hoạt động">
-        <EditableRows label="Danh sách giấy phép" name="licenses" columns={[{ key: "name", label: "Tên giấy phép" }, { key: "number", label: "Số giấy phép" }, { key: "issuer", label: "Cơ quan cấp" }]} initialRows={licenses.map((item) => ({ name: item.name, number: item.number, issuer: item.issuer }))} />
-      </EditorSection>
-      <EditorSection title="Hoạt động nội bộ">
-        <EditableRows label="Danh sách hoạt động (mới nhất đặt trên cùng)" name="activities" columns={[{ key: "date", label: "Thời gian" }, { key: "title", label: "Tên hoạt động" }, { key: "description", label: "Mô tả", multiline: true }]} initialRows={activities.map((item) => ({ date: item.date, title: item.title, description: item.description }))} />
+      <EditorSection columns="sm:grid-cols-2" title="Hoạt động nội bộ">
+        <TextField label="Tiêu đề ảnh nổi bật" name="featuredTitle" value={activities.featured.title} />
+        <div className="sm:col-span-2"><TextAreaField label="Mô tả ảnh nổi bật" name="featuredDescription" value={activities.featured.description} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Ảnh nổi bật" name="featuredPhotos" columns={photoRow} initialRows={activities.featured.photos.map((p) => ({ photo: p.src, caption: p.caption }))} /></div>
+        <div className="sm:col-span-2"><EditableRows label="Các hoạt động (nhóm dùng làm bộ lọc; tối đa 5 ảnh)" name="activities" columns={[{ key: "category", label: "Nhóm" }, { key: "title", label: "Tên hoạt động" }, { key: "description", label: "Mô tả", multiline: true }, ...photoColumns(5)]} initialRows={activities.items.map(({ photos, ...rest }) => ({ ...rest, ...photoCells(photos) }))} /></div>
       </EditorSection>
     </AdminActionForm>;
   }

@@ -1,6 +1,7 @@
 import type { ServiceCategory } from "../types/service.type";
 
-export type ServiceFilter = "all" | ServiceCategory;
+/** "pricing" shows the reference price lists instead of services. */
+export type ServiceFilter = "all" | ServiceCategory | "pricing";
 
 export const serviceIconByCategory: Record<ServiceCategory, string> = {
   pediatric: "/icons/dentia/tooth-3.png",
@@ -25,7 +26,13 @@ export const serviceGroups: readonly { label: string; value: ServiceCategory }[]
 export const serviceFilters: readonly { label: string; value: ServiceFilter }[] = [
   { label: "Tất cả dịch vụ", value: "all" },
   ...serviceGroups,
+  { label: "Bảng giá tham khảo", value: "pricing" },
 ];
+
+export const priceLists = [
+  { title: "Bảng giá Răng Tổng Quát", image: "/images/pricing/bang-gia-tong-quat.webp", alt: "Bảng giá Nha Khoa 2000: khám và chẩn đoán, nha khoa tổng quát, phục hình thẩm mỹ, implant, chỉnh nha, nha chu, khớp thái dương hàm" },
+  { title: "Bảng giá Răng Trẻ Em", image: "/images/pricing/bang-gia-tre-em.webp", alt: "Bảng giá nha khoa trẻ em Nha Khoa 2000: trám răng, chữa tủy, nhổ răng, phục hình, phòng ngừa sâu răng, nha chu, chấn thương răng" },
+] as const;
 
 export const servicePriceLink = {
   label: "Bảng Giá Theo Danh Mục Kỹ Thuật",
